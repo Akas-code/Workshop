@@ -1,15 +1,92 @@
 (function () {
-  // 1. BRANDING, FAVICON & TITLE
-  document.title = "Akash Workshop | Secure Examination & Notes Portal";
-  let link = document.querySelector("link[rel~='icon']");
-  if (!link) {
-    link = document.createElement("link");
-    link.rel = "icon";
-    document.head.appendChild(link);
-  }
-  link.href = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>";
+  // 1. DEFAULT DATA & STORAGE INITIALIZATION
+  const defaultTopics = ["William Shakespeare", "William Wordsworth", "John Milton", "Literary Terms"];
+  const defaultPaperTypes = ["PYQS", "Most Probable", "NET JRF"];
+  const defaultSets = ["Practice Set 01", "Practice Set 02", "Practice Set 03", "Practice Set 04"];
+  const defaultQuestions = [
+    {
+      topic: "William Shakespeare",
+      category: "PYQS",
+      text: "In which year was the First Folio of Shakespeare's plays published?",
+      options: ["1616", "1623", "1632", "1609"],
+      correct: 1
+    },
+    {
+      topic: "William Wordsworth",
+      category: "PYQS",
+      text: "Wordsworth's 'The Prelude' was published posthumously in which year?",
+      options: ["1798", "1805", "1850", "1832"],
+      correct: 2
+    }
+  ];
+  const defaultNotes = [
+    { title: "English Literature Hand-Written Summary", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" }
+  ];
+  const defaultCoupons = [
+    { code: "AKASH50", discount: 50 },
+    { code: "FREE100", discount: 100 }
+  ];
 
-  // 2. INJECT COMPLETE STYLESHEET
+  let storeTopics = JSON.parse(localStorage.getItem("tb_portal_topics")) || defaultTopics;
+  let storePaperTypes = JSON.parse(localStorage.getItem("tb_portal_categories")) || defaultPaperTypes;
+  let storeSets = JSON.parse(localStorage.getItem("tb_portal_sets")) || defaultSets;
+  let storeQuestions = JSON.parse(localStorage.getItem("tb_portal_questions")) || defaultQuestions;
+  let storeNotes = JSON.parse(localStorage.getItem("tb_portal_notes")) || defaultNotes;
+  let storeCoupons = JSON.parse(localStorage.getItem("tb_portal_coupons")) || defaultCoupons;
+  let storeDuration = parseInt(localStorage.getItem("tb_portal_duration"), 10) || 30;
+  let storePrice = parseFloat(localStorage.getItem("tb_portal_price")) || 99.00;
+  let registeredUsers = JSON.parse(localStorage.getItem("tb_registered_users")) || [];
+  let adminPin = localStorage.getItem("tb_admin_pin") || "1234";
+
+  // Branding Customization
+  let brandConfig = JSON.parse(localStorage.getItem("tb_brand_config")) || {
+    name: "Akash Workshop",
+    badge: "AW",
+    favicon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>"
+  };
+
+  // Runtime State
+  let activeTopic = "";
+  let activeCategory = "";
+  let activeExamQuestions = [];
+  let currentQuestionIndex = 0;
+  let candidateAnswers = {};
+  let countdownRef = null;
+  let remainingSeconds = 1800;
+  let generatedOTP = "";
+  let appliedDiscountPercent = 0;
+
+  function syncAllData() {
+    localStorage.setItem("tb_portal_topics", JSON.stringify(storeTopics));
+    localStorage.setItem("tb_portal_categories", JSON.stringify(storePaperTypes));
+    localStorage.setItem("tb_portal_sets", JSON.stringify(storeSets));
+    localStorage.setItem("tb_portal_questions", JSON.stringify(storeQuestions));
+    localStorage.setItem("tb_portal_notes", JSON.stringify(storeNotes));
+    localStorage.setItem("tb_portal_coupons", JSON.stringify(storeCoupons));
+    localStorage.setItem("tb_portal_duration", storeDuration.toString());
+    localStorage.setItem("tb_portal_price", storePrice.toString());
+    localStorage.setItem("tb_registered_users", JSON.stringify(registeredUsers));
+    localStorage.setItem("tb_admin_pin", adminPin);
+    localStorage.setItem("tb_brand_config", JSON.stringify(brandConfig));
+  }
+
+  function applyBrandIdentity() {
+    document.title = brandConfig.name + " | Online Examination Portal";
+    let link = document.querySelector("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.head.appendChild(link);
+    }
+    link.href = brandConfig.favicon;
+
+    const brandNameEl = document.getElementById("dom-brand-name");
+    const brandBadgeEl = document.getElementById("dom-brand-badge");
+    if (brandNameEl) brandNameEl.innerText = brandConfig.name;
+    if (brandBadgeEl) brandBadgeEl.innerText = brandConfig.badge;
+  }
+
+  // 2. INJECT CSS
   const styleEl = document.createElement("style");
   styleEl.textContent = `
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -111,8 +188,8 @@
   portalDiv.innerHTML = `
     <div class="cbt-nav">
       <div class="cbt-logo-area">
-        <span class="cbt-logo-badge">AW</span>
-        <span class="cbt-brand-name">Akash Workshop</span>
+        <span class="cbt-logo-badge" id="dom-brand-badge"></span>
+        <span class="cbt-brand-name" id="dom-brand-name"></span>
       </div>
       <div class="cbt-nav-actions">
         <button class="cbt-btn-pay" id="btn-open-payment">Payment & Register</button>
@@ -128,7 +205,7 @@
       <input type="password" id="login-password" class="cbt-field" placeholder="Candidate Password" />
       <button class="cbt-btn-primary" id="btn-action-login">Login to Portal</button>
       <div style="text-align:center; margin-top:14px; font-size:13px; color:#64748b;">
-        New student? Click "Payment & Register" at the top right to complete OTP verification.
+        New student? Click "Payment & Register" at the top right to complete registration.
       </div>
     </div>
 
@@ -137,18 +214,31 @@
       <div id="pay-step-1">
         <div class="cbt-h1">Registration Fee Payment</div>
         <div class="cbt-h2">Pay application fee to unlock candidate credentials</div>
-        <div style="text-align:center; margin: 20px 0; font-size:26px; font-weight:800; color:#10b981;">₹ 99.00</div>
-        <button class="cbt-btn-primary" id="btn-mock-pay">Pay & Continue to Mobile Verification</button>
+        
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:6px; margin: 16px 0; text-align:center;">
+          <div style="font-size:14px; color:#64748b;">Standard Enrollment Fee:</div>
+          <div style="font-size:28px; font-weight:800; color:#10b981;" id="dom-checkout-price">₹ 0.00</div>
+          <div style="font-size:12px; color:#059669; font-weight:600; display:none;" id="dom-discount-info"></div>
+        </div>
+
+        <div style="display:flex; gap:8px; margin-bottom:14px;">
+          <input type="text" id="coupon-code-input" class="cbt-field" style="margin:0;" placeholder="Have a Coupon Code?" />
+          <button class="cbt-btn-primary" style="width:120px;" id="btn-apply-coupon">Apply</button>
+        </div>
+
+        <button class="cbt-btn-primary" id="btn-mock-pay">Pay & Continue to Verification</button>
       </div>
+
       <div id="pay-step-2" style="display:none;">
         <div class="cbt-h1">OTP Mobile Verification</div>
         <div class="cbt-h2">Enter your 10-digit mobile number</div>
         <input type="text" id="reg-mobile" class="cbt-field" placeholder="10 Digit Mobile Number" />
         <button class="cbt-btn-primary" id="btn-send-otp">Send Verification OTP</button>
       </div>
+
       <div id="pay-step-3" style="display:none;">
         <div class="cbt-h1">Create Candidate Account</div>
-        <div class="cbt-h2">Verify OTP & create your login username/password</div>
+        <div class="cbt-h2">Verify OTP & set your login username/password</div>
         <input type="text" id="reg-otp" class="cbt-field" placeholder="Enter Received OTP" />
         <input type="text" id="reg-username" class="cbt-field" placeholder="Choose Unique Username" />
         <input type="password" id="reg-password" class="cbt-field" placeholder="Create Secret Password" />
@@ -181,7 +271,7 @@
 
     <div id="win-4" class="cbt-view">
       <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; color:#fff; padding:10px 24px;">
-        <div style="font-weight:700;" id="win4-banner">Akash Workshop | Exam Terminal</div>
+        <div style="font-weight:700;" id="win4-banner">Exam Terminal</div>
         <div style="font-size:18px; font-weight:800; color:#ef4444;" id="win4-clock">30:00</div>
       </div>
       <div class="test-fullscreen-body">
@@ -228,19 +318,58 @@
 
     <div id="win-admin-dash" class="cbt-view">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:10px; margin-bottom:16px;">
-        <span style="font-weight:700; font-size:18px;">Admin Dashboard (Akash Workshop)</span>
+        <span style="font-weight:700; font-size:18px;">Administrative Control Center</span>
         <button class="cbt-btn-del" id="btn-admin-exit">Exit to Topics</button>
       </div>
       <div class="cbt-tabs">
-        <button class="cbt-tab-btn active" data-pane="pane-w2">Window 2: Topics</button>
+        <button class="cbt-tab-btn active" data-pane="pane-pricing">Pricing & Coupons</button>
+        <button class="cbt-tab-btn" data-pane="pane-branding">Branding Identity</button>
+        <button class="cbt-tab-btn" data-pane="pane-w2">Window 2: Topics</button>
         <button class="cbt-tab-btn" data-pane="pane-w3-papers">Window 3: Categories</button>
         <button class="cbt-tab-btn" data-pane="pane-w3-sets">Window 3: Sets</button>
         <button class="cbt-tab-btn" data-pane="pane-w4-questions">Window 4: Questions</button>
-        <button class="cbt-tab-btn" data-pane="pane-notes">PDF & Notes Manager</button>
+        <button class="cbt-tab-btn" data-pane="pane-notes">PDF & Notes</button>
         <button class="cbt-tab-btn" data-pane="pane-security">Admin PIN & Time</button>
       </div>
 
-      <div id="pane-w2" class="cbt-pane active">
+      <div id="pane-pricing" class="cbt-pane active">
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:6px; margin-bottom:16px;">
+          <div style="font-weight:600; margin-bottom:8px;">Base Enrollment Fee (₹):</div>
+          <div style="display:flex; gap:8px;">
+            <input type="number" id="adm-base-price" class="cbt-field" style="margin:0;" min="0" step="1" />
+            <button class="cbt-btn-primary" style="width:140px;" id="btn-adm-save-price">Save Price</button>
+          </div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:6px; margin-bottom:16px;">
+          <div style="font-weight:600; margin-bottom:8px;">Create Discount Coupon:</div>
+          <div style="display:grid; grid-template-columns: 2fr 1fr 120px; gap:8px;">
+            <input type="text" id="adm-coupon-code" class="cbt-field" style="margin:0;" placeholder="Coupon Code (e.g. SAVE20)" />
+            <input type="number" id="adm-coupon-pct" class="cbt-field" style="margin:0;" placeholder="Discount %" min="1" max="100" />
+            <button class="cbt-btn-primary" id="btn-adm-add-coupon">Add Coupon</button>
+          </div>
+        </div>
+
+        <div style="font-weight:600; margin-bottom:8px;">Active Coupon Codes:</div>
+        <div id="dom-adm-coupons-list"></div>
+      </div>
+
+      <div id="pane-branding" class="cbt-pane">
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:6px;">
+          <div style="font-weight:600; margin-bottom:6px;">Website / Brand Name:</div>
+          <input type="text" id="adm-brand-name" class="cbt-field" placeholder="e.g. Akash Workshop" />
+
+          <div style="font-weight:600; margin-bottom:6px;">Logo Badge Text:</div>
+          <input type="text" id="adm-brand-badge" class="cbt-field" placeholder="e.g. AW" />
+
+          <div style="font-weight:600; margin-bottom:6px;">Favicon Icon URL / SVG Data:</div>
+          <input type="text" id="adm-brand-favicon" class="cbt-field" placeholder="Image URL or SVG data URI" />
+
+          <button class="cbt-btn-primary" id="btn-adm-save-branding">Update Branding & Identity</button>
+        </div>
+      </div>
+
+      <div id="pane-w2" class="cbt-pane">
         <div style="font-weight:600; margin-bottom:6px;">Add New Topic:</div>
         <div style="display:flex; gap:8px; margin-bottom:16px;">
           <input type="text" id="adm-add-topic" class="cbt-field" style="margin:0;" placeholder="Topic Name" />
@@ -291,7 +420,7 @@
 
       <div id="pane-notes" class="cbt-pane">
         <div style="font-weight:600; margin-bottom:6px;">Add PDF / Study Notes Link:</div>
-        <input type="text" id="adm-pdf-title" class="cbt-field" placeholder="Document Title (e.g. Shakespeare Master Notes)" />
+        <input type="text" id="adm-pdf-title" class="cbt-field" placeholder="Document Title (e.g. Master Notes)" />
         <input type="text" id="adm-pdf-url" class="cbt-field" placeholder="Direct PDF or Google Drive URL" />
         <button class="cbt-btn-primary" id="btn-adm-save-pdf" style="margin-bottom:16px;">Add Study Document</button>
         <div style="font-weight:600; margin-bottom:8px;">Current Study Materials:</div>
@@ -300,8 +429,8 @@
 
       <div id="pane-security" class="cbt-pane">
         <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:6px; margin-bottom:16px;">
-          <div style="font-weight:600; margin-bottom:8px;">Reset Admin Password / PIN:</div>
-          <input type="password" id="adm-new-pin" class="cbt-field" placeholder="Enter New Admin PIN" />
+          <div style="font-weight:600; margin-bottom:8px;">Reset Admin PIN / Password:</div>
+          <input type="password" id="adm-new-pin" class="cbt-field" placeholder="Enter New Secret PIN" />
           <button class="cbt-btn-primary" id="btn-adm-reset-pin">Update Admin PIN</button>
         </div>
         <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:6px;">
@@ -313,60 +442,7 @@
     </div>
   `;
   document.body.appendChild(portalDiv);
-
-  // 4. PERSISTENT STORAGE
-  const defaultTopics = ["William Shakespeare", "William Wordsworth", "John Milton", "Literary Terms"];
-  const defaultPaperTypes = ["PYQS", "Most Probable", "NET JRF"];
-  const defaultSets = ["Practice Set 01", "Practice Set 02", "Practice Set 03", "Practice Set 04"];
-  const defaultQuestions = [
-    {
-      topic: "William Shakespeare",
-      category: "PYQS",
-      text: "In which year was the First Folio of Shakespeare's plays published?",
-      options: ["1616", "1623", "1632", "1609"],
-      correct: 1
-    },
-    {
-      topic: "William Wordsworth",
-      category: "PYQS",
-      text: "Wordsworth's 'The Prelude' was published posthumously in which year?",
-      options: ["1798", "1805", "1850", "1832"],
-      correct: 2
-    }
-  ];
-  const defaultNotes = [
-    { title: "English Literature Hand-Written Summary", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" }
-  ];
-
-  let storeTopics = JSON.parse(localStorage.getItem("tb_portal_topics")) || defaultTopics;
-  let storePaperTypes = JSON.parse(localStorage.getItem("tb_portal_categories")) || defaultPaperTypes;
-  let storeSets = JSON.parse(localStorage.getItem("tb_portal_sets")) || defaultSets;
-  let storeQuestions = JSON.parse(localStorage.getItem("tb_portal_questions")) || defaultQuestions;
-  let storeNotes = JSON.parse(localStorage.getItem("tb_portal_notes")) || defaultNotes;
-  let storeDuration = parseInt(localStorage.getItem("tb_portal_duration"), 10) || 30;
-  let registeredUsers = JSON.parse(localStorage.getItem("tb_registered_users")) || [];
-  let adminPin = localStorage.getItem("tb_admin_pin") || "1234";
-
-  // Runtime State
-  let activeTopic = "";
-  let activeCategory = "";
-  let activeExamQuestions = [];
-  let currentQuestionIndex = 0;
-  let candidateAnswers = {};
-  let countdownRef = null;
-  let remainingSeconds = 1800;
-  let generatedOTP = "";
-
-  function cbtSyncLocalStorage() {
-    localStorage.setItem("tb_portal_topics", JSON.stringify(storeTopics));
-    localStorage.setItem("tb_portal_categories", JSON.stringify(storePaperTypes));
-    localStorage.setItem("tb_portal_sets", JSON.stringify(storeSets));
-    localStorage.setItem("tb_portal_questions", JSON.stringify(storeQuestions));
-    localStorage.setItem("tb_portal_notes", JSON.stringify(storeNotes));
-    localStorage.setItem("tb_portal_duration", storeDuration.toString());
-    localStorage.setItem("tb_registered_users", JSON.stringify(registeredUsers));
-    localStorage.setItem("tb_admin_pin", adminPin);
-  }
+  applyBrandIdentity();
 
   function cbtNavigate(targetId) {
     document.querySelectorAll(".cbt-view").forEach((win) => win.classList.remove("active"));
@@ -374,18 +450,45 @@
     if (el) el.classList.add("active");
   }
 
-  // 5. REGISTRATION & OTP FLOW
+  // 4. REGISTRATION, COUPONS & PAYMENT
+  function updateCheckoutDisplay() {
+    const finalPrice = Math.max(0, storePrice - (storePrice * (appliedDiscountPercent / 100)));
+    document.getElementById("dom-checkout-price").innerText = `₹ ${finalPrice.toFixed(2)}`;
+    const discInfo = document.getElementById("dom-discount-info");
+    if (appliedDiscountPercent > 0) {
+      discInfo.style.display = "block";
+      discInfo.innerText = `Coupon Applied: ${appliedDiscountPercent}% Discount!`;
+    } else {
+      discInfo.style.display = "none";
+    }
+  }
+
   document.getElementById("btn-open-payment").addEventListener("click", () => {
+    appliedDiscountPercent = 0;
+    updateCheckoutDisplay();
     cbtNavigate("win-register");
     document.getElementById("pay-step-1").style.display = "block";
     document.getElementById("pay-step-2").style.display = "none";
     document.getElementById("pay-step-3").style.display = "none";
   });
 
+  document.getElementById("btn-apply-coupon").addEventListener("click", () => {
+    const code = document.getElementById("coupon-code-input").value.trim().toUpperCase();
+    const matched = storeCoupons.find((c) => c.code.toUpperCase() === code);
+    if (matched) {
+      appliedDiscountPercent = matched.discount;
+      updateCheckoutDisplay();
+      alert(`Success: ${matched.discount}% discount applied!`);
+    } else {
+      alert("Invalid or expired coupon code.");
+    }
+  });
+
   document.getElementById("link-back-login").addEventListener("click", () => cbtNavigate("win-1"));
 
   document.getElementById("btn-mock-pay").addEventListener("click", () => {
-    alert("Payment of ₹99.00 Successful!");
+    const finalPrice = Math.max(0, storePrice - (storePrice * (appliedDiscountPercent / 100)));
+    alert(`Payment of ₹ ${finalPrice.toFixed(2)} completed successfully!`);
     document.getElementById("pay-step-1").style.display = "none";
     document.getElementById("pay-step-2").style.display = "block";
   });
@@ -397,7 +500,7 @@
       return;
     }
     generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
-    alert("Akash Workshop Verification OTP: " + generatedOTP);
+    alert(`${brandConfig.name} Verification OTP: ${generatedOTP}`);
     document.getElementById("pay-step-2").style.display = "none";
     document.getElementById("pay-step-3").style.display = "block";
   });
@@ -408,7 +511,7 @@
     const pass = document.getElementById("reg-password").value.trim();
 
     if (enteredOTP !== generatedOTP) {
-      alert("Invalid OTP.");
+      alert("Invalid OTP code.");
       return;
     }
     if (!user || !pass) {
@@ -417,20 +520,19 @@
     }
 
     registeredUsers.push({ username: user, password: pass });
-    cbtSyncLocalStorage();
-    alert("Registration successfully completed! Please login.");
+    syncAllData();
+    alert("Registration completed successfully! Please login.");
     cbtNavigate("win-1");
   });
 
-  // 6. CANDIDATE & ADMIN LOGIN
+  // 5. LOGIN HANDLERS
   document.getElementById("btn-action-login").addEventListener("click", () => {
     const u = document.getElementById("login-username").value.trim();
     const p = document.getElementById("login-password").value.trim();
 
-    // STRICT CHECK: Cannot login without registration
     const matched = registeredUsers.find((item) => item.username === u && item.password === p);
     if (!matched) {
-      alert("Access Denied: No registration found with these credentials. Please pay and register first.");
+      alert("Access Denied: You must register and pay to login.");
       return;
     }
 
@@ -458,7 +560,7 @@
     }
   });
 
-  // 7. WINDOW 2 (TOPICS + NOTES HUB)
+  // 6. WINDOW 2 & 3 RENDERING
   function cbtRenderWindow2() {
     const container = document.getElementById("dom-win2-topics");
     container.innerHTML = "";
@@ -469,7 +571,7 @@
       card.onclick = () => {
         activeTopic = t;
         document.getElementById("win3-topic-heading").innerText = t;
-        document.getElementById("win3-time-preview").innerText = "Time : " + storeDuration + ":00 min";
+        document.getElementById("win3-time-preview").innerText = `Time : ${storeDuration}:00 min`;
         cbtRenderWindow3();
         cbtNavigate("win-3");
       };
@@ -479,7 +581,7 @@
     const notesContainer = document.getElementById("dom-notes-container");
     notesContainer.innerHTML = "";
     if (storeNotes.length === 0) {
-      notesContainer.innerHTML = "<div style='font-size:13px; color:#64748b;'>No PDFs uploaded yet.</div>";
+      notesContainer.innerHTML = "<div style='font-size:13px; color:#64748b;'>No study PDFs uploaded yet.</div>";
     } else {
       storeNotes.forEach((n) => {
         const div = document.createElement("div");
@@ -518,7 +620,7 @@
 
   document.getElementById("link-back-topics").addEventListener("click", () => cbtNavigate("win-2"));
 
-  // 8. CBT EXAM ENGINE
+  // 7. CBT EXAM RUNTIME
   function cbtLaunchTest(selectedCategory) {
     activeCategory = selectedCategory;
     activeExamQuestions = storeQuestions.filter(
@@ -535,7 +637,7 @@
     candidateAnswers = {};
     remainingSeconds = storeDuration * 60;
 
-    document.getElementById("win4-banner").innerText = `Akash Workshop | ${activeTopic} (${activeCategory})`;
+    document.getElementById("win4-banner").innerText = `${brandConfig.name} | ${activeTopic} (${activeCategory})`;
     cbtNavigate("win-4");
     cbtRenderQuestion();
     cbtUpdatePalette();
@@ -605,7 +707,7 @@
       cbtUpdatePalette();
     } else {
       cbtUpdatePalette();
-      alert("You have reached the end of the test. Submit to complete.");
+      alert("End of questions reached. Click Submit to finish.");
     }
   });
 
@@ -614,7 +716,7 @@
     if (checked) {
       candidateAnswers[currentQuestionIndex] = parseInt(checked.value, 10);
     }
-    if (confirm("Are you sure you want to finish the exam?")) {
+    if (confirm("Confirm exam submission?")) {
       cbtFinishTest();
     }
   });
@@ -628,7 +730,7 @@
         (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
       if (remainingSeconds <= 0) {
         clearInterval(countdownRef);
-        alert("Time Out!");
+        alert("Time Up!");
         cbtFinishTest();
       }
       remainingSeconds--;
@@ -659,7 +761,7 @@
 
   document.getElementById("btn-restart-flow").addEventListener("click", () => cbtNavigate("win-2"));
 
-  // 9. ADMIN DASHBOARD OPERATIONS
+  // 8. ADMIN DASHBOARD ACTIONS
   document.querySelectorAll(".cbt-tab-btn").forEach((btn) => {
     btn.addEventListener("click", function () {
       document.querySelectorAll(".cbt-tab-btn").forEach((b) => b.classList.remove("active"));
@@ -676,7 +778,28 @@
   });
 
   function cbtRefreshAdmin() {
-    // Topic Chips
+    // Pricing & Coupons
+    document.getElementById("adm-base-price").value = storePrice;
+    const cList = document.getElementById("dom-adm-coupons-list");
+    cList.innerHTML = "";
+    storeCoupons.forEach((c, idx) => {
+      const chip = document.createElement("div");
+      chip.className = "cbt-item-chip";
+      chip.innerHTML = `${c.code} (${c.discount}%) <span>&times;</span>`;
+      chip.querySelector("span").onclick = () => {
+        storeCoupons.splice(idx, 1);
+        syncAllData();
+        cbtRefreshAdmin();
+      };
+      cList.appendChild(chip);
+    });
+
+    // Branding Fields
+    document.getElementById("adm-brand-name").value = brandConfig.name;
+    document.getElementById("adm-brand-badge").value = brandConfig.badge;
+    document.getElementById("adm-brand-favicon").value = brandConfig.favicon;
+
+    // Topic Chips & Selects
     const tChips = document.getElementById("dom-adm-topic-chips");
     const selTopic = document.getElementById("adm-sel-topic");
     tChips.innerHTML = "";
@@ -687,7 +810,7 @@
       chip.innerHTML = `${t} <span>&times;</span>`;
       chip.querySelector("span").onclick = () => {
         storeTopics.splice(idx, 1);
-        cbtSyncLocalStorage();
+        syncAllData();
         cbtRefreshAdmin();
       };
       tChips.appendChild(chip);
@@ -697,7 +820,7 @@
       selTopic.appendChild(o);
     });
 
-    // Category Chips
+    // Category Chips & Selects
     const cChips = document.getElementById("dom-adm-category-chips");
     const selCat = document.getElementById("adm-sel-cat");
     cChips.innerHTML = "";
@@ -708,7 +831,7 @@
       chip.innerHTML = `${c} <span>&times;</span>`;
       chip.querySelector("span").onclick = () => {
         storePaperTypes.splice(idx, 1);
-        cbtSyncLocalStorage();
+        syncAllData();
         cbtRefreshAdmin();
       };
       cChips.appendChild(chip);
@@ -727,7 +850,7 @@
       chip.innerHTML = `${s} <span>&times;</span>`;
       chip.querySelector("span").onclick = () => {
         storeSets.splice(idx, 1);
-        cbtSyncLocalStorage();
+        syncAllData();
         cbtRefreshAdmin();
       };
       sChips.appendChild(chip);
@@ -745,7 +868,7 @@
       `;
       tr.querySelector("button").onclick = () => {
         storeQuestions.splice(idx, 1);
-        cbtSyncLocalStorage();
+        syncAllData();
         cbtRefreshAdmin();
       };
       qTable.appendChild(tr);
@@ -763,7 +886,7 @@
       `;
       div.querySelector("button").onclick = () => {
         storeNotes.splice(idx, 1);
-        cbtSyncLocalStorage();
+        syncAllData();
         cbtRefreshAdmin();
       };
       pdfList.appendChild(div);
@@ -772,12 +895,50 @@
     document.getElementById("adm-exam-min").value = storeDuration;
   }
 
-  // Admin Add Actions
+  // Admin Event Listeners
+  document.getElementById("btn-adm-save-price").addEventListener("click", () => {
+    const val = parseFloat(document.getElementById("adm-base-price").value);
+    if (!isNaN(val) && val >= 0) {
+      storePrice = val;
+      syncAllData();
+      alert(`Base registration price updated to ₹ ${val.toFixed(2)}`);
+    }
+  });
+
+  document.getElementById("btn-adm-add-coupon").addEventListener("click", () => {
+    const code = document.getElementById("adm-coupon-code").value.trim().toUpperCase();
+    const pct = parseInt(document.getElementById("adm-coupon-pct").value, 10);
+    if (code && pct > 0 && pct <= 100) {
+      storeCoupons.push({ code, discount: pct });
+      syncAllData();
+      cbtRefreshAdmin();
+      document.getElementById("adm-coupon-code").value = "";
+      document.getElementById("adm-coupon-pct").value = "";
+      alert(`Coupon ${code} (${pct}%) created.`);
+    } else {
+      alert("Provide valid coupon name and percentage between 1-100.");
+    }
+  });
+
+  document.getElementById("btn-adm-save-branding").addEventListener("click", () => {
+    const name = document.getElementById("adm-brand-name").value.trim();
+    const badge = document.getElementById("adm-brand-badge").value.trim();
+    const favicon = document.getElementById("adm-brand-favicon").value.trim();
+
+    if (name) brandConfig.name = name;
+    if (badge) brandConfig.badge = badge;
+    if (favicon) brandConfig.favicon = favicon;
+
+    syncAllData();
+    applyBrandIdentity();
+    alert("Branding details updated successfully!");
+  });
+
   document.getElementById("btn-adm-add-topic").addEventListener("click", () => {
     const val = document.getElementById("adm-add-topic").value.trim();
     if (val && !storeTopics.includes(val)) {
       storeTopics.push(val);
-      cbtSyncLocalStorage();
+      syncAllData();
       cbtRefreshAdmin();
       document.getElementById("adm-add-topic").value = "";
     }
@@ -787,7 +948,7 @@
     const val = document.getElementById("adm-add-category").value.trim();
     if (val && !storePaperTypes.includes(val)) {
       storePaperTypes.push(val);
-      cbtSyncLocalStorage();
+      syncAllData();
       cbtRefreshAdmin();
       document.getElementById("adm-add-category").value = "";
     }
@@ -797,7 +958,7 @@
     const val = document.getElementById("adm-add-set").value.trim();
     if (val && !storeSets.includes(val)) {
       storeSets.push(val);
-      cbtSyncLocalStorage();
+      syncAllData();
       cbtRefreshAdmin();
       document.getElementById("adm-add-set").value = "";
     }
@@ -819,7 +980,7 @@
     }
 
     storeQuestions.push({ topic, category: cat, text: title, options: [o0, o1, o2, o3], correct });
-    cbtSyncLocalStorage();
+    syncAllData();
     cbtRefreshAdmin();
 
     document.getElementById("adm-q-title").value = "";
@@ -830,41 +991,39 @@
     alert("Question added successfully.");
   });
 
-  // Admin PDF Save
   document.getElementById("btn-adm-save-pdf").addEventListener("click", () => {
     const t = document.getElementById("adm-pdf-title").value.trim();
     const u = document.getElementById("adm-pdf-url").value.trim();
     if (!t || !u) {
-      alert("Provide both document title and PDF link.");
+      alert("Provide both document title and PDF URL.");
       return;
     }
     storeNotes.push({ title: t, url: u });
-    cbtSyncLocalStorage();
+    syncAllData();
     cbtRefreshAdmin();
     document.getElementById("adm-pdf-title").value = "";
     document.getElementById("adm-pdf-url").value = "";
     alert("Study material added.");
   });
 
-  // Admin PIN Reset
   document.getElementById("btn-adm-reset-pin").addEventListener("click", () => {
     const newPin = document.getElementById("adm-new-pin").value.trim();
     if (!newPin) {
-      alert("Please enter a valid PIN.");
+      alert("Enter a valid PIN.");
       return;
     }
     adminPin = newPin;
-    cbtSyncLocalStorage();
+    syncAllData();
     document.getElementById("adm-new-pin").value = "";
-    alert("Admin PIN updated successfully! Remember your new PIN: " + newPin);
+    alert(`Admin access PIN updated to: ${newPin}`);
   });
 
   document.getElementById("btn-adm-save-time").addEventListener("click", () => {
     const val = parseInt(document.getElementById("adm-exam-min").value, 10);
     if (val > 0) {
       storeDuration = val;
-      cbtSyncLocalStorage();
-      alert("Exam duration set to " + val + " minutes.");
+      syncAllData();
+      alert(`Exam duration set to ${val} minutes.`);
     }
   });
 })();
