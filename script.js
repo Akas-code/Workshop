@@ -1,7 +1,7 @@
 (function () {
   // 1. DEFAULT DATA & STORAGE INITIALIZATION
   const defaultTopics = ["William Shakespeare", "William Wordsworth", "John Milton", "Literary Terms"];
-  const defaultPaperTypes = ["PYQS", "Most Probable", "NET JRF"];
+  const defaultPaperTypes = ["PYQS", "Lines", "Most Probable", "NET JRF"];
   const defaultSets = ["Practice Set 01", "Practice Set 02", "Practice Set 03", "Practice Set 04"];
   const defaultQuestions = [
     {
@@ -9,14 +9,24 @@
       category: "PYQS",
       text: "In which year was the First Folio of Shakespeare's plays published?",
       options: ["1616", "1623", "1632", "1609"],
-      correct: 1
+      correct: 1,
+      solution: "The First Folio of Shakespeare's plays was published in 1623 by his fellow actors John Heminges and Henry Condell."
+    },
+    {
+      topic: "William Shakespeare",
+      category: "Lines",
+      text: "'Life's but a walking shadow, a poor player...' occurs in which play?",
+      options: ["Hamlet", "Othello", "Macbeth", "King Lear"],
+      correct: 2,
+      solution: "This line is spoken by Macbeth in Act 5, Scene 5 after hearing of Lady Macbeth's death."
     },
     {
       topic: "William Wordsworth",
       category: "PYQS",
       text: "Wordsworth's 'The Prelude' was published posthumously in which year?",
       options: ["1798", "1805", "1850", "1832"],
-      correct: 2
+      correct: 2,
+      solution: "The Prelude was published in 1850 by Wordsworth's widow, Mary Wordsworth, shortly after his death."
     }
   ];
   const defaultNotes = [
@@ -36,6 +46,7 @@
   let storeDuration = parseInt(localStorage.getItem("tb_portal_duration"), 10) || 30;
   let storePrice = parseFloat(localStorage.getItem("tb_portal_price")) || 99.00;
   let registeredUsers = JSON.parse(localStorage.getItem("tb_registered_users")) || [];
+  let userPerformance = JSON.parse(localStorage.getItem("tb_user_performance")) || {};
   let adminPin = localStorage.getItem("tb_admin_pin") || "1234";
 
   let brandConfig = JSON.parse(localStorage.getItem("tb_brand_config")) || {
@@ -43,6 +54,9 @@
     badge: "AW",
     favicon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>"
   };
+
+  // Persistent Session Runtime
+  let activeUser = JSON.parse(localStorage.getItem("tb_active_user")) || null;
 
   // Runtime State
   let activeTopic = "";
@@ -57,7 +71,6 @@
   let resetMobileTarget = "";
   let appliedDiscountPercent = 0;
   let lastTransactionInfo = { amount: "0.00", coupon: "None" };
-  let activeUser = null;
   let editingQuestionIndex = null;
 
   function syncAllData() {
@@ -70,8 +83,14 @@
     localStorage.setItem("tb_portal_duration", storeDuration.toString());
     localStorage.setItem("tb_portal_price", storePrice.toString());
     localStorage.setItem("tb_registered_users", JSON.stringify(registeredUsers));
+    localStorage.setItem("tb_user_performance", JSON.stringify(userPerformance));
     localStorage.setItem("tb_admin_pin", adminPin);
     localStorage.setItem("tb_brand_config", JSON.stringify(brandConfig));
+    if (activeUser) {
+      localStorage.setItem("tb_active_user", JSON.stringify(activeUser));
+    } else {
+      localStorage.removeItem("tb_active_user");
+    }
   }
 
   function applyBrandIdentity() {
@@ -115,7 +134,7 @@
       background: #475569; color: #fff; border: none; padding: 7px 14px; border-radius: 4px; font-size: 13px; cursor: pointer;
     }
     
-    /* Candidate Hover Menu Styles */
+    /* Candidate Hover Menu */
     .cbt-profile-menu-container {
       position: relative; display: none; padding: 4px 0;
     }
@@ -213,7 +232,8 @@
     .cbt-item-chip span { color: #dc2626; cursor: pointer; font-weight: bold; }
     .cbt-btn-del { background: #ef4444; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
     .cbt-btn-edit { background: #3b82f6; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 4px; }
-    .cbt-link-back { color: #64748b; font-size: 13px; text-decoration: underline; cursor: pointer; margin-bottom: 12px; display: inline-block; }
+    .cbt-link-back { color: #2563eb; font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer; margin-bottom: 14px; display: inline-flex; align-items: center; gap: 4px; }
+    .cbt-link-back:hover { text-decoration: underline; }
     .pdf-card {
       display: flex; justify-content: space-between; align-items: center; padding: 14px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 10px; background: #fff;
     }
@@ -230,6 +250,17 @@
     }
     .preview-correct-badge {
       display: inline-block; background: #10b981; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-left: auto;
+    }
+
+    /* Solution Box Styles */
+    .solution-card {
+      border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 16px; background: #fff;
+    }
+    .solution-card.correct-ans { border-left: 5px solid #10b981; }
+    .solution-card.wrong-ans { border-left: 5px solid #ef4444; }
+    .solution-card.skipped-ans { border-left: 5px solid #8b5cf6; }
+    .sol-explanation-box {
+      background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 6px; margin-top: 10px; font-size: 13px; color: #334155;
     }
 
     /* Modals */
@@ -263,11 +294,11 @@
         <span class="cbt-brand-name" id="dom-brand-name"></span>
       </div>
       <div class="cbt-nav-actions">
-        <!-- Guest Buttons (Shown when logged out) -->
+        <!-- Guest Buttons -->
         <button class="cbt-btn-pay" id="btn-open-payment">Payment & Register</button>
         <button class="cbt-btn-admin-nav" id="btn-open-admin">Admin Portal</button>
         
-        <!-- Candidate Hover Menu (Shown when logged in) -->
+        <!-- Candidate Hover Menu -->
         <div class="cbt-profile-menu-container" id="cbt-candidate-menu-wrapper">
           <div class="cbt-candidate-badge-logo" id="dom-candidate-logo-btn">
             <span id="dom-cand-logo-text">🎓 AW</span>
@@ -294,6 +325,11 @@
 
             <div class="drop-divider"></div>
 
+            <div class="drop-info-title">Performance Summary</div>
+            <div id="drop-perf-summary" style="font-size:12px; color:#475569; margin-bottom:10px;">No tests taken yet.</div>
+
+            <div class="drop-divider"></div>
+
             <div class="drop-info-title">Update Candidate Credentials</div>
             <input type="text" id="drop-edit-name" class="cbt-field" placeholder="Change Display Name" />
             <input type="password" id="drop-edit-pass" class="cbt-field" placeholder="Set New Password" />
@@ -305,7 +341,7 @@
     </div>
 
     <!-- Login Window -->
-    <div id="win-1" class="cbt-view active">
+    <div id="win-1" class="cbt-view">
       <div class="cbt-h1">Candidate Examination Login</div>
       <div class="cbt-h2">Registration is strictly required to login (Except Admin)</div>
       <input type="text" id="login-username" class="cbt-field" placeholder="Candidate Username" />
@@ -373,7 +409,7 @@
       </div>
     </div>
 
-    <!-- Window 2: Topic Selection -->
+    <!-- Window 2: Topic Selection (Candidate Main Dashboard) -->
     <div id="win-2" class="cbt-view">
       <div class="cbt-h1">Welcome, start your practice</div>
       <div class="cbt-h2">Selection Your Topic</div>
@@ -401,7 +437,10 @@
     <!-- Window 4: Exam Terminal -->
     <div id="win-4" class="cbt-view">
       <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; color:#fff; padding:10px 24px;">
-        <div style="font-weight:700;" id="win4-banner">Exam Terminal</div>
+        <div style="display:flex; align-items:center; gap:16px;">
+          <button id="btn-back-from-exam" style="background:#334155; color:#fff; border:none; padding:5px 10px; border-radius:4px; font-size:12px; cursor:pointer; font-weight:600;">&larr; Exit Test</button>
+          <div style="font-weight:700;" id="win4-banner">Exam Terminal</div>
+        </div>
         <div style="font-size:18px; font-weight:800; color:#ef4444;" id="win4-clock">30:00</div>
       </div>
       <div class="test-fullscreen-body">
@@ -434,11 +473,21 @@
     <!-- Result Window -->
     <div id="win-result" class="cbt-view">
       <div class="cbt-h1">Examination Result</div>
-      <div class="cbt-h2">Review your test score</div>
+      <div class="cbt-h2">Review your test score and performance analysis</div>
       <div id="dom-result-stats" style="text-align:center; margin: 24px 0;"></div>
-      <div style="display:flex; gap:10px;">
-        <button class="cbt-btn-primary" id="btn-restart-flow">Practice Another Topic</button>
+      <div style="display:flex; gap:10px; justify-content:center;">
+        <button class="cbt-btn-primary" id="btn-view-solutions" style="background:#10b981; max-width:240px;">View Detailed Solutions</button>
+        <button class="cbt-btn-secondary" id="btn-restart-flow" style="max-width:240px;">Back to Topics</button>
       </div>
+    </div>
+
+    <!-- Detailed Solutions Review Window -->
+    <div id="win-solutions" class="cbt-view">
+      <span class="cbt-link-back" id="link-back-result">&larr; Back to Result</span>
+      <div class="cbt-h1" style="text-align:left; margin-bottom:4px;">Test Questions & Solutions</div>
+      <div class="cbt-h2" style="text-align:left; margin-bottom:16px;" id="dom-solutions-header">Detailed breakdown of answers:</div>
+      <div id="dom-solutions-container"></div>
+      <button class="cbt-btn-primary" id="btn-sol-back-topics" style="margin-top:16px;">Finish & Back to Topics</button>
     </div>
 
     <!-- Admin Authentication -->
@@ -514,9 +563,9 @@
       </div>
 
       <div id="pane-w3-papers" class="cbt-pane">
-        <div style="font-weight:600; margin-bottom:6px;">Add Paper Type:</div>
+        <div style="font-weight:600; margin-bottom:6px;">Add Paper Type / Category:</div>
         <div style="display:flex; gap:8px; margin-bottom:16px;">
-          <input type="text" id="adm-add-category" class="cbt-field" style="margin:0;" placeholder="e.g. PYQS" />
+          <input type="text" id="adm-add-category" class="cbt-field" style="margin:0;" placeholder="e.g. Lines" />
           <button class="cbt-btn-primary" style="width:120px;" id="btn-adm-add-cat">Add</button>
         </div>
         <div id="dom-adm-category-chips"></div>
@@ -552,6 +601,7 @@
               <option value="2">Correct: Option C</option>
               <option value="3">Correct: Option D</option>
             </select>
+            <textarea id="adm-q-solution" class="cbt-field" style="resize:vertical; height:70px;" placeholder="Detailed Solution / Explanation"></textarea>
             <button class="cbt-btn-primary" id="btn-adm-save-q">Save Question</button>
           </div>
 
@@ -565,6 +615,7 @@
               Question preview will render here as you type...
             </div>
             <div id="preview-live-options"></div>
+            <div id="preview-live-solution" style="margin-top:10px; font-size:12px; color:#475569; background:#e2e8f0; padding:8px; border-radius:4px; display:none;"></div>
           </div>
         </div>
 
@@ -664,24 +715,29 @@
     const menuContainer = document.getElementById("cbt-candidate-menu-wrapper");
 
     if (activeUser) {
-      // Hide Guest / Admin buttons
       btnPay.style.display = "none";
       btnAdmin.style.display = "none";
-
-      // Show Candidate Mini Logo Button
       menuContainer.style.display = "block";
       document.getElementById("dom-cand-logo-text").innerText = `🎓 ${brandConfig.badge} • ${activeUser.username}`;
 
-      // Populate Hover Dropdown Sheet
       document.getElementById("drop-display-username").innerText = activeUser.username;
       document.getElementById("drop-display-phone").innerText = activeUser.mobile ? `+91 ${activeUser.mobile}` : "Not Available";
       document.getElementById("drop-display-price").innerText = activeUser.purchaseAmount ? `₹ ${activeUser.purchaseAmount}` : `₹ ${storePrice.toFixed(2)}`;
       document.getElementById("drop-display-coupon").innerText = activeUser.appliedCoupon || "Direct Payment";
 
+      // Render performance stats in profile
+      const candidateStats = userPerformance[activeUser.username];
+      const perfEl = document.getElementById("drop-perf-summary");
+      if (candidateStats && candidateStats.length > 0) {
+        const last = candidateStats[candidateStats.length - 1];
+        perfEl.innerHTML = `Tests Given: <b>${candidateStats.length}</b><br>Last Score: <b>${last.score}/${last.total} (${last.pct}%)</b> [${last.category}]`;
+      } else {
+        perfEl.innerHTML = "No tests taken yet.";
+      }
+
       document.getElementById("drop-edit-name").value = activeUser.username;
       document.getElementById("drop-edit-pass").value = "";
     } else {
-      // Restore Guest / Admin buttons
       btnPay.style.display = "block";
       btnAdmin.style.display = "block";
       menuContainer.style.display = "none";
@@ -707,25 +763,35 @@
       }
     }
 
-    const idx = registeredUsers.findIndex((u) => u.username === activeUser.username);
+    const oldName = activeUser.username;
+    const idx = registeredUsers.findIndex((u) => u.username === oldName);
     if (idx !== -1) {
       registeredUsers[idx].username = newName;
       if (newPass) registeredUsers[idx].password = newPass;
       activeUser = registeredUsers[idx];
+
+      // Migrate performance key if username changed
+      if (oldName !== newName && userPerformance[oldName]) {
+        userPerformance[newName] = userPerformance[oldName];
+        delete userPerformance[oldName];
+      }
+
       syncAllData();
       updateNavbarAuthState();
       showInAppMessage("Account Updated", "Your profile details have been saved successfully!");
     }
   });
 
-  // Logout Handler
+  // Explicit Candidate Logout Handler
   function candidateLogout() {
     activeUser = null;
     candidateAnswers = {};
     activeExamQuestions = [];
     clearInterval(countdownRef);
 
+    syncAllData();
     updateNavbarAuthState();
+
     document.getElementById("login-username").value = "";
     document.getElementById("login-password").value = "";
 
@@ -927,6 +993,7 @@
     }
 
     activeUser = matched;
+    syncAllData();
     updateNavbarAuthState();
 
     cbtRenderWindow2();
@@ -1008,19 +1075,47 @@
     });
   }
 
-  document.getElementById("link-back-topics").addEventListener("click", () => cbtNavigate("win-2"));
+  // Candidate Navigation Back Links
+  document.getElementById("link-back-topics").addEventListener("click", () => {
+    cbtRenderWindow2();
+    cbtNavigate("win-2");
+  });
 
-  // 8. CBT EXAM RUNTIME
+  document.getElementById("btn-back-from-exam").addEventListener("click", () => {
+    showInAppConfirm("Exit Exam", "Are you sure you want to exit the current exam? Your progress will not be saved.", () => {
+      clearInterval(countdownRef);
+      candidateAnswers = {};
+      cbtRenderWindow3();
+      cbtNavigate("win-3");
+    });
+  });
+
+  document.getElementById("btn-restart-flow").addEventListener("click", () => {
+    cbtRenderWindow2();
+    cbtNavigate("win-2");
+  });
+
+  document.getElementById("link-back-result").addEventListener("click", () => {
+    cbtNavigate("win-result");
+  });
+
+  document.getElementById("btn-sol-back-topics").addEventListener("click", () => {
+    cbtRenderWindow2();
+    cbtNavigate("win-2");
+  });
+
+  // 8. CBT EXAM RUNTIME (Strict Category Isolation)
   function cbtLaunchTest(selectedCategory) {
     activeCategory = selectedCategory;
+
+    // Strict Filtering: only topic AND category match
     activeExamQuestions = storeQuestions.filter(
       (q) => q.topic === activeTopic && q.category === activeCategory
     );
+
     if (activeExamQuestions.length === 0) {
-      activeExamQuestions = storeQuestions.filter((q) => q.topic === activeTopic);
-    }
-    if (activeExamQuestions.length === 0) {
-      activeExamQuestions = [...storeQuestions];
+      showInAppMessage("No Questions Found", `Currently there are no questions added for "${activeTopic}" under "${activeCategory}". Please select another category.`);
+      return;
     }
 
     currentQuestionIndex = 0;
@@ -1141,18 +1236,96 @@
     const attemptedCount = Object.keys(candidateAnswers).length;
     const pct = Math.round((correctCount / total) * 100);
 
+    // Save Candidate Performance
+    if (activeUser) {
+      if (!userPerformance[activeUser.username]) {
+        userPerformance[activeUser.username] = [];
+      }
+      userPerformance[activeUser.username].push({
+        topic: activeTopic,
+        category: activeCategory,
+        score: correctCount,
+        total: total,
+        pct: pct,
+        date: new Date().toLocaleDateString()
+      });
+      syncAllData();
+      updateNavbarAuthState();
+    }
+
     document.getElementById("dom-result-stats").innerHTML = `
       <div style="font-size:42px; font-weight:800; color:#2563eb; margin-bottom:10px;">${pct}%</div>
+      <div style="font-size:16px; margin-bottom:8px;">Test: <b>${activeTopic} (${activeCategory})</b></div>
       <div style="font-size:16px; margin-bottom:8px;">Total Questions: <b>${total}</b></div>
       <div style="font-size:16px; margin-bottom:8px; color:#10b981;">Attempted: <b>${attemptedCount}</b></div>
       <div style="font-size:16px; margin-bottom:8px; color:#8b5cf6;">Unattempted: <b>${total - attemptedCount}</b></div>
-      <div style="font-size:16px; font-weight:700;">Score: <b>${correctCount}</b> Correct</div>
+      <div style="font-size:16px; font-weight:700;">Final Score: <b>${correctCount}</b> Correct</div>
     `;
   }
 
-  document.getElementById("btn-restart-flow").addEventListener("click", () => cbtNavigate("win-2"));
+  // 9. DETAILED SOLUTIONS REVIEW
+  document.getElementById("btn-view-solutions").addEventListener("click", () => {
+    const solContainer = document.getElementById("dom-solutions-container");
+    solContainer.innerHTML = "";
+    document.getElementById("dom-solutions-header").innerText = `Solutions for ${activeTopic} - ${activeCategory}:`;
 
-  // 9. ADMIN LIVE PREVIEW LOGIC
+    activeExamQuestions.forEach((q, idx) => {
+      const userAns = candidateAnswers[idx];
+      const isAttempted = userAns !== undefined;
+      const isCorrect = userAns === q.correct;
+
+      let statusClass = "skipped-ans";
+      let statusText = "<span style='color:#8b5cf6; font-weight:700;'>SKIPPED / UNATTEMPTED</span>";
+
+      if (isAttempted) {
+        if (isCorrect) {
+          statusClass = "correct-ans";
+          statusText = "<span style='color:#10b981; font-weight:700;'>CORRECT</span>";
+        } else {
+          statusClass = "wrong-ans";
+          statusText = "<span style='color:#ef4444; font-weight:700;'>INCORRECT</span>";
+        }
+      }
+
+      const card = document.createElement("div");
+      card.className = `solution-card ${statusClass}`;
+
+      let opsHtml = "";
+      q.options.forEach((opt, oIdx) => {
+        let optStyle = "padding:6px 10px; border-radius:4px; margin-bottom:4px; font-size:13px;";
+        if (oIdx === q.correct) {
+          optStyle += " background:#dcfce7; border:1px solid #86efac; font-weight:700; color:#166534;";
+        } else if (isAttempted && userAns === oIdx) {
+          optStyle += " background:#fee2e2; border:1px solid #fca5a5; color:#991b1b;";
+        } else {
+          optStyle += " background:#f8fafc; border:1px solid #e2e8f0;";
+        }
+
+        const isUserChoice = isAttempted && userAns === oIdx ? " <b>(Your Answer)</b>" : "";
+        const isRightChoice = oIdx === q.correct ? " <b>(Correct Answer)</b>" : "";
+
+        opsHtml += `<div style="${optStyle}">${String.fromCharCode(65 + oIdx)}) ${opt} ${isUserChoice} ${isRightChoice}</div>`;
+      });
+
+      card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+          <span style="font-weight:700; font-size:14px; color:#475569;">Question ${idx + 1}</span>
+          <div>${statusText}</div>
+        </div>
+        <div style="font-size:15px; font-weight:700; margin-bottom:12px;">${q.text}</div>
+        <div style="margin-bottom:10px;">${opsHtml}</div>
+        <div class="sol-explanation-box">
+          <b>Detailed Solution / Note:</b><br>
+          ${q.solution ? q.solution : "No detailed explanation has been added for this question."}
+        </div>
+      `;
+      solContainer.appendChild(card);
+    });
+
+    cbtNavigate("win-solutions");
+  });
+
+  // 10. ADMIN LIVE PREVIEW LOGIC
   function updateAdminLivePreview() {
     const topic = document.getElementById("adm-sel-topic").value || "Topic";
     const cat = document.getElementById("adm-sel-cat").value || "Category";
@@ -1161,6 +1334,7 @@
     const o1 = document.getElementById("adm-q-op1").value.trim() || "Option B text";
     const o2 = document.getElementById("adm-q-op2").value.trim() || "Option C text";
     const o3 = document.getElementById("adm-q-op3").value.trim() || "Option D text";
+    const sol = document.getElementById("adm-q-solution").value.trim();
     const correct = parseInt(document.getElementById("adm-q-ans").value, 10);
 
     document.getElementById("preview-meta-tag").innerText = `[${topic} • ${cat}]`;
@@ -1181,6 +1355,14 @@
       `;
     });
     document.getElementById("preview-live-options").innerHTML = html;
+
+    const solEl = document.getElementById("preview-live-solution");
+    if (sol) {
+      solEl.style.display = "block";
+      solEl.innerHTML = `<b>Solution Note:</b> ${sol}`;
+    } else {
+      solEl.style.display = "none";
+    }
   }
 
   function resetQuestionEditor() {
@@ -1195,11 +1377,12 @@
     document.getElementById("adm-q-op1").value = "";
     document.getElementById("adm-q-op2").value = "";
     document.getElementById("adm-q-op3").value = "";
+    document.getElementById("adm-q-solution").value = "";
     document.getElementById("adm-q-ans").value = "0";
     updateAdminLivePreview();
   }
 
-  ["adm-sel-topic", "adm-sel-cat", "adm-q-title", "adm-q-op0", "adm-q-op1", "adm-q-op2", "adm-q-op3", "adm-q-ans"].forEach((id) => {
+  ["adm-sel-topic", "adm-sel-cat", "adm-q-title", "adm-q-op0", "adm-q-op1", "adm-q-op2", "adm-q-op3", "adm-q-solution", "adm-q-ans"].forEach((id) => {
     const el = document.getElementById(id);
     if (el) {
       el.addEventListener("input", updateAdminLivePreview);
@@ -1209,7 +1392,7 @@
 
   document.getElementById("btn-adm-cancel-edit").addEventListener("click", resetQuestionEditor);
 
-  // 10. ADMIN DASHBOARD ACTIONS
+  // 11. ADMIN DASHBOARD ACTIONS
   document.querySelectorAll(".cbt-tab-btn").forEach((btn) => {
     btn.addEventListener("click", function () {
       document.querySelectorAll(".cbt-tab-btn").forEach((b) => b.classList.remove("active"));
@@ -1221,8 +1404,12 @@
   });
 
   document.getElementById("btn-admin-exit").addEventListener("click", () => {
-    cbtRenderWindow2();
-    cbtNavigate("win-2");
+    if (activeUser) {
+      cbtRenderWindow2();
+      cbtNavigate("win-2");
+    } else {
+      cbtNavigate("win-1");
+    }
   });
 
   function cbtRefreshAdmin() {
@@ -1325,6 +1512,7 @@
         document.getElementById("adm-q-op1").value = q.options[1] || "";
         document.getElementById("adm-q-op2").value = q.options[2] || "";
         document.getElementById("adm-q-op3").value = q.options[3] || "";
+        document.getElementById("adm-q-solution").value = q.solution || "";
         document.getElementById("adm-q-ans").value = q.correct.toString();
 
         updateAdminLivePreview();
@@ -1432,6 +1620,7 @@
     }
   });
 
+  // Save / Update Question with Solution & Category isolation
   document.getElementById("btn-adm-save-q").addEventListener("click", () => {
     const topic = document.getElementById("adm-sel-topic").value;
     const cat = document.getElementById("adm-sel-cat").value;
@@ -1440,6 +1629,7 @@
     const o1 = document.getElementById("adm-q-op1").value.trim();
     const o2 = document.getElementById("adm-q-op2").value.trim();
     const o3 = document.getElementById("adm-q-op3").value.trim();
+    const solution = document.getElementById("adm-q-solution").value.trim();
     const correct = parseInt(document.getElementById("adm-q-ans").value, 10);
 
     if (!title || !o0 || !o1 || !o2 || !o3) {
@@ -1447,14 +1637,14 @@
       return;
     }
 
-    const qData = { topic, category: cat, text: title, options: [o0, o1, o2, o3], correct };
+    const qData = { topic, category: cat, text: title, options: [o0, o1, o2, o3], correct, solution };
 
     if (editingQuestionIndex !== null && editingQuestionIndex >= 0) {
       storeQuestions[editingQuestionIndex] = qData;
-      showInAppMessage("Updated", "Question has been successfully updated.");
+      showInAppMessage("Updated", `Question updated in [${topic} - ${cat}].`);
     } else {
       storeQuestions.push(qData);
-      showInAppMessage("Success", "New question added to exam repository.");
+      showInAppMessage("Success", `New question successfully added to [${topic} - ${cat}].`);
     }
 
     syncAllData();
@@ -1498,5 +1688,12 @@
     }
   });
 
+  // 12. INITIAL BOOTSTRAP (Persistent Session Check)
   updateNavbarAuthState();
+  if (activeUser) {
+    cbtRenderWindow2();
+    cbtNavigate("win-2");
+  } else {
+    cbtNavigate("win-1");
+  }
 })();
