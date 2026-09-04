@@ -54,7 +54,10 @@
   let countdownRef = null;
   let remainingSeconds = 1800;
   let generatedOTP = "";
+  let resetOTP = "";
+  let resetMobileTarget = "";
   let appliedDiscountPercent = 0;
+  let activeUser = null;
 
   function syncAllData() {
     localStorage.setItem("tb_portal_topics", JSON.stringify(storeTopics));
@@ -113,6 +116,9 @@
     .cbt-candidate-tag {
       background: #2563eb; font-size: 12px; padding: 4px 10px; border-radius: 99px; color: #fff; display: none;
     }
+    .cbt-btn-logout {
+      background: #dc2626; color: #fff; border: none; padding: 7px 12px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; display: none;
+    }
     .cbt-view {
       display: none; padding: 24px; max-width: 860px; margin: 20px auto; width: 100%; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0;
     }
@@ -140,6 +146,10 @@
       width: 100%; padding: 12px; background: #2563eb; color: #ffffff; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer;
     }
     .cbt-btn-primary:hover { background: #1d4ed8; }
+    .cbt-btn-secondary {
+      width: 100%; padding: 12px; background: #e2e8f0; color: #334155; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+    .cbt-btn-secondary:hover { background: #cbd5e1; }
     .cbt-grid {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px;
     }
@@ -179,6 +189,25 @@
     .pdf-card {
       display: flex; justify-content: space-between; align-items: center; padding: 14px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 10px; background: #fff;
     }
+
+    /* In-App Notification / Dialog Modal Window */
+    .cbt-modal-backdrop {
+      display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65);
+      z-index: 9999; justify-content: center; align-items: center; padding: 20px;
+    }
+    .cbt-modal-backdrop.active { display: flex; }
+    .cbt-modal-box {
+      background: #ffffff; width: 100%; max-width: 440px; border-radius: 10px;
+      padding: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      animation: modalFadeIn 0.2s ease-out;
+    }
+    @keyframes modalFadeIn {
+      from { transform: translateY(-15px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .cbt-modal-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .cbt-modal-text { font-size: 14px; color: #475569; line-height: 1.5; margin-bottom: 20px; }
+    .cbt-modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
   `;
   document.head.appendChild(styleEl);
 
@@ -195,20 +224,42 @@
         <button class="cbt-btn-pay" id="btn-open-payment">Payment & Register</button>
         <button class="cbt-btn-admin-nav" id="btn-open-admin">Admin Portal</button>
         <span id="cbt-user-badge" class="cbt-candidate-tag"></span>
+        <button class="cbt-btn-logout" id="btn-global-logout">Logout</button>
       </div>
     </div>
 
+    <!-- Login Window -->
     <div id="win-1" class="cbt-view active">
       <div class="cbt-h1">Candidate Examination Login</div>
       <div class="cbt-h2">Registration is strictly required to login (Except Admin)</div>
       <input type="text" id="login-username" class="cbt-field" placeholder="Candidate Username" />
       <input type="password" id="login-password" class="cbt-field" placeholder="Candidate Password" />
       <button class="cbt-btn-primary" id="btn-action-login">Login to Portal</button>
-      <div style="text-align:center; margin-top:14px; font-size:13px; color:#64748b;">
-        New student? Click "Payment & Register" at the top right to complete registration.
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; font-size:13px;">
+        <span class="cbt-link-back" id="link-open-forgot" style="margin:0;">Forgot Password?</span>
+        <span style="color:#64748b;">New student? Click "Payment & Register"</span>
       </div>
     </div>
 
+    <!-- Forgot Password Window -->
+    <div id="win-forgot" class="cbt-view">
+      <span class="cbt-link-back" id="link-back-login-from-forgot">&larr; Back to Login</span>
+      <div id="forgot-step-1">
+        <div class="cbt-h1">Reset Candidate Password</div>
+        <div class="cbt-h2">Enter your registered 10-digit mobile number</div>
+        <input type="text" id="forgot-mobile" class="cbt-field" placeholder="10 Digit Mobile Number" />
+        <button class="cbt-btn-primary" id="btn-forgot-send-otp">Send Password Reset OTP</button>
+      </div>
+      <div id="forgot-step-2" style="display:none;">
+        <div class="cbt-h1">Enter OTP & New Password</div>
+        <div class="cbt-h2">Verify identity and choose a secure password</div>
+        <input type="text" id="forgot-otp-input" class="cbt-field" placeholder="Enter Received 4-Digit OTP" />
+        <input type="password" id="forgot-new-password" class="cbt-field" placeholder="Enter New Password" />
+        <button class="cbt-btn-primary" id="btn-forgot-confirm">Update & Reset Password</button>
+      </div>
+    </div>
+
+    <!-- Registration Window -->
     <div id="win-register" class="cbt-view">
       <span class="cbt-link-back" id="link-back-login">&larr; Back to Login</span>
       <div id="pay-step-1">
@@ -246,6 +297,7 @@
       </div>
     </div>
 
+    <!-- Window 2: Topic Selection -->
     <div id="win-2" class="cbt-view">
       <div class="cbt-h1">Welcome, start your practice</div>
       <div class="cbt-h2">Selection Your Topic</div>
@@ -257,6 +309,7 @@
       </div>
     </div>
 
+    <!-- Window 3: Category & Set Selection -->
     <div id="win-3" class="cbt-view">
       <span class="cbt-link-back" id="link-back-topics">&larr; Back to Topics</span>
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:8px; margin-bottom:14px;">
@@ -269,6 +322,7 @@
       <div class="cbt-grid" id="dom-win3-practice-sets"></div>
     </div>
 
+    <!-- Window 4: Exam Terminal -->
     <div id="win-4" class="cbt-view">
       <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; color:#fff; padding:10px 24px;">
         <div style="font-weight:700;" id="win4-banner">Exam Terminal</div>
@@ -301,13 +355,18 @@
       </div>
     </div>
 
+    <!-- Result Window -->
     <div id="win-result" class="cbt-view">
       <div class="cbt-h1">Examination Result</div>
       <div class="cbt-h2">Review your test score</div>
       <div id="dom-result-stats" style="text-align:center; margin: 24px 0;"></div>
-      <button class="cbt-btn-primary" id="btn-restart-flow">Practice Another Topic</button>
+      <div style="display:flex; gap:10px;">
+        <button class="cbt-btn-primary" id="btn-restart-flow">Practice Another Topic</button>
+        <button class="cbt-btn-secondary" id="btn-result-logout">Logout</button>
+      </div>
     </div>
 
+    <!-- Admin Authentication -->
     <div id="win-admin-auth" class="cbt-view">
       <span class="cbt-link-back" id="link-admin-back-login">&larr; Back to Login</span>
       <div class="cbt-h1">Admin Authentication</div>
@@ -316,6 +375,7 @@
       <button class="cbt-btn-primary" id="btn-admin-verify">Unlock Control Dashboard</button>
     </div>
 
+    <!-- Admin Dashboard -->
     <div id="win-admin-dash" class="cbt-view">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:10px; margin-bottom:16px;">
         <span style="font-weight:700; font-size:18px;">Administrative Control Center</span>
@@ -440,15 +500,120 @@
         </div>
       </div>
     </div>
+
+    <!-- In-App Notification Modal Window -->
+    <div id="dom-cbt-modal" class="cbt-modal-backdrop">
+      <div class="cbt-modal-box">
+        <div class="cbt-modal-title" id="cbt-modal-heading">Notification</div>
+        <div class="cbt-modal-text" id="cbt-modal-body">Message content goes here.</div>
+        <div class="cbt-modal-actions" id="cbt-modal-btns"></div>
+      </div>
+    </div>
   `;
   document.body.appendChild(portalDiv);
   applyBrandIdentity();
+
+  // In-App Notification & Confirmation Dialogs
+  function showInAppMessage(title, message, callback) {
+    const modal = document.getElementById("dom-cbt-modal");
+    const h = document.getElementById("cbt-modal-heading");
+    const b = document.getElementById("cbt-modal-body");
+    const btns = document.getElementById("cbt-modal-btns");
+
+    h.innerText = title;
+    b.innerText = message;
+    btns.innerHTML = `<button class="cbt-btn-primary" style="width:auto; padding:8px 20px;" id="cbt-modal-ok">OK</button>`;
+    modal.classList.add("active");
+
+    document.getElementById("cbt-modal-ok").onclick = () => {
+      modal.classList.remove("active");
+      if (callback) callback();
+    };
+  }
+
+  function showInAppConfirm(title, message, onConfirm, onCancel) {
+    const modal = document.getElementById("dom-cbt-modal");
+    const h = document.getElementById("cbt-modal-heading");
+    const b = document.getElementById("cbt-modal-body");
+    const btns = document.getElementById("cbt-modal-btns");
+
+    h.innerText = title;
+    b.innerText = message;
+    btns.innerHTML = `
+      <button class="cbt-btn-secondary" style="width:auto; padding:8px 18px;" id="cbt-modal-cancel">Cancel</button>
+      <button class="cbt-btn-primary" style="width:auto; padding:8px 18px; background:#dc2626;" id="cbt-modal-yes">Confirm</button>
+    `;
+    modal.classList.add("active");
+
+    document.getElementById("cbt-modal-yes").onclick = () => {
+      modal.classList.remove("active");
+      if (onConfirm) onConfirm();
+    };
+    document.getElementById("cbt-modal-cancel").onclick = () => {
+      modal.classList.remove("active");
+      if (onCancel) onCancel();
+    };
+  }
 
   function cbtNavigate(targetId) {
     document.querySelectorAll(".cbt-view").forEach((win) => win.classList.remove("active"));
     const el = document.getElementById(targetId);
     if (el) el.classList.add("active");
   }
+
+  // Clear Registration Form Inputs & State
+  function resetRegistrationForm() {
+    appliedDiscountPercent = 0;
+    generatedOTP = "";
+    document.getElementById("coupon-code-input").value = "";
+    document.getElementById("reg-mobile").value = "";
+    document.getElementById("reg-otp").value = "";
+    document.getElementById("reg-username").value = "";
+    document.getElementById("reg-password").value = "";
+    document.getElementById("pay-step-1").style.display = "block";
+    document.getElementById("pay-step-2").style.display = "none";
+    document.getElementById("pay-step-3").style.display = "none";
+    updateCheckoutDisplay();
+  }
+
+  // Clear Forgot Password Form Inputs & State
+  function resetForgotPasswordForm() {
+    resetOTP = "";
+    resetMobileTarget = "";
+    document.getElementById("forgot-mobile").value = "";
+    document.getElementById("forgot-otp-input").value = "";
+    document.getElementById("forgot-new-password").value = "";
+    document.getElementById("forgot-step-1").style.display = "block";
+    document.getElementById("forgot-step-2").style.display = "none";
+  }
+
+  // Session Logout Handler
+  function candidateLogout() {
+    activeUser = null;
+    candidateAnswers = {};
+    activeExamQuestions = [];
+    clearInterval(countdownRef);
+
+    const badge = document.getElementById("cbt-user-badge");
+    const logoutBtn = document.getElementById("btn-global-logout");
+    badge.innerText = "";
+    badge.style.display = "none";
+    logoutBtn.style.display = "none";
+
+    document.getElementById("login-username").value = "";
+    document.getElementById("login-password").value = "";
+
+    cbtNavigate("win-1");
+    showInAppMessage("Logged Out", "You have been logged out successfully.");
+  }
+
+  document.getElementById("btn-global-logout").addEventListener("click", () => {
+    showInAppConfirm("Logout Confirmation", "Do you want to log out of your session?", candidateLogout);
+  });
+
+  document.getElementById("btn-result-logout").addEventListener("click", () => {
+    candidateLogout();
+  });
 
   // 4. REGISTRATION, COUPONS & PAYMENT
   function updateCheckoutDisplay() {
@@ -464,12 +629,8 @@
   }
 
   document.getElementById("btn-open-payment").addEventListener("click", () => {
-    appliedDiscountPercent = 0;
-    updateCheckoutDisplay();
+    resetRegistrationForm();
     cbtNavigate("win-register");
-    document.getElementById("pay-step-1").style.display = "block";
-    document.getElementById("pay-step-2").style.display = "none";
-    document.getElementById("pay-step-3").style.display = "none";
   });
 
   document.getElementById("btn-apply-coupon").addEventListener("click", () => {
@@ -478,67 +639,141 @@
     if (matched) {
       appliedDiscountPercent = matched.discount;
       updateCheckoutDisplay();
-      alert(`Success: ${matched.discount}% discount applied!`);
+      showInAppMessage("Coupon Applied", `Success: ${matched.discount}% discount applied!`);
     } else {
-      alert("Invalid or expired coupon code.");
+      showInAppMessage("Coupon Error", "Invalid or expired coupon code.");
     }
   });
 
-  document.getElementById("link-back-login").addEventListener("click", () => cbtNavigate("win-1"));
+  document.getElementById("link-back-login").addEventListener("click", () => {
+    resetRegistrationForm();
+    cbtNavigate("win-1");
+  });
 
   document.getElementById("btn-mock-pay").addEventListener("click", () => {
     const finalPrice = Math.max(0, storePrice - (storePrice * (appliedDiscountPercent / 100)));
-    alert(`Payment of ₹ ${finalPrice.toFixed(2)} completed successfully!`);
-    document.getElementById("pay-step-1").style.display = "none";
-    document.getElementById("pay-step-2").style.display = "block";
+    showInAppMessage("Payment Successful", `Payment of ₹ ${finalPrice.toFixed(2)} completed successfully!`, () => {
+      document.getElementById("pay-step-1").style.display = "none";
+      document.getElementById("pay-step-2").style.display = "block";
+    });
   });
 
   document.getElementById("btn-send-otp").addEventListener("click", () => {
     const mobile = document.getElementById("reg-mobile").value.trim();
     if (mobile.length !== 10 || isNaN(mobile)) {
-      alert("Please enter a valid 10-digit mobile number.");
+      showInAppMessage("Invalid Input", "Please enter a valid 10-digit mobile number.");
       return;
     }
     generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
-    alert(`${brandConfig.name} Verification OTP: ${generatedOTP}`);
-    document.getElementById("pay-step-2").style.display = "none";
-    document.getElementById("pay-step-3").style.display = "block";
+    showInAppMessage("Mobile Verification", `${brandConfig.name} Verification OTP: ${generatedOTP}`, () => {
+      document.getElementById("pay-step-2").style.display = "none";
+      document.getElementById("pay-step-3").style.display = "block";
+    });
   });
 
   document.getElementById("btn-complete-reg").addEventListener("click", () => {
+    const mobile = document.getElementById("reg-mobile").value.trim();
     const enteredOTP = document.getElementById("reg-otp").value.trim();
     const user = document.getElementById("reg-username").value.trim();
     const pass = document.getElementById("reg-password").value.trim();
 
     if (enteredOTP !== generatedOTP) {
-      alert("Invalid OTP code.");
+      showInAppMessage("OTP Error", "Invalid OTP code entered.");
       return;
     }
     if (!user || !pass) {
-      alert("Username and password are required.");
+      showInAppMessage("Missing Information", "Both username and password are required.");
+      return;
+    }
+    if (registeredUsers.some((u) => u.username.toLowerCase() === user.toLowerCase())) {
+      showInAppMessage("Duplicate Account", "This username is already taken. Please choose another.");
       return;
     }
 
-    registeredUsers.push({ username: user, password: pass });
+    registeredUsers.push({ username: user, password: pass, mobile: mobile });
     syncAllData();
-    alert("Registration completed successfully! Please login.");
+
+    showInAppMessage("Registration Successful", "Your account has been created successfully! Please log in.", () => {
+      resetRegistrationForm();
+      cbtNavigate("win-1");
+    });
+  });
+
+  // 5. FORGOT PASSWORD WORKFLOW
+  document.getElementById("link-open-forgot").addEventListener("click", () => {
+    resetForgotPasswordForm();
+    cbtNavigate("win-forgot");
+  });
+
+  document.getElementById("link-back-login-from-forgot").addEventListener("click", () => {
+    resetForgotPasswordForm();
     cbtNavigate("win-1");
   });
 
-  // 5. LOGIN HANDLERS
+  document.getElementById("btn-forgot-send-otp").addEventListener("click", () => {
+    const mobile = document.getElementById("forgot-mobile").value.trim();
+    if (mobile.length !== 10 || isNaN(mobile)) {
+      showInAppMessage("Input Error", "Enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    const userObj = registeredUsers.find((u) => u.mobile === mobile);
+    if (!userObj) {
+      showInAppMessage("User Not Found", "No account registered with this mobile number.");
+      return;
+    }
+
+    resetMobileTarget = mobile;
+    resetOTP = Math.floor(1000 + Math.random() * 9000).toString();
+    showInAppMessage("Password Reset OTP", `Your Password Reset OTP: ${resetOTP} (Username: ${userObj.username})`, () => {
+      document.getElementById("forgot-step-1").style.display = "none";
+      document.getElementById("forgot-step-2").style.display = "block";
+    });
+  });
+
+  document.getElementById("btn-forgot-confirm").addEventListener("click", () => {
+    const otp = document.getElementById("forgot-otp-input").value.trim();
+    const newPass = document.getElementById("forgot-new-password").value.trim();
+
+    if (otp !== resetOTP) {
+      showInAppMessage("Security Error", "Incorrect OTP. Verification failed.");
+      return;
+    }
+    if (!newPass || newPass.length < 4) {
+      showInAppMessage("Password Requirements", "Password must be at least 4 characters long.");
+      return;
+    }
+
+    const userObj = registeredUsers.find((u) => u.mobile === resetMobileTarget);
+    if (userObj) {
+      userObj.password = newPass;
+      syncAllData();
+      showInAppMessage("Password Updated", "Your password has been changed successfully. You can now log in.", () => {
+        resetForgotPasswordForm();
+        cbtNavigate("win-1");
+      });
+    }
+  });
+
+  // 6. LOGIN HANDLERS
   document.getElementById("btn-action-login").addEventListener("click", () => {
     const u = document.getElementById("login-username").value.trim();
     const p = document.getElementById("login-password").value.trim();
 
     const matched = registeredUsers.find((item) => item.username === u && item.password === p);
     if (!matched) {
-      alert("Access Denied: You must register and pay to login.");
+      showInAppMessage("Access Denied", "Invalid username or password. Please verify credentials or register.");
       return;
     }
 
+    activeUser = matched;
     const badge = document.getElementById("cbt-user-badge");
+    const logoutBtn = document.getElementById("btn-global-logout");
+
     badge.innerText = u;
     badge.style.display = "inline-block";
+    logoutBtn.style.display = "inline-block";
+
     cbtRenderWindow2();
     cbtNavigate("win-2");
   });
@@ -556,11 +791,11 @@
       cbtNavigate("win-admin-dash");
       cbtRefreshAdmin();
     } else {
-      alert("Incorrect Admin PIN/Password.");
+      showInAppMessage("Admin Error", "Incorrect Admin PIN / Password.");
     }
   });
 
-  // 6. WINDOW 2 & 3 RENDERING
+  // 7. WINDOW 2 & 3 RENDERING
   function cbtRenderWindow2() {
     const container = document.getElementById("dom-win2-topics");
     container.innerHTML = "";
@@ -620,7 +855,7 @@
 
   document.getElementById("link-back-topics").addEventListener("click", () => cbtNavigate("win-2"));
 
-  // 7. CBT EXAM RUNTIME
+  // 8. CBT EXAM RUNTIME
   function cbtLaunchTest(selectedCategory) {
     activeCategory = selectedCategory;
     activeExamQuestions = storeQuestions.filter(
@@ -707,7 +942,7 @@
       cbtUpdatePalette();
     } else {
       cbtUpdatePalette();
-      alert("End of questions reached. Click Submit to finish.");
+      showInAppMessage("End of Exam", "You have reached the final question. Click Submit to finish.");
     }
   });
 
@@ -716,9 +951,9 @@
     if (checked) {
       candidateAnswers[currentQuestionIndex] = parseInt(checked.value, 10);
     }
-    if (confirm("Confirm exam submission?")) {
+    showInAppConfirm("Submit Exam", "Are you sure you want to finalize and submit your exam?", () => {
       cbtFinishTest();
-    }
+    });
   });
 
   function cbtStartTimer() {
@@ -730,8 +965,9 @@
         (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
       if (remainingSeconds <= 0) {
         clearInterval(countdownRef);
-        alert("Time Up!");
-        cbtFinishTest();
+        showInAppMessage("Time Up!", "The allotted time has expired. Submitting exam...", () => {
+          cbtFinishTest();
+        });
       }
       remainingSeconds--;
     }, 1000);
@@ -761,7 +997,7 @@
 
   document.getElementById("btn-restart-flow").addEventListener("click", () => cbtNavigate("win-2"));
 
-  // 8. ADMIN DASHBOARD ACTIONS
+  // 9. ADMIN DASHBOARD ACTIONS
   document.querySelectorAll(".cbt-tab-btn").forEach((btn) => {
     btn.addEventListener("click", function () {
       document.querySelectorAll(".cbt-tab-btn").forEach((b) => b.classList.remove("active"));
@@ -901,7 +1137,7 @@
     if (!isNaN(val) && val >= 0) {
       storePrice = val;
       syncAllData();
-      alert(`Base registration price updated to ₹ ${val.toFixed(2)}`);
+      showInAppMessage("Updated", `Base registration price updated to ₹ ${val.toFixed(2)}`);
     }
   });
 
@@ -914,9 +1150,9 @@
       cbtRefreshAdmin();
       document.getElementById("adm-coupon-code").value = "";
       document.getElementById("adm-coupon-pct").value = "";
-      alert(`Coupon ${code} (${pct}%) created.`);
+      showInAppMessage("Coupon Created", `Coupon ${code} (${pct}%) added successfully.`);
     } else {
-      alert("Provide valid coupon name and percentage between 1-100.");
+      showInAppMessage("Validation Error", "Provide valid coupon name and percentage between 1-100.");
     }
   });
 
@@ -931,7 +1167,7 @@
 
     syncAllData();
     applyBrandIdentity();
-    alert("Branding details updated successfully!");
+    showInAppMessage("Branding Updated", "Branding details updated successfully!");
   });
 
   document.getElementById("btn-adm-add-topic").addEventListener("click", () => {
@@ -975,7 +1211,7 @@
     const correct = parseInt(document.getElementById("adm-q-ans").value, 10);
 
     if (!title || !o0 || !o1 || !o2 || !o3) {
-      alert("Please fill in question text and all 4 options.");
+      showInAppMessage("Validation Error", "Please fill in question text and all 4 options.");
       return;
     }
 
@@ -988,14 +1224,14 @@
     document.getElementById("adm-q-op1").value = "";
     document.getElementById("adm-q-op2").value = "";
     document.getElementById("adm-q-op3").value = "";
-    alert("Question added successfully.");
+    showInAppMessage("Success", "Question added successfully.");
   });
 
   document.getElementById("btn-adm-save-pdf").addEventListener("click", () => {
     const t = document.getElementById("adm-pdf-title").value.trim();
     const u = document.getElementById("adm-pdf-url").value.trim();
     if (!t || !u) {
-      alert("Provide both document title and PDF URL.");
+      showInAppMessage("Validation Error", "Provide both document title and PDF URL.");
       return;
     }
     storeNotes.push({ title: t, url: u });
@@ -1003,19 +1239,19 @@
     cbtRefreshAdmin();
     document.getElementById("adm-pdf-title").value = "";
     document.getElementById("adm-pdf-url").value = "";
-    alert("Study material added.");
+    showInAppMessage("Success", "Study material added.");
   });
 
   document.getElementById("btn-adm-reset-pin").addEventListener("click", () => {
     const newPin = document.getElementById("adm-new-pin").value.trim();
     if (!newPin) {
-      alert("Enter a valid PIN.");
+      showInAppMessage("Validation Error", "Enter a valid PIN.");
       return;
     }
     adminPin = newPin;
     syncAllData();
     document.getElementById("adm-new-pin").value = "";
-    alert(`Admin access PIN updated to: ${newPin}`);
+    showInAppMessage("Admin Security", `Admin access PIN updated to: ${newPin}`);
   });
 
   document.getElementById("btn-adm-save-time").addEventListener("click", () => {
@@ -1023,7 +1259,7 @@
     if (val > 0) {
       storeDuration = val;
       syncAllData();
-      alert(`Exam duration set to ${val} minutes.`);
+      showInAppMessage("Success", `Exam duration set to ${val} minutes.`);
     }
   });
 })();
