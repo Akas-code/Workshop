@@ -8,6 +8,7 @@
       topic: "William Shakespeare",
       category: "PYQS",
       text: "In which year was the First Folio of Shakespeare's plays published?",
+      text_hi: "शेक्सपियर के नाटकों का पहला फोलियो (First Folio) किस वर्ष प्रकाशित हुआ था?",
       options: ["1616", "1623", "1632", "1609"],
       correct: 1,
       solution: "The First Folio of Shakespeare's plays was published in 1623 by John Heminges and Henry Condell."
@@ -16,6 +17,7 @@
       topic: "William Shakespeare",
       category: "Lines",
       text: "'Life's but a walking shadow, a poor player...' occurs in which play?",
+      text_hi: "'Life's but a walking shadow, a poor player...' पंक्ति किस नाटक में आती है?",
       options: ["Hamlet", "Othello", "Macbeth", "King Lear"],
       correct: 2,
       solution: "This line is spoken by Macbeth in Act 5, Scene 5 after hearing of Lady Macbeth's death."
@@ -24,6 +26,7 @@
       topic: "William Wordsworth",
       category: "PYQS",
       text: "Wordsworth's 'The Prelude' was published posthumously in which year?",
+      text_hi: "वर्ड्सवर्थ की 'द प्रील्यूड' उनके मरणोपरांत किस वर्ष प्रकाशित हुई थी?",
       options: ["1798", "1805", "1850", "1832"],
       correct: 2,
       solution: "The Prelude was published in 1850 by Wordsworth's widow, Mary Wordsworth, shortly after his death."
@@ -45,6 +48,8 @@
   let storeCoupons = JSON.parse(localStorage.getItem("tb_portal_coupons")) || defaultCoupons;
   let storeDuration = parseInt(localStorage.getItem("tb_portal_duration"), 10) || 30;
   let storePrice = parseFloat(localStorage.getItem("tb_portal_price")) || 99.00;
+  let storeMarkPositive = parseFloat(localStorage.getItem("tb_portal_mark_pos")) || 2.0;
+  let storeMarkNegative = parseFloat(localStorage.getItem("tb_portal_mark_neg")) || 0.50;
   let registeredUsers = JSON.parse(localStorage.getItem("tb_registered_users")) || [];
   let userPerformance = JSON.parse(localStorage.getItem("tb_user_performance")) || {};
   let adminPin = localStorage.getItem("tb_admin_pin") || "1234";
@@ -55,7 +60,7 @@
     favicon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>"
   };
 
-  // Persistent Session Runtime
+  // Persistent User Session
   let activeUser = null;
   try {
     const saved = localStorage.getItem("tb_active_user");
@@ -67,6 +72,7 @@
   // Runtime State
   let activeTopic = "";
   let activeCategory = "";
+  let activeLanguage = "en";
   let activeExamQuestions = [];
   let currentQuestionIndex = 0;
   let candidateAnswers = {};
@@ -78,6 +84,7 @@
   let appliedDiscountPercent = 0;
   let lastTransactionInfo = { amount: "0.00", coupon: "None" };
   let editingQuestionIndex = null;
+  let isExamActive = false;
 
   function syncAllData() {
     localStorage.setItem("tb_portal_topics", JSON.stringify(storeTopics));
@@ -88,6 +95,8 @@
     localStorage.setItem("tb_portal_coupons", JSON.stringify(storeCoupons));
     localStorage.setItem("tb_portal_duration", storeDuration.toString());
     localStorage.setItem("tb_portal_price", storePrice.toString());
+    localStorage.setItem("tb_portal_mark_pos", storeMarkPositive.toString());
+    localStorage.setItem("tb_portal_mark_neg", storeMarkNegative.toString());
     localStorage.setItem("tb_registered_users", JSON.stringify(registeredUsers));
     localStorage.setItem("tb_user_performance", JSON.stringify(userPerformance));
     localStorage.setItem("tb_admin_pin", adminPin);
@@ -97,6 +106,26 @@
     } else {
       localStorage.removeItem("tb_active_user");
     }
+  }
+
+  function saveExamSnapshot() {
+    if (!isExamActive) return;
+    const snap = {
+      activeTopic,
+      activeCategory,
+      activeLanguage,
+      activeExamQuestions,
+      currentQuestionIndex,
+      candidateAnswers,
+      remainingSeconds,
+      timestamp: Date.now()
+    };
+    localStorage.setItem("tb_exam_running_snapshot", JSON.stringify(snap));
+  }
+
+  function clearExamSnapshot() {
+    isExamActive = false;
+    localStorage.removeItem("tb_exam_running_snapshot");
   }
 
   function applyBrandIdentity() {
@@ -140,91 +169,56 @@
       background: #475569; color: #fff; border: none; padding: 7px 14px; border-radius: 4px; font-size: 13px; cursor: pointer;
     }
     
-    /* Candidate Hover Menu */
-    .cbt-profile-menu-container {
-      position: relative; display: none; padding: 4px 0;
-    }
+    .cbt-profile-menu-container { position: relative; display: none; padding: 4px 0; }
     .cbt-candidate-badge-logo {
       background: #2563eb; color: #ffffff; font-weight: 800; font-size: 13px;
       padding: 6px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px;
       border: 1px solid rgba(255,255,255,0.2); transition: background 0.2s ease;
     }
-    .cbt-candidate-badge-logo:hover {
-      background: #1d4ed8;
-    }
+    .cbt-candidate-badge-logo:hover { background: #1d4ed8; }
     .cbt-profile-dropdown {
       display: none; position: absolute; right: 0; top: 100%; width: 330px;
       background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15), 0 8px 10px -6px rgba(0,0,0,0.1);
-      padding: 16px; color: #1e293b; z-index: 2000;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15); padding: 16px; color: #1e293b; z-index: 2000;
     }
-    .cbt-profile-menu-container:hover .cbt-profile-dropdown {
-      display: block;
-    }
-    .drop-divider {
-      height: 1px; background: #e2e8f0; margin: 10px 0;
-    }
-    .drop-info-title {
-      font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px;
-    }
-    .drop-detail-row {
-      display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;
-    }
+    .cbt-profile-menu-container:hover .cbt-profile-dropdown { display: block; }
+    .drop-divider { height: 1px; background: #e2e8f0; margin: 10px 0; }
+    .drop-info-title { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
+    .drop-detail-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
 
     .cbt-view {
       display: none; padding: 24px; max-width: 860px; margin: 20px auto; width: 100%; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0;
     }
     .cbt-view.active { display: block; }
     
-    /* Full-Screen Test Mode */
+    /* Full-Screen Test Mode Lock */
     #win-4.active {
       display: flex; flex-direction: column; max-width: 100% !important; width: 100% !important;
-      height: calc(100vh - 60px) !important; margin: 0 !important; padding: 0 !important; border-radius: 0 !important; border: none !important;
+      height: 100vh !important; margin: 0 !important; padding: 0 !important; border-radius: 0 !important; border: none !important;
+      position: fixed; inset: 0; z-index: 99999; background: #ffffff;
     }
     .test-fullscreen-body { display: flex; flex: 1; overflow: hidden; }
-    .test-main-area {
-      flex: 1; padding: 24px 32px; overflow-y: auto; border-right: 2px solid #e2e8f0; display: flex; flex-direction: column;
-    }
-    .test-sidebar {
-      width: 300px; background: #ffffff; padding: 18px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto;
-    }
+    .test-main-area { flex: 1; padding: 24px 32px; overflow-y: auto; border-right: 2px solid #e2e8f0; display: flex; flex-direction: column; }
+    .test-sidebar { width: 320px; background: #ffffff; padding: 18px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
     .cbt-h1 { font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 6px; }
     .cbt-h2 { font-size: 14px; color: #64748b; text-align: center; margin-bottom: 20px; }
-    .cbt-field {
-      width: 100%; padding: 10px 12px; margin-bottom: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none;
-    }
+    .cbt-field { width: 100%; padding: 10px 12px; margin-bottom: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; }
     .cbt-field:focus { border-color: #2563eb; }
-    .cbt-btn-primary {
-      width: 100%; padding: 10px; background: #2563eb; color: #ffffff; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;
-    }
+    .cbt-btn-primary { width: 100%; padding: 10px; background: #2563eb; color: #ffffff; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; }
     .cbt-btn-primary:hover { background: #1d4ed8; }
-    .cbt-btn-secondary {
-      width: 100%; padding: 10px; background: #e2e8f0; color: #334155; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;
-    }
+    .cbt-btn-secondary { width: 100%; padding: 10px; background: #e2e8f0; color: #334155; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; }
     .cbt-btn-secondary:hover { background: #cbd5e1; }
-    .cbt-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px;
-    }
-    .cbt-selection-card {
-      background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 16px 12px; text-align: center; cursor: pointer; font-weight: 600; font-size: 14px;
-    }
-    .cbt-selection-card:hover {
-      background: #eff6ff; border-color: #3b82f6; color: #1d4ed8; transform: translateY(-2px);
-    }
-    .palette-legend {
-      display: flex; gap: 12px; font-size: 12px; font-weight: 600; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;
-    }
+    .cbt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .cbt-selection-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 16px 12px; text-align: center; cursor: pointer; font-weight: 600; font-size: 14px; }
+    .cbt-selection-card:hover { background: #eff6ff; border-color: #3b82f6; color: #1d4ed8; transform: translateY(-2px); }
+    .palette-legend { display: flex; gap: 12px; font-size: 12px; font-weight: 600; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
     .legend-item { display: flex; align-items: center; gap: 6px; }
     .circle-icon { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
     .bg-attempted { background-color: #10b981; }
     .bg-unattempted { background-color: #8b5cf6; }
     .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-    .palette-btn {
-      padding: 9px 0; border: none; border-radius: 4px; font-weight: 700; color: white; cursor: pointer; font-size: 13px; text-align: center;
-    }
-    .cbt-opt-label {
-      display: flex; align-items: center; padding: 13px 16px; margin-bottom: 10px; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 15px;
-    }
+    .palette-btn { padding: 9px 0; border: none; border-radius: 4px; font-weight: 700; color: white; cursor: pointer; font-size: 13px; text-align: center; }
+    .cbt-opt-label { display: flex; align-items: center; padding: 13px 16px; margin-bottom: 10px; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 15px; }
     .cbt-opt-label:hover { background: #f8fafc; }
     .cbt-opt-label input { margin-right: 12px; }
     .cbt-tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 16px; overflow-x: auto; gap: 8px; }
@@ -232,57 +226,35 @@
     .cbt-tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; }
     .cbt-pane { display: none; }
     .cbt-pane.active { display: block; }
-    .cbt-item-chip {
-      display: inline-flex; align-items: center; gap: 6px; background: #f1f5f9; padding: 5px 10px; border-radius: 20px; margin: 4px; font-size: 13px;
-    }
+    .cbt-item-chip { display: inline-flex; align-items: center; gap: 6px; background: #f1f5f9; padding: 5px 10px; border-radius: 20px; margin: 4px; font-size: 13px; }
     .cbt-item-chip span { color: #dc2626; cursor: pointer; font-weight: bold; }
     .cbt-btn-del { background: #ef4444; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
     .cbt-btn-edit { background: #3b82f6; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 4px; }
     .cbt-link-back { color: #2563eb; font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer; margin-bottom: 14px; display: inline-flex; align-items: center; gap: 4px; }
     .cbt-link-back:hover { text-decoration: underline; }
-    .pdf-card {
-      display: flex; justify-content: space-between; align-items: center; padding: 14px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 10px; background: #fff;
-    }
+    .pdf-card { display: flex; justify-content: space-between; align-items: center; padding: 14px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 10px; background: #fff; }
 
-    /* Live Preview Panel Layout */
-    .preview-editor-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px;
-    }
-    @media (max-width: 768px) {
-      .preview-editor-grid { grid-template-columns: 1fr; }
-    }
-    .preview-box-container {
-      background: #f8fafc; border: 1px dashed #3b82f6; border-radius: 6px; padding: 14px;
-    }
-    .preview-correct-badge {
-      display: inline-block; background: #10b981; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-left: auto;
-    }
+    /* Rules & Instructions Box */
+    .rules-list { margin: 16px 0; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 16px; font-size: 14px; line-height: 1.6; }
+    .rules-list li { margin-bottom: 8px; list-style-position: inside; }
+    .scheme-badge { display: inline-flex; gap: 8px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 13px; }
 
     /* Solution Box Styles */
-    .solution-card {
-      border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 16px; background: #fff;
-    }
+    .solution-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 16px; background: #fff; }
     .solution-card.correct-ans { border-left: 5px solid #10b981; }
     .solution-card.wrong-ans { border-left: 5px solid #ef4444; }
     .solution-card.skipped-ans { border-left: 5px solid #8b5cf6; }
-    .sol-explanation-box {
-      background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 6px; margin-top: 10px; font-size: 13px; color: #334155;
-    }
+    .sol-explanation-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 6px; margin-top: 10px; font-size: 13px; color: #334155; }
 
     /* Modals */
     .cbt-modal-backdrop {
-      display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65);
-      z-index: 9999; justify-content: center; align-items: center; padding: 20px;
+      display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75);
+      z-index: 999999; justify-content: center; align-items: center; padding: 20px;
     }
     .cbt-modal-backdrop.active { display: flex; }
     .cbt-modal-box {
-      background: #ffffff; width: 100%; max-width: 440px; border-radius: 10px;
-      padding: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      animation: modalFadeIn 0.2s ease-out;
-    }
-    @keyframes modalFadeIn {
-      from { transform: translateY(-15px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      background: #ffffff; width: 100%; max-width: 480px; border-radius: 10px;
+      padding: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     }
     .cbt-modal-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
     .cbt-modal-text { font-size: 14px; color: #475569; line-height: 1.5; margin-bottom: 20px; }
@@ -294,17 +266,15 @@
   const portalDiv = document.createElement("div");
   portalDiv.id = "cbt-portal";
   portalDiv.innerHTML = `
-    <div class="cbt-nav">
+    <div class="cbt-nav" id="dom-main-navbar">
       <div class="cbt-logo-area">
         <span class="cbt-logo-badge" id="dom-brand-badge"></span>
         <span class="cbt-brand-name" id="dom-brand-name"></span>
       </div>
       <div class="cbt-nav-actions">
-        <!-- Guest Buttons -->
         <button class="cbt-btn-pay" id="btn-open-payment">Payment & Register</button>
         <button class="cbt-btn-admin-nav" id="btn-open-admin">Admin Portal</button>
         
-        <!-- Candidate Hover Menu -->
         <div class="cbt-profile-menu-container" id="cbt-candidate-menu-wrapper">
           <div class="cbt-candidate-badge-logo" id="dom-candidate-logo-btn">
             <span id="dom-cand-logo-text">🎓 AW</span>
@@ -316,26 +286,15 @@
             <div style="font-size:12px; color:#64748b; margin-bottom:10px;">Status: <span style="color:#10b981; font-weight:700;">Verified Active</span></div>
 
             <div class="drop-info-title">Contact & Subscription</div>
-            <div class="drop-detail-row">
-              <span style="color:#64748b;">Phone:</span>
-              <span style="font-weight:600;" id="drop-display-phone">+91 ----------</span>
-            </div>
-            <div class="drop-detail-row">
-              <span style="color:#64748b;">Fee Paid:</span>
-              <span style="font-weight:700; color:#10b981;" id="drop-display-price">₹ 0.00</span>
-            </div>
-            <div class="drop-detail-row">
-              <span style="color:#64748b;">Coupon Used:</span>
-              <span style="font-weight:600;" id="drop-display-coupon">None</span>
-            </div>
+            <div class="drop-detail-row"><span style="color:#64748b;">Phone:</span><span style="font-weight:600;" id="drop-display-phone">+91 ----------</span></div>
+            <div class="drop-detail-row"><span style="color:#64748b;">Fee Paid:</span><span style="font-weight:700; color:#10b981;" id="drop-display-price">₹ 0.00</span></div>
+            <div class="drop-detail-row"><span style="color:#64748b;">Coupon:</span><span style="font-weight:600;" id="drop-display-coupon">None</span></div>
 
             <div class="drop-divider"></div>
-
             <div class="drop-info-title">Performance Summary</div>
             <div id="drop-perf-summary" style="font-size:12px; color:#475569; margin-bottom:10px;">No tests taken yet.</div>
 
             <div class="drop-divider"></div>
-
             <div class="drop-info-title">Update Candidate Credentials</div>
             <input type="text" id="drop-edit-name" class="cbt-field" placeholder="Change Display Name" />
             <input type="password" id="drop-edit-pass" class="cbt-field" placeholder="Set New Password" />
@@ -415,7 +374,7 @@
       </div>
     </div>
 
-    <!-- Window 2: Topic Selection (Candidate Main Dashboard) -->
+    <!-- Window 2: Topic Selection -->
     <div id="win-2" class="cbt-view">
       <div class="cbt-h1">Welcome, start your practice</div>
       <div class="cbt-h2">Selection Your Topic</div>
@@ -440,19 +399,70 @@
       <div class="cbt-grid" id="dom-win3-practice-sets"></div>
     </div>
 
-    <!-- Window 4: Exam Terminal -->
+    <!-- Window 3.5: Pre-Exam Confirmation & Instructions Screen -->
+    <div id="win-instructions" class="cbt-view">
+      <span class="cbt-link-back" id="link-back-from-instructions">&larr; Back to Categories</span>
+      <div class="cbt-h1" id="inst-heading" style="text-align:left;">Examination Instructions & Confirmation</div>
+      <div class="cbt-h2" id="inst-subheading" style="text-align:left;">Please read terms and instructions carefully before starting the test</div>
+
+      <div style="display:flex; gap:12px; margin: 14px 0;">
+        <div class="scheme-badge">Marks per Correct Answer: <span id="inst-pos-mark">+2.0</span></div>
+        <div class="scheme-badge" style="background:#fef2f2; border-color:#fecaca; color:#991b1b;">Negative Marking: <span id="inst-neg-mark">-0.50</span></div>
+      </div>
+
+      <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:12px; margin-bottom:16px;">
+        <label style="font-weight:700; font-size:14px; display:block; margin-bottom:6px;">Choose Default Examination Language:</label>
+        <select id="exam-lang-select" class="cbt-field" style="margin:0; max-width:260px;">
+          <option value="en">English</option>
+          <option value="hi">हिंदी (Hindi)</option>
+        </select>
+      </div>
+
+      <div class="rules-list">
+        <b>Rules, Terms & Conditions:</b>
+        <ol style="margin-top:8px;">
+          <li>Once started, the test screen will be locked in <b>Full-Screen Mode</b>.</li>
+          <li>Page refresh, browser back, or closing tab will not terminate the exam. The timer will continue and your previous progress will be restored.</li>
+          <li>Negative marking will be strictly applied for every incorrect answer. Skipped questions carry zero deduction.</li>
+          <li>Do not attempt to exit full screen or switch tabs. Any exit attempt will record an infraction.</li>
+          <li>Ensure stable internet connection. You can review and change your answers before final submission.</li>
+        </ol>
+      </div>
+
+      <div style="margin:16px 0; display:flex; align-items:flex-start; gap:10px;">
+        <input type="checkbox" id="inst-agree-chk" style="margin-top:4px; transform:scale(1.2); cursor:pointer;" />
+        <label for="inst-agree-chk" style="font-size:13px; color:#334155; cursor:pointer;">
+          I have read and understood all the instructions, negative marking scheme, and terms stated above. I agree that the decision of the portal system is final.
+        </label>
+      </div>
+
+      <button class="cbt-btn-primary" id="btn-start-locked-exam" style="padding:14px; font-size:16px; background:#10b981;" disabled>I Am Ready to Begin (Start Test)</button>
+    </div>
+
+    <!-- Window 4: Locked Full-Screen Exam Terminal -->
     <div id="win-4" class="cbt-view">
-      <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; color:#fff; padding:10px 24px;">
-        <div style="display:flex; align-items:center; gap:16px;">
-          <button id="btn-back-from-exam" style="background:#334155; color:#fff; border:none; padding:5px 10px; border-radius:4px; font-size:12px; cursor:pointer; font-weight:600;">&larr; Exit Test</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; color:#fff; padding:12px 24px;">
+        <div style="display:flex; align-items:center; gap:14px;">
+          <span style="background:#ef4444; color:#fff; font-size:11px; font-weight:800; padding:3px 8px; border-radius:4px;">LOCKED CBT SESSION</span>
           <div style="font-weight:700;" id="win4-banner">Exam Terminal</div>
         </div>
-        <div style="font-size:18px; font-weight:800; color:#ef4444;" id="win4-clock">30:00</div>
+        <div style="display:flex; align-items:center; gap:16px;">
+          <div style="display:flex; align-items:center; gap:6px; font-size:12px;">
+            <span>Language:</span>
+            <select id="win4-lang-toggle" style="background:#1e293b; color:#fff; border:1px solid #475569; padding:3px 6px; border-radius:4px; font-size:12px;">
+              <option value="en">English</option>
+              <option value="hi">हिंदी</option>
+            </select>
+          </div>
+          <div style="font-size:20px; font-weight:800; color:#ef4444;" id="win4-clock">30:00</div>
+        </div>
       </div>
+
       <div class="test-fullscreen-body">
         <div class="test-main-area">
-          <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
             <span style="font-size:14px; font-weight:700; color:#64748b;" id="win4-counter">Question 1</span>
+            <span style="font-size:12px; font-weight:700; color:#2563eb;" id="win4-mark-info">+2.0 / -0.50</span>
           </div>
           <div id="dom-test-container" style="flex:1;"></div>
           <div style="display:flex; gap:12px; margin-top:20px;">
@@ -460,17 +470,14 @@
             <button class="cbt-btn-primary" id="btn-submit-exam" style="width:auto; padding:12px 28px; background:#dc2626; margin-left:auto;">Submit Final Exam</button>
           </div>
         </div>
+
         <div class="test-sidebar">
           <div style="font-weight:700; font-size:15px;">Question Palette</div>
           <div class="palette-legend">
-            <div class="legend-item">
-              <span class="circle-icon bg-attempted"></span> Attempted: <span id="stat-attempted" style="color:#10b981;">0</span>
-            </div>
-            <div class="legend-item">
-              <span class="circle-icon bg-unattempted"></span> Unattempted: <span id="stat-unattempted" style="color:#8b5cf6;">0</span>
-            </div>
+            <div class="legend-item"><span class="circle-icon bg-attempted"></span> Attempted: <span id="stat-attempted" style="color:#10b981;">0</span></div>
+            <div class="legend-item"><span class="circle-icon bg-unattempted"></span> Unattempted: <span id="stat-unattempted" style="color:#8b5cf6;">0</span></div>
           </div>
-          <div style="font-size:11px; font-weight:600; color:#64748b;">Click number to jump to question:</div>
+          <div style="font-size:11px; font-weight:600; color:#64748b;">Click question number to jump:</div>
           <div class="palette-grid" id="dom-palette-grid"></div>
         </div>
       </div>
@@ -478,8 +485,8 @@
 
     <!-- Result Window -->
     <div id="win-result" class="cbt-view">
-      <div class="cbt-h1">Examination Result</div>
-      <div class="cbt-h2">Review your test score and performance analysis</div>
+      <div class="cbt-h1">Examination Scorecard & Result</div>
+      <div class="cbt-h2">Review detailed performance metrics & score</div>
       <div id="dom-result-stats" style="text-align:center; margin: 24px 0;"></div>
       <div style="display:flex; gap:10px; justify-content:center;">
         <button class="cbt-btn-primary" id="btn-view-solutions" style="background:#10b981; max-width:240px;">View Detailed Solutions</button>
@@ -519,7 +526,7 @@
         <button class="cbt-tab-btn" data-pane="pane-w3-sets">Window 3: Sets</button>
         <button class="cbt-tab-btn" data-pane="pane-w4-questions">Window 4: Questions</button>
         <button class="cbt-tab-btn" data-pane="pane-notes">PDF & Notes</button>
-        <button class="cbt-tab-btn" data-pane="pane-security">Admin PIN & Time</button>
+        <button class="cbt-tab-btn" data-pane="pane-security">Admin PIN & Marking</button>
       </div>
 
       <div id="pane-pricing" class="cbt-pane active">
@@ -534,12 +541,11 @@
         <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:6px; margin-bottom:16px;">
           <div style="font-weight:600; margin-bottom:8px;">Create Discount Coupon:</div>
           <div style="display:grid; grid-template-columns: 2fr 1fr 120px; gap:8px;">
-            <input type="text" id="adm-coupon-code" class="cbt-field" style="margin:0;" placeholder="Coupon Code (e.g. SAVE20)" />
+            <input type="text" id="adm-coupon-code" class="cbt-field" style="margin:0;" placeholder="Coupon Code" />
             <input type="number" id="adm-coupon-pct" class="cbt-field" style="margin:0;" placeholder="Discount %" min="1" max="100" />
             <button class="cbt-btn-primary" id="btn-adm-add-coupon">Add Coupon</button>
           </div>
         </div>
-
         <div style="font-weight:600; margin-bottom:8px;">Active Coupon Codes:</div>
         <div id="dom-adm-coupons-list"></div>
       </div>
@@ -547,14 +553,11 @@
       <div id="pane-branding" class="cbt-pane">
         <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:6px;">
           <div style="font-weight:600; margin-bottom:6px;">Website / Brand Name:</div>
-          <input type="text" id="adm-brand-name" class="cbt-field" placeholder="e.g. Akash Workshop" />
-
+          <input type="text" id="adm-brand-name" class="cbt-field" />
           <div style="font-weight:600; margin-bottom:6px;">Logo Badge Text:</div>
-          <input type="text" id="adm-brand-badge" class="cbt-field" placeholder="e.g. AW" />
-
-          <div style="font-weight:600; margin-bottom:6px;">Favicon Icon URL / SVG Data:</div>
-          <input type="text" id="adm-brand-favicon" class="cbt-field" placeholder="Image URL or SVG data URI" />
-
+          <input type="text" id="adm-brand-badge" class="cbt-field" />
+          <div style="font-weight:600; margin-bottom:6px;">Favicon URL / SVG Data:</div>
+          <input type="text" id="adm-brand-favicon" class="cbt-field" />
           <button class="cbt-btn-primary" id="btn-adm-save-branding">Update Branding & Identity</button>
         </div>
       </div>
@@ -587,42 +590,27 @@
       </div>
 
       <div id="pane-w4-questions" class="cbt-pane">
-        <div class="preview-editor-grid">
-          <!-- Editor Controls -->
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:6px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <span id="adm-form-mode" style="font-weight:700; color:#2563eb; font-size:13px;">CREATE NEW QUESTION</span>
-              <button id="btn-adm-cancel-edit" style="display:none; background:#94a3b8; color:#fff; border:none; border-radius:4px; padding:3px 8px; font-size:11px; cursor:pointer;">Cancel Edit</button>
-            </div>
-            <select id="adm-sel-topic" class="cbt-field"></select>
-            <select id="adm-sel-cat" class="cbt-field"></select>
-            <input type="text" id="adm-q-title" class="cbt-field" placeholder="Question Text" />
-            <input type="text" id="adm-q-op0" class="cbt-field" placeholder="Option A" />
-            <input type="text" id="adm-q-op1" class="cbt-field" placeholder="Option B" />
-            <input type="text" id="adm-q-op2" class="cbt-field" placeholder="Option C" />
-            <input type="text" id="adm-q-op3" class="cbt-field" placeholder="Option D" />
-            <select id="adm-q-ans" class="cbt-field">
-              <option value="0">Correct: Option A</option>
-              <option value="1">Correct: Option B</option>
-              <option value="2">Correct: Option C</option>
-              <option value="3">Correct: Option D</option>
-            </select>
-            <textarea id="adm-q-solution" class="cbt-field" style="resize:vertical; height:70px;" placeholder="Detailed Solution / Explanation"></textarea>
-            <button class="cbt-btn-primary" id="btn-adm-save-q">Save Question</button>
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:6px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span id="adm-form-mode" style="font-weight:700; color:#2563eb; font-size:13px;">CREATE NEW QUESTION</span>
+            <button id="btn-adm-cancel-edit" style="display:none; background:#94a3b8; color:#fff; border:none; border-radius:4px; padding:3px 8px; font-size:11px; cursor:pointer;">Cancel</button>
           </div>
-
-          <!-- Live Interactive Preview Panel -->
-          <div class="preview-box-container">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #cbd5e1; padding-bottom:6px; margin-bottom:12px;">
-              <span style="font-weight:700; font-size:13px; color:#1e293b;">LIVE CANDIDATE PREVIEW</span>
-              <span id="preview-meta-tag" style="font-size:11px; color:#64748b; font-weight:600;">[Topic • Category]</span>
-            </div>
-            <div id="preview-live-text" style="font-weight:700; font-size:15px; margin-bottom:12px; color:#0f172a; min-height:40px;">
-              Question preview will render here as you type...
-            </div>
-            <div id="preview-live-options"></div>
-            <div id="preview-live-solution" style="margin-top:10px; font-size:12px; color:#475569; background:#e2e8f0; padding:8px; border-radius:4px; display:none;"></div>
-          </div>
+          <select id="adm-sel-topic" class="cbt-field"></select>
+          <select id="adm-sel-cat" class="cbt-field"></select>
+          <input type="text" id="adm-q-title" class="cbt-field" placeholder="Question Text (English)" />
+          <input type="text" id="adm-q-title-hi" class="cbt-field" placeholder="Question Text (Hindi Translation - Optional)" />
+          <input type="text" id="adm-q-op0" class="cbt-field" placeholder="Option A" />
+          <input type="text" id="adm-q-op1" class="cbt-field" placeholder="Option B" />
+          <input type="text" id="adm-q-op2" class="cbt-field" placeholder="Option C" />
+          <input type="text" id="adm-q-op3" class="cbt-field" placeholder="Option D" />
+          <select id="adm-q-ans" class="cbt-field">
+            <option value="0">Correct: Option A</option>
+            <option value="1">Correct: Option B</option>
+            <option value="2">Correct: Option C</option>
+            <option value="3">Correct: Option D</option>
+          </select>
+          <textarea id="adm-q-solution" class="cbt-field" style="resize:vertical; height:60px;" placeholder="Detailed Solution / Explanation"></textarea>
+          <button class="cbt-btn-primary" id="btn-adm-save-q">Save Question</button>
         </div>
 
         <div style="font-weight:600; margin:12px 0 8px 0; font-size:14px;">Existing Question Pool:</div>
@@ -633,7 +621,7 @@
 
       <div id="pane-notes" class="cbt-pane">
         <div style="font-weight:600; margin-bottom:6px;">Add PDF / Study Notes Link:</div>
-        <input type="text" id="adm-pdf-title" class="cbt-field" placeholder="Document Title (e.g. Master Notes)" />
+        <input type="text" id="adm-pdf-title" class="cbt-field" placeholder="Document Title" />
         <input type="text" id="adm-pdf-url" class="cbt-field" placeholder="Direct PDF or Google Drive URL" />
         <button class="cbt-btn-primary" id="btn-adm-save-pdf" style="margin-bottom:16px;">Add Study Document</button>
         <div style="font-weight:600; margin-bottom:8px;">Current Study Materials:</div>
@@ -643,13 +631,18 @@
       <div id="pane-security" class="cbt-pane">
         <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:6px; margin-bottom:16px;">
           <div style="font-weight:600; margin-bottom:8px;">Reset Admin PIN / Password:</div>
-          <input type="password" id="adm-new-pin" class="cbt-field" placeholder="Enter New Secret PIN" />
-          <button class="cbt-btn-primary" id="btn-adm-reset-pin">Update Admin PIN</button>
+          <input type="password" id="adm-new-pin" class="cbt-field" placeholder="Enter New PIN" />
+          <button class="cbt-btn-primary" id="btn-adm-reset-pin">Update PIN</button>
         </div>
         <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:6px;">
-          <div style="font-weight:600; margin-bottom:8px;">Exam Duration (Minutes):</div>
+          <div style="font-weight:600; margin-bottom:8px;">Exam Marking Scheme & Duration:</div>
+          <label style="font-size:12px; font-weight:700;">Marks for Correct (+):</label>
+          <input type="number" id="adm-mark-pos" class="cbt-field" step="0.5" />
+          <label style="font-size:12px; font-weight:700;">Negative Marks per Wrong (-):</label>
+          <input type="number" id="adm-mark-neg" class="cbt-field" step="0.25" />
+          <label style="font-size:12px; font-weight:700;">Duration (Minutes):</label>
           <input type="number" id="adm-exam-min" class="cbt-field" min="1" max="180" />
-          <button class="cbt-btn-primary" id="btn-adm-save-time">Save Duration</button>
+          <button class="cbt-btn-primary" id="btn-adm-save-scheme">Save Exam Settings</button>
         </div>
       </div>
     </div>
@@ -665,7 +658,7 @@
   `;
   document.body.appendChild(portalDiv);
 
-  // Modal Alert Dialog
+  // Dialog & Notification Modal
   function showInAppMessage(title, message, callback) {
     const modal = document.getElementById("dom-cbt-modal");
     const h = document.getElementById("cbt-modal-heading");
@@ -683,17 +676,17 @@
     };
   }
 
-  function showInAppConfirm(title, message, onConfirm, onCancel) {
+  function showInAppConfirm(title, message, onConfirm, onCancel, confirmText = "Confirm") {
     const modal = document.getElementById("dom-cbt-modal");
     const h = document.getElementById("cbt-modal-heading");
     const b = document.getElementById("cbt-modal-body");
     const btns = document.getElementById("cbt-modal-btns");
 
     h.innerText = title;
-    b.innerText = message;
+    b.innerHTML = message;
     btns.innerHTML = `
       <button class="cbt-btn-secondary" style="width:auto; padding:8px 18px;" id="cbt-modal-cancel">Cancel</button>
-      <button class="cbt-btn-primary" style="width:auto; padding:8px 18px; background:#dc2626;" id="cbt-modal-yes">Confirm</button>
+      <button class="cbt-btn-primary" style="width:auto; padding:8px 18px; background:#dc2626;" id="cbt-modal-yes">${confirmText}</button>
     `;
     modal.classList.add("active");
 
@@ -711,7 +704,43 @@
     document.querySelectorAll(".cbt-view").forEach((win) => win.classList.remove("active"));
     const el = document.getElementById(targetId);
     if (el) el.classList.add("active");
+
+    // Hide navbar if inside exam
+    const nav = document.getElementById("dom-main-navbar");
+    if (targetId === "win-4") {
+      if (nav) nav.style.display = "none";
+    } else {
+      if (nav) nav.style.display = "flex";
+    }
   }
+
+  // Full-Screen API Lock
+  function enterFullScreen() {
+    const el = document.documentElement;
+    if (el.requestFullscreen) {
+      el.requestFullscreen().catch(() => {});
+    } else if (el.mozRequestFullScreen) {
+      el.mozRequestFullScreen();
+    } else if (el.webkitRequestFullscreen) {
+      el.webkitRequestFullscreen();
+    }
+  }
+
+  function exitFullScreen() {
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    }
+  }
+
+  // Window Unload & Refresh Interceptor
+  window.addEventListener("beforeunload", (e) => {
+    if (isExamActive) {
+      saveExamSnapshot();
+      e.preventDefault();
+      e.returnValue = "Your exam is in progress! If you leave, your exam timer will continue running.";
+      return e.returnValue;
+    }
+  });
 
   // Dynamic Navbar Logic
   function updateNavbarAuthState() {
@@ -734,7 +763,7 @@
       const perfEl = document.getElementById("drop-perf-summary");
       if (candidateStats && candidateStats.length > 0) {
         const last = candidateStats[candidateStats.length - 1];
-        perfEl.innerHTML = `Tests Given: <b>${candidateStats.length}</b><br>Last Score: <b>${last.score}/${last.total} (${last.pct}%)</b> [${last.category}]`;
+        perfEl.innerHTML = `Tests Given: <b>${candidateStats.length}</b><br>Last Net Score: <b>${last.netScore} pts (${last.pct}%)</b> [${last.category}]`;
       } else {
         perfEl.innerHTML = "No tests taken yet.";
       }
@@ -787,6 +816,10 @@
 
   // Explicit Candidate Logout
   function candidateLogout() {
+    if (isExamActive) {
+      showInAppMessage("Test In Progress", "You cannot logout while an exam is in progress. Please submit your test first.");
+      return;
+    }
     activeUser = null;
     candidateAnswers = {};
     activeExamQuestions = [];
@@ -1072,7 +1105,7 @@
       const card = document.createElement("div");
       card.className = "cbt-selection-card";
       card.innerText = cat;
-      card.onclick = () => cbtLaunchTest(cat);
+      card.onclick = () => cbtPrepareInstructions(cat);
       catBox.appendChild(card);
     });
 
@@ -1080,24 +1113,64 @@
       const card = document.createElement("div");
       card.className = "cbt-selection-card";
       card.innerText = setLabel;
-      card.onclick = () => cbtLaunchTest(setLabel);
+      card.onclick = () => cbtPrepareInstructions(setLabel);
       setBox.appendChild(card);
     });
   }
+
+  // Window 3.5: Prepare Confirmation & Instructions Screen
+  function cbtPrepareInstructions(categoryName) {
+    activeCategory = (categoryName || "").trim();
+
+    const targetTopic = (activeTopic || "").trim().toLowerCase();
+    const targetCat = activeCategory.toLowerCase();
+
+    // Check availability strictly
+    activeExamQuestions = storeQuestions.filter((q) => {
+      const qTopic = (q.topic || "").trim().toLowerCase();
+      const qCat = (q.category || "").trim().toLowerCase();
+      return qTopic === targetTopic && qCat === targetCat;
+    });
+
+    if (activeExamQuestions.length === 0) {
+      showInAppMessage(
+        "No Questions Available",
+        `There are currently 0 questions available for "${activeTopic}" under "${activeCategory}". Please select another category or contact administrator.`
+      );
+      return;
+    }
+
+    document.getElementById("inst-heading").innerText = `${activeTopic} - ${activeCategory}`;
+    document.getElementById("inst-pos-mark").innerText = `+${storeMarkPositive.toFixed(2)}`;
+    document.getElementById("inst-neg-mark").innerText = `-${storeMarkNegative.toFixed(2)}`;
+
+    const chk = document.getElementById("inst-agree-chk");
+    const btn = document.getElementById("btn-start-locked-exam");
+    chk.checked = false;
+    btn.disabled = true;
+
+    chk.onchange = () => {
+      btn.disabled = !chk.checked;
+    };
+
+    cbtNavigate("win-instructions");
+  }
+
+  document.getElementById("link-back-from-instructions").addEventListener("click", () => {
+    cbtRenderWindow3();
+    cbtNavigate("win-3");
+  });
+
+  document.getElementById("btn-start-locked-exam").addEventListener("click", () => {
+    activeLanguage = document.getElementById("exam-lang-select").value;
+    document.getElementById("win4-lang-toggle").value = activeLanguage;
+    cbtLaunchTestExecution();
+  });
 
   // Navigation Back Links
   document.getElementById("link-back-topics").addEventListener("click", () => {
     cbtRenderWindow2();
     cbtNavigate("win-2");
-  });
-
-  document.getElementById("btn-back-from-exam").addEventListener("click", () => {
-    showInAppConfirm("Exit Exam", "Are you sure you want to exit the current exam? Your progress will not be saved.", () => {
-      clearInterval(countdownRef);
-      candidateAnswers = {};
-      cbtRenderWindow3();
-      cbtNavigate("win-3");
-    });
   });
 
   document.getElementById("btn-restart-flow").addEventListener("click", () => {
@@ -1114,34 +1187,43 @@
     cbtNavigate("win-2");
   });
 
-  // 8. CBT EXAM RUNTIME (100% Strict Category & Topic Matching)
-  function cbtLaunchTest(selectedCategory) {
-    activeCategory = (selectedCategory || "").trim();
-
-    const targetTopic = (activeTopic || "").trim().toLowerCase();
-    const targetCat = activeCategory.toLowerCase();
-
-    // STRICT FILTERING: Only match exact topic AND exact category
-    activeExamQuestions = storeQuestions.filter((q) => {
-      const qTopic = (q.topic || "").trim().toLowerCase();
-      const qCat = (q.category || "").trim().toLowerCase();
-      return qTopic === targetTopic && qCat === targetCat;
-    });
-
-    if (activeExamQuestions.length === 0) {
-      showInAppMessage(
-        "No Questions Found",
-        `Topic "${activeTopic}" ke under Category "${activeCategory}" me abhi koi questions uplabdh nahi hain. Kripya Admin portal se is category me questions add karein ya dusri category chunein.`
-      );
-      return;
-    }
-
+  // 8. CBT EXAM RUNTIME (Locked Execution & Resume)
+  function cbtLaunchTestExecution() {
+    isExamActive = true;
     currentQuestionIndex = 0;
     candidateAnswers = {};
     remainingSeconds = storeDuration * 60;
 
     document.getElementById("win4-banner").innerText = `${brandConfig.name} | ${activeTopic} (${activeCategory})`;
+    document.getElementById("win4-mark-info").innerText = `+${storeMarkPositive.toFixed(2)} / -${storeMarkNegative.toFixed(2)}`;
+
     cbtNavigate("win-4");
+    enterFullScreen();
+    cbtRenderQuestion();
+    cbtUpdatePalette();
+    cbtStartTimer();
+    saveExamSnapshot();
+  }
+
+  function cbtResumeTest(snap) {
+    isExamActive = true;
+    activeTopic = snap.activeTopic;
+    activeCategory = snap.activeCategory;
+    activeLanguage = snap.activeLanguage || "en";
+    activeExamQuestions = snap.activeExamQuestions || [];
+    currentQuestionIndex = snap.currentQuestionIndex || 0;
+    candidateAnswers = snap.candidateAnswers || {};
+
+    // Deduct elapsed time since snapshot
+    const elapsed = Math.floor((Date.now() - snap.timestamp) / 1000);
+    remainingSeconds = Math.max(5, (snap.remainingSeconds || 1800) - elapsed);
+
+    document.getElementById("win4-lang-toggle").value = activeLanguage;
+    document.getElementById("win4-banner").innerText = `${brandConfig.name} | ${activeTopic} (${activeCategory})`;
+    document.getElementById("win4-mark-info").innerText = `+${storeMarkPositive.toFixed(2)} / -${storeMarkNegative.toFixed(2)}`;
+
+    cbtNavigate("win-4");
+    enterFullScreen();
     cbtRenderQuestion();
     cbtUpdatePalette();
     cbtStartTimer();
@@ -1153,7 +1235,9 @@
       `Question ${currentQuestionIndex + 1} of ${activeExamQuestions.length}`;
 
     const container = document.getElementById("dom-test-container");
-    let html = `<div style="font-size:18px; font-weight:700; margin-bottom:18px;">Q${currentQuestionIndex + 1}. ${cur.text}</div>`;
+    const questionText = (activeLanguage === "hi" && cur.text_hi) ? cur.text_hi : cur.text;
+
+    let html = `<div style="font-size:18px; font-weight:700; margin-bottom:18px; line-height:1.4;">Q${currentQuestionIndex + 1}. ${questionText}</div>`;
 
     for (let i = 0; i < cur.options.length; i++) {
       const checked = candidateAnswers[currentQuestionIndex] === i ? "checked" : "";
@@ -1165,6 +1249,12 @@
     }
     container.innerHTML = html;
   }
+
+  document.getElementById("win4-lang-toggle").addEventListener("change", (e) => {
+    activeLanguage = e.target.value;
+    cbtRenderQuestion();
+    saveExamSnapshot();
+  });
 
   function cbtUpdatePalette() {
     const paletteGrid = document.getElementById("dom-palette-grid");
@@ -1191,6 +1281,7 @@
         currentQuestionIndex = idx;
         cbtRenderQuestion();
         cbtUpdatePalette();
+        saveExamSnapshot();
       };
       paletteGrid.appendChild(btn);
     });
@@ -1208,19 +1299,47 @@
       currentQuestionIndex++;
       cbtRenderQuestion();
       cbtUpdatePalette();
+      saveExamSnapshot();
     } else {
       cbtUpdatePalette();
-      showInAppMessage("End of Exam", "You have reached the final question. Click Submit to finish.");
+      saveExamSnapshot();
+      showInAppMessage("Last Question", "You are at the final question. Click 'Submit Final Exam' when ready.");
     }
   });
 
+  // Double-Check Confirmation on Submit
   document.getElementById("btn-submit-exam").addEventListener("click", () => {
     const checked = document.querySelector('input[name="cbt-choice"]:checked');
     if (checked) {
       candidateAnswers[currentQuestionIndex] = parseInt(checked.value, 10);
     }
-    showInAppConfirm("Submit Exam", "Are you sure you want to finalize and submit your exam?", () => {
-      cbtFinishTest();
+    saveExamSnapshot();
+
+    const attempted = Object.keys(candidateAnswers).length;
+    const total = activeExamQuestions.length;
+    const unattempted = total - attempted;
+
+    const summaryMsg = `
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:6px; margin: 10px 0;">
+        <div>Total Questions: <b>${total}</b></div>
+        <div style="color:#10b981;">Attempted Questions: <b>${attempted}</b></div>
+        <div style="color:#ef4444;">Unattempted / Left: <b>${unattempted}</b></div>
+      </div>
+      Are you sure you want to finish and submit your exam?
+    `;
+
+    // 1st Confirmation
+    showInAppConfirm("Exam Submission (Check 1 of 2)", summaryMsg, () => {
+      // 2nd Final Confirmation
+      showInAppConfirm(
+        "FINAL VERIFICATION (Check 2 of 2)",
+        `<div style="color:#dc2626; font-weight:700; margin-bottom:8px;">Warning: Once confirmed, you CANNOT change any answer or re-enter this test.</div>Do you strictly confirm final submission?`,
+        () => {
+          cbtFinishTest();
+        },
+        null,
+        "Yes, Submit Now"
+      );
     });
   });
 
@@ -1231,28 +1350,49 @@
       const s = remainingSeconds % 60;
       document.getElementById("win4-clock").innerText =
         (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+
       if (remainingSeconds <= 0) {
         clearInterval(countdownRef);
-        showInAppMessage("Time Up!", "The allotted time has expired. Submitting exam...", () => {
+        showInAppMessage("Time Expired!", "Allotted time is over. System is automatically finalizing your test...", () => {
           cbtFinishTest();
         });
       }
       remainingSeconds--;
+
+      // Periodic auto-sync
+      if (remainingSeconds % 5 === 0) saveExamSnapshot();
     }, 1000);
   }
 
+  // Calculate Net Score with Positive & Negative Marking
   function cbtFinishTest() {
     clearInterval(countdownRef);
-    cbtNavigate("win-result");
+    exitFullScreen();
+    clearExamSnapshot();
 
     let correctCount = 0;
+    let wrongCount = 0;
+
     activeExamQuestions.forEach((q, idx) => {
-      if (candidateAnswers[idx] === q.correct) correctCount++;
+      if (candidateAnswers.hasOwnProperty(idx)) {
+        if (candidateAnswers[idx] === q.correct) {
+          correctCount++;
+        } else {
+          wrongCount++;
+        }
+      }
     });
 
-    const total = activeExamQuestions.length || 1;
+    const totalQuestions = activeExamQuestions.length || 1;
     const attemptedCount = Object.keys(candidateAnswers).length;
-    const pct = Math.round((correctCount / total) * 100);
+    const unattemptedCount = totalQuestions - attemptedCount;
+
+    const positiveMarksEarned = correctCount * storeMarkPositive;
+    const negativeMarksDeducted = wrongCount * storeMarkNegative;
+    const maxPossibleMarks = totalQuestions * storeMarkPositive;
+    const netMarks = Math.max(0, positiveMarksEarned - negativeMarksDeducted);
+    const netPct = Math.round((netMarks / maxPossibleMarks) * 100);
+    const accuracy = attemptedCount > 0 ? Math.round((correctCount / attemptedCount) * 100) : 0;
 
     if (activeUser && activeUser.username) {
       if (!userPerformance[activeUser.username]) {
@@ -1261,9 +1401,13 @@
       userPerformance[activeUser.username].push({
         topic: activeTopic,
         category: activeCategory,
-        score: correctCount,
-        total: total,
-        pct: pct,
+        total: totalQuestions,
+        correct: correctCount,
+        wrong: wrongCount,
+        unattempted: unattemptedCount,
+        netScore: netMarks.toFixed(2),
+        maxMarks: maxPossibleMarks.toFixed(2),
+        pct: netPct,
         date: new Date().toLocaleDateString()
       });
       syncAllData();
@@ -1271,13 +1415,27 @@
     }
 
     document.getElementById("dom-result-stats").innerHTML = `
-      <div style="font-size:42px; font-weight:800; color:#2563eb; margin-bottom:10px;">${pct}%</div>
-      <div style="font-size:16px; margin-bottom:8px;">Test: <b>${activeTopic} (${activeCategory})</b></div>
-      <div style="font-size:16px; margin-bottom:8px;">Total Questions: <b>${total}</b></div>
-      <div style="font-size:16px; margin-bottom:8px; color:#10b981;">Attempted: <b>${attemptedCount}</b></div>
-      <div style="font-size:16px; margin-bottom:8px; color:#8b5cf6;">Unattempted: <b>${total - attemptedCount}</b></div>
-      <div style="font-size:16px; font-weight:700;">Final Score: <b>${correctCount}</b> Correct</div>
+      <div style="font-size:46px; font-weight:800; color:#2563eb; margin-bottom:6px;">${netMarks.toFixed(2)} <span style="font-size:20px; color:#64748b;">/ ${maxPossibleMarks.toFixed(2)} pts</span></div>
+      <div style="font-size:18px; font-weight:700; color:#0f172a; margin-bottom:14px;">Percentage: ${netPct}% | Accuracy: ${accuracy}%</div>
+
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; max-width:540px; margin:0 auto 16px auto; font-size:14px;">
+        <div style="background:#ecfdf5; border:1px solid #a7f3d0; padding:10px; border-radius:6px;">
+          <div style="color:#059669; font-weight:700;">${correctCount} Correct</div>
+          <div style="font-size:12px; color:#065f46;">+${positiveMarksEarned.toFixed(2)} pts</div>
+        </div>
+        <div style="background:#fef2f2; border:1px solid #fecaca; padding:10px; border-radius:6px;">
+          <div style="color:#dc2626; font-weight:700;">${wrongCount} Incorrect</div>
+          <div style="font-size:12px; color:#991b1b;">-${negativeMarksDeducted.toFixed(2)} pts</div>
+        </div>
+        <div style="background:#f5f3ff; border:1px solid #ddd6fe; padding:10px; border-radius:6px;">
+          <div style="color:#7c3aed; font-weight:700;">${unattemptedCount} Skipped</div>
+          <div style="font-size:12px; color:#5b21b6;">0.00 pts</div>
+        </div>
+      </div>
+      <div style="font-size:13px; color:#64748b;">Test Paper: <b>${activeTopic} (${activeCategory})</b></div>
     `;
+
+    cbtNavigate("win-result");
   }
 
   // 9. DETAILED SOLUTIONS REVIEW
@@ -1292,15 +1450,15 @@
       const isCorrect = userAns === q.correct;
 
       let statusClass = "skipped-ans";
-      let statusText = "<span style='color:#8b5cf6; font-weight:700;'>SKIPPED / UNATTEMPTED</span>";
+      let statusText = "<span style='color:#8b5cf6; font-weight:700;'>SKIPPED (0 pts)</span>";
 
       if (isAttempted) {
         if (isCorrect) {
           statusClass = "correct-ans";
-          statusText = "<span style='color:#10b981; font-weight:700;'>CORRECT</span>";
+          statusText = `<span style='color:#10b981; font-weight:700;'>CORRECT (+${storeMarkPositive.toFixed(2)} pts)</span>`;
         } else {
           statusClass = "wrong-ans";
-          statusText = "<span style='color:#ef4444; font-weight:700;'>INCORRECT</span>";
+          statusText = `<span style='color:#ef4444; font-weight:700;'>INCORRECT (-${storeMarkNegative.toFixed(2)} pts)</span>`;
         }
       }
 
@@ -1324,16 +1482,18 @@
         opsHtml += `<div style="${optStyle}">${String.fromCharCode(65 + oIdx)}) ${opt} ${isUserChoice} ${isRightChoice}</div>`;
       });
 
+      const qText = (activeLanguage === "hi" && q.text_hi) ? q.text_hi : q.text;
+
       card.innerHTML = `
         <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
           <span style="font-weight:700; font-size:14px; color:#475569;">Question ${idx + 1}</span>
           <div>${statusText}</div>
         </div>
-        <div style="font-size:15px; font-weight:700; margin-bottom:12px;">${q.text}</div>
+        <div style="font-size:15px; font-weight:700; margin-bottom:12px;">${qText}</div>
         <div style="margin-bottom:10px;">${opsHtml}</div>
         <div class="sol-explanation-box">
           <b>Detailed Solution / Note:</b><br>
-          ${q.solution ? q.solution : "No detailed explanation has been added for this question."}
+          ${q.solution ? q.solution : "No detailed explanation provided for this question."}
         </div>
       `;
       solContainer.appendChild(card);
@@ -1342,11 +1502,11 @@
     cbtNavigate("win-solutions");
   });
 
-  // 10. ADMIN LIVE PREVIEW LOGIC
+  // 10. ADMIN DASHBOARD & EDITING
   function updateAdminLivePreview() {
     const topic = document.getElementById("adm-sel-topic").value || "Topic";
     const cat = document.getElementById("adm-sel-cat").value || "Category";
-    const title = document.getElementById("adm-q-title").value.trim() || "Type question text to see it live...";
+    const title = document.getElementById("adm-q-title").value.trim() || "Type question text to see preview...";
     const o0 = document.getElementById("adm-q-op0").value.trim() || "Option A text";
     const o1 = document.getElementById("adm-q-op1").value.trim() || "Option B text";
     const o2 = document.getElementById("adm-q-op2").value.trim() || "Option C text";
@@ -1390,6 +1550,7 @@
     document.getElementById("btn-adm-cancel-edit").style.display = "none";
 
     document.getElementById("adm-q-title").value = "";
+    document.getElementById("adm-q-title-hi").value = "";
     document.getElementById("adm-q-op0").value = "";
     document.getElementById("adm-q-op1").value = "";
     document.getElementById("adm-q-op2").value = "";
@@ -1409,7 +1570,6 @@
 
   document.getElementById("btn-adm-cancel-edit").addEventListener("click", resetQuestionEditor);
 
-  // 11. ADMIN DASHBOARD ACTIONS
   document.querySelectorAll(".cbt-tab-btn").forEach((btn) => {
     btn.addEventListener("click", function () {
       document.querySelectorAll(".cbt-tab-btn").forEach((b) => b.classList.remove("active"));
@@ -1448,6 +1608,9 @@
     document.getElementById("adm-brand-name").value = brandConfig.name;
     document.getElementById("adm-brand-badge").value = brandConfig.badge;
     document.getElementById("adm-brand-favicon").value = brandConfig.favicon;
+    document.getElementById("adm-mark-pos").value = storeMarkPositive;
+    document.getElementById("adm-mark-neg").value = storeMarkNegative;
+    document.getElementById("adm-exam-min").value = storeDuration;
 
     // Topics in Admin
     const tChips = document.getElementById("dom-adm-topic-chips");
@@ -1500,7 +1663,7 @@
       sChips.appendChild(chip);
     });
 
-    // Unified Categories & Sets in Question Creator Dropdown
+    // Unified Categories in Question Creator Dropdown
     const selCat = document.getElementById("adm-sel-cat");
     selCat.innerHTML = "";
 
@@ -1545,6 +1708,7 @@
         document.getElementById("adm-sel-topic").value = q.topic;
         document.getElementById("adm-sel-cat").value = q.category;
         document.getElementById("adm-q-title").value = q.text;
+        document.getElementById("adm-q-title-hi").value = q.text_hi || "";
         document.getElementById("adm-q-op0").value = q.options[0] || "";
         document.getElementById("adm-q-op1").value = q.options[1] || "";
         document.getElementById("adm-q-op2").value = q.options[2] || "";
@@ -1584,7 +1748,6 @@
       pdfList.appendChild(div);
     });
 
-    document.getElementById("adm-exam-min").value = storeDuration;
     updateAdminLivePreview();
   }
 
@@ -1657,11 +1820,12 @@
     }
   });
 
-  // Save / Update Question
+  // Save / Update Question with Hindi translation field
   document.getElementById("btn-adm-save-q").addEventListener("click", () => {
     const topic = document.getElementById("adm-sel-topic").value.trim();
     const cat = document.getElementById("adm-sel-cat").value.trim();
     const title = document.getElementById("adm-q-title").value.trim();
+    const titleHi = document.getElementById("adm-q-title-hi").value.trim();
     const o0 = document.getElementById("adm-q-op0").value.trim();
     const o1 = document.getElementById("adm-q-op1").value.trim();
     const o2 = document.getElementById("adm-q-op2").value.trim();
@@ -1674,7 +1838,7 @@
       return;
     }
 
-    const qData = { topic, category: cat, text: title, options: [o0, o1, o2, o3], correct, solution };
+    const qData = { topic, category: cat, text: title, text_hi: titleHi, options: [o0, o1, o2, o3], correct, solution };
 
     if (editingQuestionIndex !== null && editingQuestionIndex >= 0) {
       storeQuestions[editingQuestionIndex] = qData;
@@ -1716,19 +1880,40 @@
     showInAppMessage("Admin Security", `Admin access PIN updated to: ${newPin}`);
   });
 
-  document.getElementById("btn-adm-save-time").addEventListener("click", () => {
-    const val = parseInt(document.getElementById("adm-exam-min").value, 10);
-    if (val > 0) {
-      storeDuration = val;
+  document.getElementById("btn-adm-save-scheme").addEventListener("click", () => {
+    const pos = parseFloat(document.getElementById("adm-mark-pos").value);
+    const neg = parseFloat(document.getElementById("adm-mark-neg").value);
+    const dur = parseInt(document.getElementById("adm-exam-min").value, 10);
+
+    if (pos > 0 && neg >= 0 && dur > 0) {
+      storeMarkPositive = pos;
+      storeMarkNegative = neg;
+      storeDuration = dur;
       syncAllData();
-      showInAppMessage("Success", `Exam duration set to ${val} minutes.`);
+      showInAppMessage("Success", `Marking scheme saved: +${pos.toFixed(2)} for correct, -${neg.toFixed(2)} for wrong. Time: ${dur} min.`);
+    } else {
+      showInAppMessage("Validation Error", "Enter valid positive values for marks and duration.");
     }
   });
 
-  // 12. INITIAL BOOTSTRAP (Persistent Session Check on Load / Reload)
+  // 11. BOOTSTRAP WITH EXAM SNAPSHOT RECOVERY
   function bootApplication() {
     applyBrandIdentity();
     updateNavbarAuthState();
+
+    // Check if candidate had a running exam that crashed or was refreshed
+    const runningSnap = localStorage.getItem("tb_exam_running_snapshot");
+    if (activeUser && activeUser.username && runningSnap) {
+      try {
+        const snap = JSON.parse(runningSnap);
+        if (snap && snap.activeExamQuestions && snap.activeExamQuestions.length > 0) {
+          cbtResumeTest(snap);
+          return;
+        }
+      } catch (e) {
+        clearExamSnapshot();
+      }
+    }
 
     if (activeUser && activeUser.username) {
       cbtRenderWindow2();
