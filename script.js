@@ -38,7 +38,6 @@
   let registeredUsers = JSON.parse(localStorage.getItem("tb_registered_users")) || [];
   let adminPin = localStorage.getItem("tb_admin_pin") || "1234";
 
-  // Branding Customization
   let brandConfig = JSON.parse(localStorage.getItem("tb_brand_config")) || {
     name: "Akash Workshop",
     badge: "AW",
@@ -57,6 +56,7 @@
   let resetOTP = "";
   let resetMobileTarget = "";
   let appliedDiscountPercent = 0;
+  let lastTransactionInfo = { amount: "0.00", coupon: "None" };
   let activeUser = null;
   let editingQuestionIndex = null;
 
@@ -100,7 +100,7 @@
     }
     .cbt-nav {
       display: flex; justify-content: space-between; align-items: center;
-      background: #0f172a; padding: 12px 24px; color: #ffffff;
+      background: #0f172a; padding: 12px 24px; color: #ffffff; position: relative; z-index: 1000;
     }
     .cbt-logo-area { display: flex; align-items: center; gap: 10px; }
     .cbt-logo-badge {
@@ -114,26 +114,37 @@
     .cbt-btn-admin-nav {
       background: #475569; color: #fff; border: none; padding: 7px 14px; border-radius: 4px; font-size: 13px; cursor: pointer;
     }
-    .cbt-btn-logout {
-      background: #dc2626; color: #fff; border: none; padding: 7px 12px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer;
-    }
     
-    /* Candidate Logged-In Profile UI */
-    .cbt-user-profile-bar {
-      display: none; align-items: center; gap: 10px; background: #1e293b; padding: 4px 10px 4px 4px; border-radius: 30px; border: 1px solid #334155;
+    /* Candidate Hover Menu Styles */
+    .cbt-profile-menu-container {
+      position: relative; display: none; padding: 4px 0;
     }
-    .cbt-profile-avatar {
-      width: 32px; height: 32px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #fff;
+    .cbt-candidate-badge-logo {
+      background: #2563eb; color: #ffffff; font-weight: 800; font-size: 13px;
+      padding: 6px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+      border: 1px solid rgba(255,255,255,0.2); transition: background 0.2s ease;
     }
-    .cbt-profile-details {
-      display: flex; flex-direction: column; text-align: left; line-height: 1.2;
+    .cbt-candidate-badge-logo:hover {
+      background: #1d4ed8;
     }
-    .cbt-profile-name { font-size: 13px; font-weight: 700; color: #f8fafc; }
-    .cbt-profile-phone { font-size: 11px; color: #94a3b8; }
-    .cbt-btn-settings {
-      background: #334155; color: #f8fafc; border: none; padding: 6px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600;
+    .cbt-profile-dropdown {
+      display: none; position: absolute; right: 0; top: 100%; width: 330px;
+      background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15), 0 8px 10px -6px rgba(0,0,0,0.1);
+      padding: 16px; color: #1e293b; z-index: 2000;
     }
-    .cbt-btn-settings:hover { background: #475569; }
+    .cbt-profile-menu-container:hover .cbt-profile-dropdown {
+      display: block;
+    }
+    .drop-divider {
+      height: 1px; background: #e2e8f0; margin: 10px 0;
+    }
+    .drop-info-title {
+      font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px;
+    }
+    .drop-detail-row {
+      display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;
+    }
 
     .cbt-view {
       display: none; padding: 24px; max-width: 860px; margin: 20px auto; width: 100%; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0;
@@ -155,15 +166,15 @@
     .cbt-h1 { font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 6px; }
     .cbt-h2 { font-size: 14px; color: #64748b; text-align: center; margin-bottom: 20px; }
     .cbt-field {
-      width: 100%; padding: 11px 13px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none;
+      width: 100%; padding: 10px 12px; margin-bottom: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none;
     }
     .cbt-field:focus { border-color: #2563eb; }
     .cbt-btn-primary {
-      width: 100%; padding: 12px; background: #2563eb; color: #ffffff; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer;
+      width: 100%; padding: 10px; background: #2563eb; color: #ffffff; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;
     }
     .cbt-btn-primary:hover { background: #1d4ed8; }
     .cbt-btn-secondary {
-      width: 100%; padding: 12px; background: #e2e8f0; color: #334155; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer;
+      width: 100%; padding: 10px; background: #e2e8f0; color: #334155; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;
     }
     .cbt-btn-secondary:hover { background: #cbd5e1; }
     .cbt-grid {
@@ -252,19 +263,43 @@
         <span class="cbt-brand-name" id="dom-brand-name"></span>
       </div>
       <div class="cbt-nav-actions">
-        <!-- Guest / Public Buttons -->
+        <!-- Guest Buttons (Shown when logged out) -->
         <button class="cbt-btn-pay" id="btn-open-payment">Payment & Register</button>
         <button class="cbt-btn-admin-nav" id="btn-open-admin">Admin Portal</button>
         
-        <!-- Candidate Profile UI (Visible upon login) -->
-        <div class="cbt-user-profile-bar" id="cbt-user-profile-bar">
-          <div class="cbt-profile-avatar" id="dom-profile-avatar">U</div>
-          <div class="cbt-profile-details">
-            <span class="cbt-profile-name" id="dom-profile-name">Candidate</span>
-            <span class="cbt-profile-phone" id="dom-profile-phone">Phone</span>
+        <!-- Candidate Hover Menu (Shown when logged in) -->
+        <div class="cbt-profile-menu-container" id="cbt-candidate-menu-wrapper">
+          <div class="cbt-candidate-badge-logo" id="dom-candidate-logo-btn">
+            <span id="dom-cand-logo-text">🎓 AW</span>
+            <span style="font-size:10px;">▼</span>
           </div>
-          <button class="cbt-btn-settings" id="btn-open-settings" title="Profile Settings">Settings ⚙️</button>
-          <button class="cbt-btn-logout" id="btn-global-logout">Logout</button>
+
+          <div class="cbt-profile-dropdown">
+            <div style="font-size:15px; font-weight:800; color:#0f172a; margin-bottom:2px;" id="drop-display-username">Candidate</div>
+            <div style="font-size:12px; color:#64748b; margin-bottom:10px;">Status: <span style="color:#10b981; font-weight:700;">Verified Active</span></div>
+
+            <div class="drop-info-title">Contact & Subscription</div>
+            <div class="drop-detail-row">
+              <span style="color:#64748b;">Phone:</span>
+              <span style="font-weight:600;" id="drop-display-phone">+91 ----------</span>
+            </div>
+            <div class="drop-detail-row">
+              <span style="color:#64748b;">Fee Paid:</span>
+              <span style="font-weight:700; color:#10b981;" id="drop-display-price">₹ 0.00</span>
+            </div>
+            <div class="drop-detail-row">
+              <span style="color:#64748b;">Coupon Used:</span>
+              <span style="font-weight:600;" id="drop-display-coupon">None</span>
+            </div>
+
+            <div class="drop-divider"></div>
+
+            <div class="drop-info-title">Update Candidate Credentials</div>
+            <input type="text" id="drop-edit-name" class="cbt-field" placeholder="Change Display Name" />
+            <input type="password" id="drop-edit-pass" class="cbt-field" placeholder="Set New Password" />
+            <button class="cbt-btn-primary" id="btn-drop-save-credentials" style="margin-bottom:8px;">Update Credentials</button>
+            <button class="cbt-btn-secondary" id="btn-drop-logout" style="background:#fee2e2; color:#dc2626; border:1px solid #fecaca;">Logout Session</button>
+          </div>
         </div>
       </div>
     </div>
@@ -403,7 +438,6 @@
       <div id="dom-result-stats" style="text-align:center; margin: 24px 0;"></div>
       <div style="display:flex; gap:10px;">
         <button class="cbt-btn-primary" id="btn-restart-flow">Practice Another Topic</button>
-        <button class="cbt-btn-secondary" id="btn-result-logout">Logout</button>
       </div>
     </div>
 
@@ -563,28 +597,6 @@
       </div>
     </div>
 
-    <!-- Candidate Profile Settings Modal -->
-    <div id="dom-settings-modal" class="cbt-modal-backdrop">
-      <div class="cbt-modal-box">
-        <div class="cbt-modal-title">Candidate Profile & Settings</div>
-        <div style="margin-bottom:14px; font-size:13px; color:#64748b;">Update your candidate credentials & security details:</div>
-        
-        <label style="font-size:12px; font-weight:700; color:#475569;">Display Username / Name:</label>
-        <input type="text" id="set-input-name" class="cbt-field" style="margin-top:4px;" />
-
-        <label style="font-size:12px; font-weight:700; color:#475569;">Mobile Number (Verified):</label>
-        <input type="text" id="set-input-phone" class="cbt-field" style="margin-top:4px; background:#f1f5f9;" disabled />
-
-        <label style="font-size:12px; font-weight:700; color:#475569;">New Password:</label>
-        <input type="password" id="set-input-pass" class="cbt-field" style="margin-top:4px;" placeholder="Leave blank to keep current password" />
-
-        <div class="cbt-modal-actions">
-          <button class="cbt-btn-secondary" style="width:auto; padding:8px 18px;" id="btn-settings-cancel">Cancel</button>
-          <button class="cbt-btn-primary" style="width:auto; padding:8px 18px;" id="btn-settings-save">Save Changes</button>
-        </div>
-      </div>
-    </div>
-
     <!-- In-App Notification Modal Window -->
     <div id="dom-cbt-modal" class="cbt-modal-backdrop">
       <div class="cbt-modal-box">
@@ -597,7 +609,7 @@
   document.body.appendChild(portalDiv);
   applyBrandIdentity();
 
-  // In-App Notification & Confirmation Dialogs
+  // Dialog & Notification Modal
   function showInAppMessage(title, message, callback) {
     const modal = document.getElementById("dom-cbt-modal");
     const h = document.getElementById("cbt-modal-heading");
@@ -645,34 +657,91 @@
     if (el) el.classList.add("active");
   }
 
-  // Update Navbar based on Auth State
+  // Dynamic Navbar Logic: Handles Candidate Logo & Hides Admin/Pay
   function updateNavbarAuthState() {
     const btnPay = document.getElementById("btn-open-payment");
     const btnAdmin = document.getElementById("btn-open-admin");
-    const profileBar = document.getElementById("cbt-user-profile-bar");
+    const menuContainer = document.getElementById("cbt-candidate-menu-wrapper");
 
     if (activeUser) {
-      // Hide public & admin controls
+      // Hide Guest / Admin buttons
       btnPay.style.display = "none";
       btnAdmin.style.display = "none";
 
-      // Show Candidate Profile UI
-      profileBar.style.display = "flex";
-      document.getElementById("dom-profile-name").innerText = activeUser.username;
-      document.getElementById("dom-profile-phone").innerText = activeUser.mobile ? `+91 ${activeUser.mobile}` : "Verified Student";
-      document.getElementById("dom-profile-avatar").innerText = activeUser.username.charAt(0).toUpperCase();
+      // Show Candidate Mini Logo Button
+      menuContainer.style.display = "block";
+      document.getElementById("dom-cand-logo-text").innerText = `🎓 ${brandConfig.badge} • ${activeUser.username}`;
+
+      // Populate Hover Dropdown Sheet
+      document.getElementById("drop-display-username").innerText = activeUser.username;
+      document.getElementById("drop-display-phone").innerText = activeUser.mobile ? `+91 ${activeUser.mobile}` : "Not Available";
+      document.getElementById("drop-display-price").innerText = activeUser.purchaseAmount ? `₹ ${activeUser.purchaseAmount}` : `₹ ${storePrice.toFixed(2)}`;
+      document.getElementById("drop-display-coupon").innerText = activeUser.appliedCoupon || "Direct Payment";
+
+      document.getElementById("drop-edit-name").value = activeUser.username;
+      document.getElementById("drop-edit-pass").value = "";
     } else {
-      // Restore public controls
+      // Restore Guest / Admin buttons
       btnPay.style.display = "block";
       btnAdmin.style.display = "block";
-      profileBar.style.display = "none";
+      menuContainer.style.display = "none";
     }
   }
 
-  // Clear Forms
+  // Update Credentials from Dropdown
+  document.getElementById("btn-drop-save-credentials").addEventListener("click", () => {
+    if (!activeUser) return;
+    const newName = document.getElementById("drop-edit-name").value.trim();
+    const newPass = document.getElementById("drop-edit-pass").value.trim();
+
+    if (!newName) {
+      showInAppMessage("Validation Error", "Candidate name cannot be empty.");
+      return;
+    }
+
+    if (newName.toLowerCase() !== activeUser.username.toLowerCase()) {
+      const exists = registeredUsers.some((u) => u.username.toLowerCase() === newName.toLowerCase());
+      if (exists) {
+        showInAppMessage("Duplicate Name", "This username is already taken. Please choose another.");
+        return;
+      }
+    }
+
+    const idx = registeredUsers.findIndex((u) => u.username === activeUser.username);
+    if (idx !== -1) {
+      registeredUsers[idx].username = newName;
+      if (newPass) registeredUsers[idx].password = newPass;
+      activeUser = registeredUsers[idx];
+      syncAllData();
+      updateNavbarAuthState();
+      showInAppMessage("Account Updated", "Your profile details have been saved successfully!");
+    }
+  });
+
+  // Logout Handler
+  function candidateLogout() {
+    activeUser = null;
+    candidateAnswers = {};
+    activeExamQuestions = [];
+    clearInterval(countdownRef);
+
+    updateNavbarAuthState();
+    document.getElementById("login-username").value = "";
+    document.getElementById("login-password").value = "";
+
+    cbtNavigate("win-1");
+    showInAppMessage("Logged Out", "You have been logged out successfully.");
+  }
+
+  document.getElementById("btn-drop-logout").addEventListener("click", () => {
+    showInAppConfirm("Logout Confirmation", "Do you want to log out of your session?", candidateLogout);
+  });
+
+  // Forms Reset
   function resetRegistrationForm() {
     appliedDiscountPercent = 0;
     generatedOTP = "";
+    lastTransactionInfo = { amount: "0.00", coupon: "None" };
     document.getElementById("coupon-code-input").value = "";
     document.getElementById("reg-mobile").value = "";
     document.getElementById("reg-otp").value = "";
@@ -693,73 +762,6 @@
     document.getElementById("forgot-step-1").style.display = "block";
     document.getElementById("forgot-step-2").style.display = "none";
   }
-
-  function candidateLogout() {
-    activeUser = null;
-    candidateAnswers = {};
-    activeExamQuestions = [];
-    clearInterval(countdownRef);
-
-    updateNavbarAuthState();
-    document.getElementById("login-username").value = "";
-    document.getElementById("login-password").value = "";
-
-    cbtNavigate("win-1");
-    showInAppMessage("Logged Out", "You have been logged out successfully.");
-  }
-
-  document.getElementById("btn-global-logout").addEventListener("click", () => {
-    showInAppConfirm("Logout Confirmation", "Do you want to log out of your session?", candidateLogout);
-  });
-
-  document.getElementById("btn-result-logout").addEventListener("click", () => {
-    candidateLogout();
-  });
-
-  // Candidate Profile Settings Modal Controls
-  document.getElementById("btn-open-settings").addEventListener("click", () => {
-    if (!activeUser) return;
-    document.getElementById("set-input-name").value = activeUser.username;
-    document.getElementById("set-input-phone").value = activeUser.mobile || "N/A";
-    document.getElementById("set-input-pass").value = "";
-    document.getElementById("dom-settings-modal").classList.add("active");
-  });
-
-  document.getElementById("btn-settings-cancel").addEventListener("click", () => {
-    document.getElementById("dom-settings-modal").classList.remove("active");
-  });
-
-  document.getElementById("btn-settings-save").addEventListener("click", () => {
-    if (!activeUser) return;
-    const newName = document.getElementById("set-input-name").value.trim();
-    const newPass = document.getElementById("set-input-pass").value.trim();
-
-    if (!newName) {
-      showInAppMessage("Validation Error", "Candidate name cannot be empty.");
-      return;
-    }
-
-    // Check duplicate name if changed
-    if (newName.toLowerCase() !== activeUser.username.toLowerCase()) {
-      const exists = registeredUsers.some((u) => u.username.toLowerCase() === newName.toLowerCase());
-      if (exists) {
-        showInAppMessage("Duplicate Name", "This username is already taken by another student.");
-        return;
-      }
-    }
-
-    // Find and update candidate in registry
-    const idx = registeredUsers.findIndex((u) => u.username === activeUser.username);
-    if (idx !== -1) {
-      registeredUsers[idx].username = newName;
-      if (newPass) registeredUsers[idx].password = newPass;
-      activeUser = registeredUsers[idx];
-      syncAllData();
-      updateNavbarAuthState();
-      document.getElementById("dom-settings-modal").classList.remove("active");
-      showInAppMessage("Profile Updated", "Your profile details have been successfully updated!");
-    }
-  });
 
   // 4. REGISTRATION, COUPONS & PAYMENT
   function updateCheckoutDisplay() {
@@ -798,6 +800,12 @@
 
   document.getElementById("btn-mock-pay").addEventListener("click", () => {
     const finalPrice = Math.max(0, storePrice - (storePrice * (appliedDiscountPercent / 100)));
+    const code = document.getElementById("coupon-code-input").value.trim().toUpperCase();
+    lastTransactionInfo = {
+      amount: finalPrice.toFixed(2),
+      coupon: code ? `${code} (${appliedDiscountPercent}%)` : "None"
+    };
+
     showInAppMessage("Payment Successful", `Payment of ₹ ${finalPrice.toFixed(2)} completed successfully!`, () => {
       document.getElementById("pay-step-1").style.display = "none";
       document.getElementById("pay-step-2").style.display = "block";
@@ -836,7 +844,13 @@
       return;
     }
 
-    registeredUsers.push({ username: user, password: pass, mobile: mobile });
+    registeredUsers.push({
+      username: user,
+      password: pass,
+      mobile: mobile,
+      purchaseAmount: lastTransactionInfo.amount,
+      appliedCoupon: lastTransactionInfo.coupon
+    });
     syncAllData();
 
     showInAppMessage("Registration Successful", "Your account has been created successfully! Please log in.", () => {
@@ -1185,7 +1199,6 @@
     updateAdminLivePreview();
   }
 
-  // Live Input Listeners for Instant Previewing
   ["adm-sel-topic", "adm-sel-cat", "adm-q-title", "adm-q-op0", "adm-q-op1", "adm-q-op2", "adm-q-op3", "adm-q-ans"].forEach((id) => {
     const el = document.getElementById(id);
     if (el) {
@@ -1213,7 +1226,6 @@
   });
 
   function cbtRefreshAdmin() {
-    // Pricing & Coupons
     document.getElementById("adm-base-price").value = storePrice;
     const cList = document.getElementById("dom-adm-coupons-list");
     cList.innerHTML = "";
@@ -1229,12 +1241,10 @@
       cList.appendChild(chip);
     });
 
-    // Branding Fields
     document.getElementById("adm-brand-name").value = brandConfig.name;
     document.getElementById("adm-brand-badge").value = brandConfig.badge;
     document.getElementById("adm-brand-favicon").value = brandConfig.favicon;
 
-    // Topic Chips & Selects
     const tChips = document.getElementById("dom-adm-topic-chips");
     const selTopic = document.getElementById("adm-sel-topic");
     tChips.innerHTML = "";
@@ -1255,7 +1265,6 @@
       selTopic.appendChild(o);
     });
 
-    // Category Chips & Selects
     const cChips = document.getElementById("dom-adm-category-chips");
     const selCat = document.getElementById("adm-sel-cat");
     cChips.innerHTML = "";
@@ -1276,7 +1285,6 @@
       selCat.appendChild(o);
     });
 
-    // Set Chips
     const sChips = document.getElementById("dom-adm-set-chips");
     sChips.innerHTML = "";
     storeSets.forEach((s, idx) => {
@@ -1291,7 +1299,6 @@
       sChips.appendChild(chip);
     });
 
-    // Questions Table with Edit & Live Preview Integration
     const qTable = document.getElementById("dom-table-q-list");
     qTable.innerHTML = "";
     storeQuestions.forEach((q, idx) => {
@@ -1304,7 +1311,6 @@
           <button class="cbt-btn-del">Del</button>
         </td>
       `;
-      // Edit Question Event
       tr.querySelector(".cbt-btn-edit").onclick = () => {
         editingQuestionIndex = idx;
         document.getElementById("adm-form-mode").innerText = `EDITING QUESTION #${idx + 1}`;
@@ -1325,7 +1331,6 @@
         document.getElementById("adm-q-title").scrollIntoView({ behavior: "smooth" });
       };
 
-      // Delete Question Event
       tr.querySelector(".cbt-btn-del").onclick = () => {
         showInAppConfirm("Delete Question", "Remove this question permanently?", () => {
           storeQuestions.splice(idx, 1);
@@ -1337,7 +1342,6 @@
       qTable.appendChild(tr);
     });
 
-    // Notes List
     const pdfList = document.getElementById("dom-adm-pdf-list");
     pdfList.innerHTML = "";
     storeNotes.forEach((n, idx) => {
@@ -1359,7 +1363,7 @@
     updateAdminLivePreview();
   }
 
-  // Admin Event Listeners
+  // Admin Listeners
   document.getElementById("btn-adm-save-price").addEventListener("click", () => {
     const val = parseFloat(document.getElementById("adm-base-price").value);
     if (!isNaN(val) && val >= 0) {
@@ -1428,7 +1432,6 @@
     }
   });
 
-  // Save / Update Question
   document.getElementById("btn-adm-save-q").addEventListener("click", () => {
     const topic = document.getElementById("adm-sel-topic").value;
     const cat = document.getElementById("adm-sel-cat").value;
