@@ -10,7 +10,7 @@
       text: "In which year was the First Folio of Shakespeare's plays published?",
       options: ["1616", "1623", "1632", "1609"],
       correct: 1,
-      solution: "The First Folio of Shakespeare's plays was published in 1623 by his fellow actors John Heminges and Henry Condell."
+      solution: "The First Folio of Shakespeare's plays was published in 1623 by John Heminges and Henry Condell."
     },
     {
       topic: "William Shakespeare",
@@ -56,7 +56,13 @@
   };
 
   // Persistent Session Runtime
-  let activeUser = JSON.parse(localStorage.getItem("tb_active_user")) || null;
+  let activeUser = null;
+  try {
+    const saved = localStorage.getItem("tb_active_user");
+    if (saved) activeUser = JSON.parse(saved);
+  } catch (e) {
+    activeUser = null;
+  }
 
   // Runtime State
   let activeTopic = "";
@@ -86,7 +92,7 @@
     localStorage.setItem("tb_user_performance", JSON.stringify(userPerformance));
     localStorage.setItem("tb_admin_pin", adminPin);
     localStorage.setItem("tb_brand_config", JSON.stringify(brandConfig));
-    if (activeUser) {
+    if (activeUser && activeUser.username) {
       localStorage.setItem("tb_active_user", JSON.stringify(activeUser));
     } else {
       localStorage.removeItem("tb_active_user");
@@ -503,7 +509,7 @@
     <div id="win-admin-dash" class="cbt-view">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:10px; margin-bottom:16px;">
         <span style="font-weight:700; font-size:18px;">Administrative Control Center</span>
-        <button class="cbt-btn-del" id="btn-admin-exit">Exit to Topics</button>
+        <button class="cbt-btn-del" id="btn-admin-exit">Exit</button>
       </div>
       <div class="cbt-tabs">
         <button class="cbt-tab-btn active" data-pane="pane-pricing">Pricing & Coupons</button>
@@ -574,7 +580,7 @@
       <div id="pane-w3-sets" class="cbt-pane">
         <div style="font-weight:600; margin-bottom:6px;">Add Set Label:</div>
         <div style="display:flex; gap:8px; margin-bottom:16px;">
-          <input type="text" id="adm-add-set" class="cbt-field" style="margin:0;" placeholder="e.g. Set 01" />
+          <input type="text" id="adm-add-set" class="cbt-field" style="margin:0;" placeholder="e.g. Practice Set 01" />
           <button class="cbt-btn-primary" style="width:120px;" id="btn-adm-add-set">Add</button>
         </div>
         <div id="dom-adm-set-chips"></div>
@@ -658,9 +664,8 @@
     </div>
   `;
   document.body.appendChild(portalDiv);
-  applyBrandIdentity();
 
-  // Dialog & Notification Modal
+  // Modal Alert Dialog
   function showInAppMessage(title, message, callback) {
     const modal = document.getElementById("dom-cbt-modal");
     const h = document.getElementById("cbt-modal-heading");
@@ -708,13 +713,13 @@
     if (el) el.classList.add("active");
   }
 
-  // Dynamic Navbar Logic: Handles Candidate Logo & Hides Admin/Pay
+  // Dynamic Navbar Logic
   function updateNavbarAuthState() {
     const btnPay = document.getElementById("btn-open-payment");
     const btnAdmin = document.getElementById("btn-open-admin");
     const menuContainer = document.getElementById("cbt-candidate-menu-wrapper");
 
-    if (activeUser) {
+    if (activeUser && activeUser.username) {
       btnPay.style.display = "none";
       btnAdmin.style.display = "none";
       menuContainer.style.display = "block";
@@ -725,7 +730,6 @@
       document.getElementById("drop-display-price").innerText = activeUser.purchaseAmount ? `₹ ${activeUser.purchaseAmount}` : `₹ ${storePrice.toFixed(2)}`;
       document.getElementById("drop-display-coupon").innerText = activeUser.appliedCoupon || "Direct Payment";
 
-      // Render performance stats in profile
       const candidateStats = userPerformance[activeUser.username];
       const perfEl = document.getElementById("drop-perf-summary");
       if (candidateStats && candidateStats.length > 0) {
@@ -744,7 +748,7 @@
     }
   }
 
-  // Update Credentials from Dropdown
+  // Dropdown Credential Update
   document.getElementById("btn-drop-save-credentials").addEventListener("click", () => {
     if (!activeUser) return;
     const newName = document.getElementById("drop-edit-name").value.trim();
@@ -770,7 +774,6 @@
       if (newPass) registeredUsers[idx].password = newPass;
       activeUser = registeredUsers[idx];
 
-      // Migrate performance key if username changed
       if (oldName !== newName && userPerformance[oldName]) {
         userPerformance[newName] = userPerformance[oldName];
         delete userPerformance[oldName];
@@ -782,7 +785,7 @@
     }
   });
 
-  // Explicit Candidate Logout Handler
+  // Explicit Candidate Logout
   function candidateLogout() {
     activeUser = null;
     candidateAnswers = {};
@@ -981,12 +984,12 @@
     }
   });
 
-  // 6. LOGIN HANDLERS
+  // 6. LOGIN HANDLER
   document.getElementById("btn-action-login").addEventListener("click", () => {
     const u = document.getElementById("login-username").value.trim();
     const p = document.getElementById("login-password").value.trim();
 
-    const matched = registeredUsers.find((item) => item.username === u && item.password === p);
+    const matched = registeredUsers.find((item) => item.username.toLowerCase() === u.toLowerCase() && item.password === p);
     if (!matched) {
       showInAppMessage("Access Denied", "Invalid username or password. Please verify credentials or register.");
       return;
@@ -1004,7 +1007,14 @@
     cbtNavigate("win-admin-auth");
   });
 
-  document.getElementById("link-admin-back-login").addEventListener("click", () => cbtNavigate("win-1"));
+  document.getElementById("link-admin-back-login").addEventListener("click", () => {
+    if (activeUser) {
+      cbtRenderWindow2();
+      cbtNavigate("win-2");
+    } else {
+      cbtNavigate("win-1");
+    }
+  });
 
   document.getElementById("btn-admin-verify").addEventListener("click", () => {
     const entered = document.getElementById("admin-pass-input").value.trim();
@@ -1026,8 +1036,8 @@
       card.className = "cbt-selection-card";
       card.innerText = t;
       card.onclick = () => {
-        activeTopic = t;
-        document.getElementById("win3-topic-heading").innerText = t;
+        activeTopic = t.trim();
+        document.getElementById("win3-topic-heading").innerText = activeTopic;
         document.getElementById("win3-time-preview").innerText = `Time : ${storeDuration}:00 min`;
         cbtRenderWindow3();
         cbtNavigate("win-3");
@@ -1075,7 +1085,7 @@
     });
   }
 
-  // Candidate Navigation Back Links
+  // Navigation Back Links
   document.getElementById("link-back-topics").addEventListener("click", () => {
     cbtRenderWindow2();
     cbtNavigate("win-2");
@@ -1104,17 +1114,25 @@
     cbtNavigate("win-2");
   });
 
-  // 8. CBT EXAM RUNTIME (Strict Category Isolation)
+  // 8. CBT EXAM RUNTIME (100% Strict Category & Topic Matching)
   function cbtLaunchTest(selectedCategory) {
-    activeCategory = selectedCategory;
+    activeCategory = (selectedCategory || "").trim();
 
-    // Strict Filtering: only topic AND category match
-    activeExamQuestions = storeQuestions.filter(
-      (q) => q.topic === activeTopic && q.category === activeCategory
-    );
+    const targetTopic = (activeTopic || "").trim().toLowerCase();
+    const targetCat = activeCategory.toLowerCase();
+
+    // STRICT FILTERING: Only match exact topic AND exact category
+    activeExamQuestions = storeQuestions.filter((q) => {
+      const qTopic = (q.topic || "").trim().toLowerCase();
+      const qCat = (q.category || "").trim().toLowerCase();
+      return qTopic === targetTopic && qCat === targetCat;
+    });
 
     if (activeExamQuestions.length === 0) {
-      showInAppMessage("No Questions Found", `Currently there are no questions added for "${activeTopic}" under "${activeCategory}". Please select another category.`);
+      showInAppMessage(
+        "No Questions Found",
+        `Topic "${activeTopic}" ke under Category "${activeCategory}" me abhi koi questions uplabdh nahi hain. Kripya Admin portal se is category me questions add karein ya dusri category chunein.`
+      );
       return;
     }
 
@@ -1236,8 +1254,7 @@
     const attemptedCount = Object.keys(candidateAnswers).length;
     const pct = Math.round((correctCount / total) * 100);
 
-    // Save Candidate Performance
-    if (activeUser) {
+    if (activeUser && activeUser.username) {
       if (!userPerformance[activeUser.username]) {
         userPerformance[activeUser.username] = [];
       }
@@ -1432,6 +1449,7 @@
     document.getElementById("adm-brand-badge").value = brandConfig.badge;
     document.getElementById("adm-brand-favicon").value = brandConfig.favicon;
 
+    // Topics in Admin
     const tChips = document.getElementById("dom-adm-topic-chips");
     const selTopic = document.getElementById("adm-sel-topic");
     tChips.innerHTML = "";
@@ -1452,10 +1470,9 @@
       selTopic.appendChild(o);
     });
 
+    // Categories in Admin
     const cChips = document.getElementById("dom-adm-category-chips");
-    const selCat = document.getElementById("adm-sel-cat");
     cChips.innerHTML = "";
-    selCat.innerHTML = "";
     storePaperTypes.forEach((c, idx) => {
       const chip = document.createElement("div");
       chip.className = "cbt-item-chip";
@@ -1466,12 +1483,9 @@
         cbtRefreshAdmin();
       };
       cChips.appendChild(chip);
-
-      const o = document.createElement("option");
-      o.value = c; o.innerText = c;
-      selCat.appendChild(o);
     });
 
+    // Sets in Admin
     const sChips = document.getElementById("dom-adm-set-chips");
     sChips.innerHTML = "";
     storeSets.forEach((s, idx) => {
@@ -1486,6 +1500,29 @@
       sChips.appendChild(chip);
     });
 
+    // Unified Categories & Sets in Question Creator Dropdown
+    const selCat = document.getElementById("adm-sel-cat");
+    selCat.innerHTML = "";
+
+    const grpPapers = document.createElement("optgroup");
+    grpPapers.label = "Paper Types";
+    storePaperTypes.forEach((c) => {
+      const o = document.createElement("option");
+      o.value = c; o.innerText = c;
+      grpPapers.appendChild(o);
+    });
+    selCat.appendChild(grpPapers);
+
+    const grpSets = document.createElement("optgroup");
+    grpSets.label = "Practice Sets";
+    storeSets.forEach((s) => {
+      const o = document.createElement("option");
+      o.value = s; o.innerText = s;
+      grpSets.appendChild(o);
+    });
+    selCat.appendChild(grpSets);
+
+    // Questions Table
     const qTable = document.getElementById("dom-table-q-list");
     qTable.innerHTML = "";
     storeQuestions.forEach((q, idx) => {
@@ -1620,10 +1657,10 @@
     }
   });
 
-  // Save / Update Question with Solution & Category isolation
+  // Save / Update Question
   document.getElementById("btn-adm-save-q").addEventListener("click", () => {
-    const topic = document.getElementById("adm-sel-topic").value;
-    const cat = document.getElementById("adm-sel-cat").value;
+    const topic = document.getElementById("adm-sel-topic").value.trim();
+    const cat = document.getElementById("adm-sel-cat").value.trim();
     const title = document.getElementById("adm-q-title").value.trim();
     const o0 = document.getElementById("adm-q-op0").value.trim();
     const o1 = document.getElementById("adm-q-op1").value.trim();
@@ -1688,12 +1725,18 @@
     }
   });
 
-  // 12. INITIAL BOOTSTRAP (Persistent Session Check)
-  updateNavbarAuthState();
-  if (activeUser) {
-    cbtRenderWindow2();
-    cbtNavigate("win-2");
-  } else {
-    cbtNavigate("win-1");
+  // 12. INITIAL BOOTSTRAP (Persistent Session Check on Load / Reload)
+  function bootApplication() {
+    applyBrandIdentity();
+    updateNavbarAuthState();
+
+    if (activeUser && activeUser.username) {
+      cbtRenderWindow2();
+      cbtNavigate("win-2");
+    } else {
+      cbtNavigate("win-1");
+    }
   }
+
+  bootApplication();
 })();
