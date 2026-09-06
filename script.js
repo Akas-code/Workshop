@@ -26,7 +26,7 @@
       text_hi: "शेक्सपियर के नाटकों का पहला फोलियो (First Folio) किस वर्ष प्रकाशित हुआ था?",
       options: ["1616", "1623", "1632", "1609"],
       correct: 1,
-      solution: "The First Folio of Shakespeare's plays was published in 1623 by John Heminges and Henry Condell."
+      solution: "The First Folio was published in 1623 by John Heminges and Henry Condell.\n\n💡 Short Trick: '23 me Folio Free' (1623)."
     },
     {
       topic: "William Shakespeare",
@@ -35,7 +35,7 @@
       text_hi: "'Life's but a walking shadow, a poor player...' पंक्ति किस नाटक में आती है?",
       options: ["Hamlet", "Othello", "Macbeth", "King Lear"],
       correct: 2,
-      solution: "This line is spoken by Macbeth in Act 5, Scene 5 after hearing of Lady Macbeth's death."
+      solution: "This line is spoken by Macbeth in Act 5, Scene 5 after hearing of Lady Macbeth's death.\n\n💡 Short Trick: Shadow & Candle = Macbeth's Tragedy."
     },
     {
       topic: "William Wordsworth",
@@ -44,7 +44,7 @@
       text_hi: "वर्ड्सवर्थ की 'द प्रील्यूड' उनके मरणोपरांत किस वर्ष प्रकाशित हुई थी?",
       options: ["1798", "1805", "1850", "1832"],
       correct: 2,
-      solution: "The Prelude was published in 1850 by Wordsworth's widow, Mary Wordsworth, shortly after his death."
+      solution: "The Prelude was published in 1850 by Wordsworth's widow, Mary Wordsworth, shortly after his death.\n\n💡 Short Trick: Wordsworth died in 1850 = Prelude in 1850."
     }
   ];
   const defaultNotes = [
@@ -69,10 +69,15 @@
   let userPerformance = JSON.parse(localStorage.getItem("tb_user_performance")) || {};
   let adminPin = localStorage.getItem("tb_admin_pin") || "1234";
 
+  // AI Configuration State
+  let openAiApiKey = localStorage.getItem("tb_openai_api_key") || "sk-proj-dummy-key-paste-here";
+  let aiAdminEnabled = localStorage.getItem("tb_ai_admin_enabled") !== "false"; // default ON
+  let aiCandidateEnabled = localStorage.getItem("tb_ai_candidate_enabled") === "true"; // default OFF
+
   // Persistent Admin Session State
   let isAdminAuthenticated = localStorage.getItem("tb_admin_active") === "true";
 
-  // Branding Customization (Now includes custom profile picture)
+  // Branding Customization
   let brandConfig = JSON.parse(localStorage.getItem("tb_brand_config")) || {
     name: "Akash Workshop",
     badge: "AW",
@@ -125,6 +130,9 @@
     localStorage.setItem("tb_admin_pin", adminPin);
     localStorage.setItem("tb_brand_config", JSON.stringify(brandConfig));
     localStorage.setItem("tb_admin_active", isAdminAuthenticated.toString());
+    localStorage.setItem("tb_openai_api_key", openAiApiKey);
+    localStorage.setItem("tb_ai_admin_enabled", aiAdminEnabled.toString());
+    localStorage.setItem("tb_ai_candidate_enabled", aiCandidateEnabled.toString());
 
     if (activeUser && activeUser.username) {
       localStorage.setItem("tb_active_user", JSON.stringify(activeUser));
@@ -183,7 +191,49 @@
   }
 
   /* ==========================================================================
-     SECTION 4: CSS STYLESHEET INJECTION (RESPONSIVE)
+     SECTION 4: OPENAI CHATGPT API ENGINE
+     ========================================================================== */
+  async function callOpenAiForSolution(questionText, correctOptionText) {
+    if (!openAiApiKey || openAiApiKey.includes("paste-here")) {
+      throw new Error("Valid OpenAI API Key is not set in Admin Settings.");
+    }
+
+    const prompt = `You are an elite competitive exam teacher for UGC NET, PGT, and TGT.
+For this question:
+Question: "${questionText}"
+Correct Option: "${correctOptionText}"
+
+Provide:
+1. Short, precise Conceptual Explanation (2-3 lines).
+2. Key Exam Facts / Memory Points.
+3. A memorable and catchy SHORT TRICK or MNEMONIC (short trick in Hindi/Hinglish or English) to memorize this answer instantly.
+
+Keep the tone professional, scannable, and clean.`;
+
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + openAiApiKey.trim()
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.6
+      })
+    });
+
+    if (!response.ok) {
+      const errJson = await response.json().catch(() => ({}));
+      throw new Error(errJson.error?.message || "HTTP Error " + response.status);
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content.trim();
+  }
+
+  /* ==========================================================================
+     SECTION 5: CSS STYLESHEET INJECTION (RESPONSIVE)
      ========================================================================== */
   const styleEl = document.createElement("style");
   styleEl.textContent = `
@@ -252,6 +302,11 @@
     .cbt-btn-primary:hover { background: #1d4ed8; }
     .cbt-btn-secondary { width: 100%; padding: 10px 14px; background: #e2e8f0; color: #334155; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; }
     .cbt-btn-secondary:hover { background: #cbd5e1; }
+    .cbt-btn-ai {
+      background: linear-gradient(135deg, #8b5cf6, #d946ef); color: #fff; border: none; padding: 6px 12px;
+      border-radius: 4px; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+    }
+    .cbt-btn-ai:hover { opacity: 0.92; }
     
     .cbt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
     .cbt-selection-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 14px 10px; text-align: center; cursor: pointer; font-weight: 600; font-size: 13px; word-break: break-word; }
@@ -290,7 +345,7 @@
     .solution-card.correct-ans { border-left: 5px solid #10b981; }
     .solution-card.wrong-ans { border-left: 5px solid #ef4444; }
     .solution-card.skipped-ans { border-left: 5px solid #8b5cf6; }
-    .sol-explanation-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px 10px; border-radius: 6px; margin-top: 8px; font-size: 12px; color: #334155; }
+    .sol-explanation-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 6px; margin-top: 8px; font-size: 13px; color: #334155; line-height: 1.5; white-space: pre-line; }
 
     .cbt-modal-backdrop {
       display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75);
@@ -309,6 +364,16 @@
     .preview-box-container { background: #f8fafc; border: 1px dashed #3b82f6; border-radius: 6px; padding: 12px; }
     .preview-correct-badge { display: inline-block; background: #10b981; color: #fff; font-size: 10px; padding: 2px 5px; border-radius: 4px; margin-left: auto; }
     .cbt-responsive-flex-row { display: flex; gap: 8px; align-items: center; }
+
+    /* Custom Toggle Switch */
+    .toggle-switch-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
+    .toggle-switch-label { font-size: 13px; font-weight: 600; color: #334155; }
+    .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; inset: 0; background-color: #cbd5e1; transition: .3s; border-radius: 24px; }
+    .toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+    input:checked + .toggle-slider { background-color: #8b5cf6; }
+    input:checked + .toggle-slider:before { transform: translateX(20px); }
 
     @media (max-width: 768px) {
       .cbt-nav { padding: 10px 12px; }
@@ -330,7 +395,7 @@
   document.head.appendChild(styleEl);
 
   /* ==========================================================================
-     SECTION 5: INJECT APPLICATION DOM STRUCTURE
+     SECTION 6: INJECT APPLICATION DOM STRUCTURE
      ========================================================================== */
   const portalDiv = document.createElement("div");
   portalDiv.id = "cbt-portal";
@@ -593,7 +658,7 @@
         <button class="cbt-tab-btn" data-pane="pane-w3-sets">Sets</button>
         <button class="cbt-tab-btn" data-pane="pane-w4-questions">Questions</button>
         <button class="cbt-tab-btn" data-pane="pane-notes">PDF & Notes</button>
-        <button class="cbt-tab-btn" data-pane="pane-security">Settings</button>
+        <button class="cbt-tab-btn" data-pane="pane-security">Settings & AI</button>
       </div>
 
       <div id="pane-pricing" class="cbt-pane active">
@@ -692,7 +757,13 @@
               <option value="2">Correct: Option C</option>
               <option value="3">Correct: Option D</option>
             </select>
-            <textarea id="adm-q-solution" class="cbt-field" style="resize:vertical; height:50px;" placeholder="Detailed Solution"></textarea>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0;">
+              <span style="font-size:12px; font-weight:700; color:#475569;">Explanation & Trick:</span>
+              <button type="button" class="cbt-btn-ai" id="btn-ai-gen-solution">✨ AI Generate Solution & Trick</button>
+            </div>
+            <textarea id="adm-q-solution" class="cbt-field" style="resize:vertical; height:70px;" placeholder="Detailed Solution & Memory Trick"></textarea>
+            
             <button class="cbt-btn-primary" id="btn-adm-save-q">Save Question</button>
           </div>
 
@@ -703,7 +774,7 @@
             </div>
             <div id="preview-live-text" style="font-weight:700; font-size:13px; margin-bottom:8px; min-height:30px;">Preview renders here...</div>
             <div id="preview-live-options"></div>
-            <div id="preview-live-solution" style="margin-top:8px; font-size:11px; color:#475569; background:#e2e8f0; padding:6px; border-radius:4px; display:none;"></div>
+            <div id="preview-live-solution" style="margin-top:8px; font-size:11px; color:#475569; background:#e2e8f0; padding:6px; border-radius:4px; display:none; white-space:pre-line;"></div>
           </div>
         </div>
 
@@ -722,6 +793,39 @@
       </div>
 
       <div id="pane-security" class="cbt-pane">
+        <!-- OpenAI / ChatGPT Configuration Panel -->
+        <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:14px; border-radius:6px; margin-bottom:14px;">
+          <div style="font-weight:700; font-size:14px; color:#8b5cf6; margin-bottom:4px;">OpenAI / ChatGPT Automation Controls:</div>
+          <div style="font-size:12px; color:#64748b; margin-bottom:10px;">Paste your API Key below to power automatic solutions, facts, and short tricks.</div>
+          
+          <label style="font-size:12px; font-weight:700; color:#334155;">OpenAI Secret API Key:</label>
+          <input type="password" id="adm-ai-key" class="cbt-field" placeholder="sk-proj-dummy-key-paste-here..." />
+
+          <div class="toggle-switch-row">
+            <div>
+              <div class="toggle-switch-label">Admin 1-Click AI Auto-Fill Button</div>
+              <div style="font-size:11px; color:#64748b;">Enables the '✨ AI Generate Solution & Trick' button while editing questions.</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="chk-ai-admin" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-switch-row">
+            <div>
+              <div class="toggle-switch-label">Candidate Dynamic AI Fallback</div>
+              <div style="font-size:11px; color:#64748b;">Automatically fetches solutions & tricks in real-time if a question was saved without any explanation.</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="chk-ai-candidate" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <button class="cbt-btn-primary" id="btn-adm-save-ai" style="margin-top:10px; background:linear-gradient(135deg, #7c3aed, #c026d3);">Save AI Settings & Key</button>
+        </div>
+
         <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:6px; margin-bottom:12px;">
           <div style="font-weight:600; margin-bottom:6px;">Reset Admin PIN:</div>
           <div class="cbt-responsive-flex-row">
@@ -754,7 +858,7 @@
   document.body.appendChild(portalDiv);
 
   /* ==========================================================================
-     SECTION 6: MODAL NOTIFICATIONS & POPUP DIALOGS
+     SECTION 7: MODAL NOTIFICATIONS & POPUP DIALOGS
      ========================================================================== */
   function showInAppMessage(title, message, callback) {
     const modal = document.getElementById("dom-cbt-modal");
@@ -811,7 +915,7 @@
   }
 
   /* ==========================================================================
-     SECTION 7: SECURITY & FULLSCREEN LOCK ENGINE
+     SECTION 8: SECURITY & FULLSCREEN LOCK ENGINE
      ========================================================================== */
   function enterFullScreen() {
     const el = document.documentElement;
@@ -840,7 +944,7 @@
   });
 
   /* ==========================================================================
-     SECTION 8: CANDIDATE AUTHENTICATION & NAVBAR LOGIC
+     SECTION 9: CANDIDATE AUTHENTICATION & NAVBAR LOGIC
      ========================================================================== */
   function updateNavbarAuthState() {
     const btnPay = document.getElementById("btn-open-payment");
@@ -937,7 +1041,7 @@
   });
 
   /* ==========================================================================
-     SECTION 9: REGISTRATION, CHECKOUT & PAYMENT LOGIC
+     SECTION 10: REGISTRATION, CHECKOUT & PAYMENT LOGIC
      ========================================================================== */
   function resetRegistrationForm() {
     appliedDiscountPercent = 0;
@@ -1060,7 +1164,7 @@
   });
 
   /* ==========================================================================
-     SECTION 10: PASSWORD RECOVERY WORKFLOW
+     SECTION 11: PASSWORD RECOVERY WORKFLOW
      ========================================================================== */
   document.getElementById("link-open-forgot").addEventListener("click", () => {
     resetForgotPasswordForm();
@@ -1118,7 +1222,7 @@
   });
 
   /* ==========================================================================
-     SECTION 11: CANDIDATE PORTAL NAVIGATION & RENDERING (WINDOWS 2 & 3)
+     SECTION 12: CANDIDATE PORTAL NAVIGATION & RENDERING (WINDOWS 2 & 3)
      ========================================================================== */
   document.getElementById("btn-action-login").addEventListener("click", () => {
     const u = document.getElementById("login-username").value.trim();
@@ -1261,7 +1365,7 @@
   });
 
   /* ==========================================================================
-     SECTION 12: EXAM ENGINE, TIMER & DOUBLE CONFIRMATION
+     SECTION 13: EXAM ENGINE, TIMER & DOUBLE CONFIRMATION
      ========================================================================== */
   function cbtLaunchTestExecution() {
     isExamActive = true;
@@ -1508,7 +1612,7 @@
   }
 
   /* ==========================================================================
-     SECTION 13: DETAILED SOLUTIONS REVIEW
+     SECTION 14: DETAILED SOLUTIONS REVIEW & CANDIDATE DYNAMIC AI FALLBACK
      ========================================================================== */
   document.getElementById("btn-view-solutions").addEventListener("click", () => {
     const solContainer = document.getElementById("dom-solutions-container");
@@ -1562,19 +1666,39 @@
         </div>
         <div style="font-size:14px; font-weight:700; margin-bottom:10px;">${qText}</div>
         <div style="margin-bottom:8px;">${opsHtml}</div>
-        <div class="sol-explanation-box">
-          <b>Detailed Solution / Note:</b><br>
-          ${q.solution ? q.solution : "No detailed explanation provided for this question."}
+        <div class="sol-explanation-box" id="sol-box-${idx}">
+          <b>Detailed Solution & Memory Trick:</b><br>
+          <span class="sol-text-content">${q.solution ? q.solution : (aiCandidateEnabled ? "<em>Fetching AI Solution & Trick...</em>" : "No detailed explanation provided.")}</span>
         </div>
       `;
       solContainer.appendChild(card);
+
+      // Method 2: Dynamic Candidate AI Fallback Trigger
+      if (!q.solution && aiCandidateEnabled) {
+        const correctOptStr = q.options[q.correct] || "";
+        callOpenAiForSolution(q.text, correctOptStr)
+          .then((aiText) => {
+            q.solution = aiText; // Save to question pool so next time it is instant
+            syncAllData();
+            const box = document.getElementById(`sol-box-${idx}`);
+            if (box) {
+              box.querySelector(".sol-text-content").innerText = aiText;
+            }
+          })
+          .catch(() => {
+            const box = document.getElementById(`sol-box-${idx}`);
+            if (box) {
+              box.querySelector(".sol-text-content").innerText = "Explanation currently unavailable.";
+            }
+          });
+      }
     });
 
     cbtNavigate("win-solutions");
   });
 
   /* ==========================================================================
-     SECTION 14: ADMIN LIVE PREVIEW & QUESTION EDITOR
+     SECTION 15: ADMIN LIVE PREVIEW & 1-CLICK AI AUTO-FILL
      ========================================================================== */
   function updateAdminLivePreview() {
     const topic = document.getElementById("adm-sel-topic").value || "Topic";
@@ -1609,7 +1733,7 @@
     const solEl = document.getElementById("preview-live-solution");
     if (sol) {
       solEl.style.display = "block";
-      solEl.innerHTML = `<b>Solution:</b> ${sol}`;
+      solEl.innerHTML = `<b>Solution & Trick:</b>\n${sol}`;
     } else {
       solEl.style.display = "none";
     }
@@ -1633,6 +1757,41 @@
     updateAdminLivePreview();
   }
 
+  // Method 1: 1-Click AI Auto-Generate Solution & Trick Button Listener
+  document.getElementById("btn-ai-gen-solution").addEventListener("click", async () => {
+    if (!aiAdminEnabled) {
+      showInAppMessage("Feature Disabled", "Admin AI Generator button is toggled OFF in Admin Settings.");
+      return;
+    }
+
+    const qText = document.getElementById("adm-q-title").value.trim();
+    const ansIdx = parseInt(document.getElementById("adm-q-ans").value, 10);
+    const correctOptInput = document.getElementById(`adm-q-op${ansIdx}`);
+    const correctOptText = correctOptInput ? correctOptInput.value.trim() : "";
+    const solTextarea = document.getElementById("adm-q-solution");
+    const aiBtn = document.getElementById("btn-ai-gen-solution");
+
+    if (!qText || !correctOptText) {
+      showInAppMessage("Missing Data", "Please type the Question Text and all Options, and choose the correct answer first.");
+      return;
+    }
+
+    aiBtn.innerText = "⏳ Generating with AI...";
+    aiBtn.disabled = true;
+
+    try {
+      const generatedSolution = await callOpenAiForSolution(qText, correctOptText);
+      solTextarea.value = generatedSolution;
+      updateAdminLivePreview();
+      showInAppMessage("AI Generation Complete", "Solution and short trick generated successfully! Review before saving.");
+    } catch (err) {
+      showInAppMessage("AI Error", "Could not generate solution: " + err.message);
+    } finally {
+      aiBtn.innerText = "✨ AI Generate Solution & Trick";
+      aiBtn.disabled = false;
+    }
+  });
+
   ["adm-sel-topic", "adm-sel-cat", "adm-q-title", "adm-q-op0", "adm-q-op1", "adm-q-op2", "adm-q-op3", "adm-q-solution", "adm-q-ans"].forEach((id) => {
     const el = document.getElementById(id);
     if (el) {
@@ -1644,7 +1803,7 @@
   document.getElementById("btn-adm-cancel-edit").addEventListener("click", resetQuestionEditor);
 
   /* ==========================================================================
-     SECTION 15: ADMIN AUTHENTICATION & DASHBOARD LOGIC
+     SECTION 16: ADMIN AUTHENTICATION, SETTINGS & AI CONFIGURATION
      ========================================================================== */
   document.getElementById("btn-open-admin").addEventListener("click", () => {
     if (isAdminAuthenticated) {
@@ -1736,6 +1895,14 @@
     document.getElementById("adm-mark-pos").value = storeMarkPositive;
     document.getElementById("adm-mark-neg").value = storeMarkNegative;
     document.getElementById("adm-exam-min").value = storeDuration;
+
+    // AI Configuration fields
+    document.getElementById("adm-ai-key").value = openAiApiKey;
+    document.getElementById("chk-ai-admin").checked = aiAdminEnabled;
+    document.getElementById("chk-ai-candidate").checked = aiCandidateEnabled;
+
+    const btnAi = document.getElementById("btn-ai-gen-solution");
+    if (btnAi) btnAi.style.display = aiAdminEnabled ? "inline-flex" : "none";
 
     // Refresh chips & select elements
     const tChips = document.getElementById("dom-adm-topic-chips");
@@ -1871,6 +2038,18 @@
 
     updateAdminLivePreview();
   }
+
+  // Save AI Settings
+  document.getElementById("btn-adm-save-ai").addEventListener("click", () => {
+    const keyVal = document.getElementById("adm-ai-key").value.trim();
+    openAiApiKey = keyVal;
+    aiAdminEnabled = document.getElementById("chk-ai-admin").checked;
+    aiCandidateEnabled = document.getElementById("chk-ai-candidate").checked;
+
+    syncAllData();
+    cbtRefreshAdmin();
+    showInAppMessage("AI Settings Saved", "OpenAI API Key and switches have been successfully saved!");
+  });
 
   // Profile Picture File Upload Listener
   document.getElementById("adm-brand-pic-file").addEventListener("change", function () {
@@ -2045,13 +2224,13 @@
   });
 
   /* ==========================================================================
-     SECTION 16: APPLICATION INITIALIZATION (BOOTSTRAP)
+     SECTION 17: APPLICATION BOOTSTRAP
      ========================================================================== */
   function bootApplication() {
     applyBrandIdentity();
     updateNavbarAuthState();
 
-    // 1. Check if an exam was interrupted by reload
+    // 1. Recover active running exam if page was reloaded
     const runningSnap = localStorage.getItem("tb_exam_running_snapshot");
     if (activeUser && activeUser.username && runningSnap) {
       try {
@@ -2065,7 +2244,7 @@
       }
     }
 
-    // 2. Check if Admin was authenticated before reload
+    // 2. Recover admin session if logged in
     if (isAdminAuthenticated) {
       cbtNavigate("win-admin-dash");
       cbtRefreshAdmin();
