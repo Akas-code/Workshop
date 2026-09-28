@@ -2,8 +2,13 @@
   "use strict";
 
   function startPortalApp() {
+    // Check if portal is already injected
+    if (document.getElementById("cbt-portal")) {
+      return;
+    }
+
     /* ==========================================================================
-       SECTION 1: VIEWPORT & DEVICE METADATA
+       SECTION 1: VIEWPORT INJECTION
        ========================================================================== */
     let metaTag = document.querySelector('meta[name="viewport"]');
     if (!metaTag) {
@@ -14,7 +19,7 @@
     }
 
     /* ==========================================================================
-       SECTION 2: DEFAULT DATA & LOCAL STORAGE STATE
+       SECTION 2: DEFAULT DATA SETS
        ========================================================================== */
     const defaultTopics = [
       "William Shakespeare",
@@ -126,10 +131,10 @@
         topic: "John Galsworthy",
         category: "PYQS",
         text: "The first work that earned Galsworthy was the novel. Identify it.",
-        text_hi: "गाल्सवर्दी का पहला उपन्यास जिसने उन्हें उपन्यासकार के रूप में पहचान दिलाई:",
+        text_hi: "गाल्सवर्दी का पहला उपन्यास जिसने उन्हें पहचान दिलाई:",
         options: ["Fraternity", "Country Mouse", "The Island Pharisees", "Jocelyn"],
         correct: 2,
-        solution: "'The Island Pharisees' (1904) was the first book published under his own real name[span_14](start_span)[span_14](end_span)."
+        solution: "'The Island Pharisees' (1904) was the first novel published under his own real name[span_14](start_span)[span_14](end_span)."
       },
       {
         topic: "John Galsworthy",
@@ -1226,6 +1231,7 @@
       { code: "FREE100", discount: 100 }
     ];
 
+    // STORAGE EXTRACTION & AUTO SYNC
     let storeTopics = JSON.parse(localStorage.getItem("tb_portal_topics")) || defaultTopics;
     if (!storeTopics.some(t => t.toLowerCase() === "john galsworthy")) {
       storeTopics.push("John Galsworthy");
@@ -1293,7 +1299,7 @@
     let isExamActive = false;
 
     /* ==========================================================================
-       SECTION 3: DATA SYNCHRONIZATION HELPERS
+       SECTION 3: CORE FUNCTIONS DEFINITION
        ========================================================================== */
     function syncAllData() {
       localStorage.setItem("tb_portal_topics", JSON.stringify(storeTopics));
@@ -1371,671 +1377,658 @@
       }
     }
 
-    /* ==========================================================================
-       SECTION 4: OPENAI CHATGPT API ENGINE
-       ========================================================================== */
-    async function callOpenAiForSolution(questionText, correctOptionText) {
-      if (!openAiApiKey || openAiApiKey.includes("paste-here")) {
-        throw new Error("Valid OpenAI API Key is not set in Admin Settings.");
+    function showInAppMessage(title, message, callback) {
+      const modal = document.getElementById("dom-cbt-modal");
+      const h = document.getElementById("cbt-modal-heading");
+      const b = document.getElementById("cbt-modal-body");
+      const btns = document.getElementById("cbt-modal-btns");
+
+      h.innerText = title;
+      b.innerText = message;
+      btns.innerHTML = `<button class="cbt-btn-primary" style="width:auto; padding:8px 20px;" id="cbt-modal-ok">OK</button>`;
+      modal.classList.add("active");
+
+      document.getElementById("cbt-modal-ok").onclick = () => {
+        modal.classList.remove("active");
+        if (callback) callback();
+      };
+    }
+
+    function showInAppConfirm(title, message, onConfirm, onCancel, confirmText = "Confirm") {
+      const modal = document.getElementById("dom-cbt-modal");
+      const h = document.getElementById("cbt-modal-heading");
+      const b = document.getElementById("cbt-modal-body");
+      const btns = document.getElementById("cbt-modal-btns");
+
+      h.innerText = title;
+      b.innerHTML = message;
+      btns.innerHTML = `
+        <button class="cbt-btn-secondary" style="width:auto; padding:8px 16px;" id="cbt-modal-cancel">Cancel</button>
+        <button class="cbt-btn-primary" style="width:auto; padding:8px 16px; background:#dc2626;" id="cbt-modal-yes">${confirmText}</button>
+      `;
+      modal.classList.add("active");
+
+      document.getElementById("cbt-modal-yes").onclick = () => {
+        modal.classList.remove("active");
+        if (onConfirm) onConfirm();
+      };
+      document.getElementById("cbt-modal-cancel").onclick = () => {
+        modal.classList.remove("active");
+        if (onCancel) onCancel();
+      };
+    }
+
+    function cbtNavigate(targetId) {
+      document.querySelectorAll(".cbt-view").forEach((win) => win.classList.remove("active"));
+      const el = document.getElementById(targetId);
+      if (el) el.classList.add("active");
+
+      const nav = document.getElementById("dom-main-navbar");
+      if (targetId === "win-4") {
+        if (nav) nav.style.display = "none";
+      } else {
+        if (nav) nav.style.display = "flex";
       }
+    }
 
-      const prompt = `You are an elite competitive exam teacher for English Literature.
-Question: "${questionText}"
-Correct Option: "${correctOptionText}"
+    function updateNavbarAuthState() {
+      const btnPay = document.getElementById("btn-open-payment");
+      const btnAdmin = document.getElementById("btn-open-admin");
+      const menuContainer = document.getElementById("cbt-candidate-menu-wrapper");
 
-Provide:
-1. Short, precise Conceptual Explanation (2-3 lines).
-2. Key Facts.
-3. Catchy Short Trick or Mnemonic.`;
+      if (activeUser && activeUser.username) {
+        btnPay.style.display = "none";
+        btnAdmin.style.display = "none";
+        menuContainer.style.display = "block";
+        document.getElementById("dom-cand-logo-text").innerText = `🎓 ${brandConfig.badge} • ${activeUser.username}`;
 
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + openAiApiKey.trim()
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [{ role: "user", content: prompt }],
-          temperature: 0.6
-        })
+        document.getElementById("drop-display-username").innerText = activeUser.username;
+        document.getElementById("drop-display-phone").innerText = activeUser.mobile ? `+91 ${activeUser.mobile}` : "Not Available";
+        document.getElementById("drop-display-price").innerText = activeUser.purchaseAmount ? `₹ ${activeUser.purchaseAmount}` : `₹ ${storePrice.toFixed(2)}`;
+        document.getElementById("drop-display-coupon").innerText = activeUser.appliedCoupon || "Direct Payment";
+
+        const candidateStats = userPerformance[activeUser.username];
+        const perfEl = document.getElementById("drop-perf-summary");
+        if (candidateStats && candidateStats.length > 0) {
+          const last = candidateStats[candidateStats.length - 1];
+          perfEl.innerHTML = `Tests Given: <b>${candidateStats.length}</b><br>Last Net Score: <b>${last.netScore} pts (${last.pct}%)</b> [${last.category}]`;
+        } else {
+          perfEl.innerHTML = "No tests taken yet.";
+        }
+
+        document.getElementById("drop-edit-name").value = activeUser.username;
+        document.getElementById("drop-edit-pass").value = "";
+      } else {
+        btnPay.style.display = "block";
+        btnAdmin.style.display = "block";
+        menuContainer.style.display = "none";
+      }
+    }
+
+    function resetRegistrationForm() {
+      appliedDiscountPercent = 0;
+      generatedOTP = "";
+      lastTransactionInfo = { amount: "0.00", coupon: "None" };
+      document.getElementById("coupon-code-input").value = "";
+      document.getElementById("reg-mobile").value = "";
+      document.getElementById("reg-otp").value = "";
+      document.getElementById("reg-username").value = "";
+      document.getElementById("reg-password").value = "";
+      document.getElementById("pay-step-1").style.display = "block";
+      document.getElementById("pay-step-2").style.display = "none";
+      document.getElementById("pay-step-3").style.display = "none";
+      updateCheckoutDisplay();
+    }
+
+    function resetForgotPasswordForm() {
+      resetOTP = "";
+      resetMobileTarget = "";
+      document.getElementById("forgot-mobile").value = "";
+      document.getElementById("forgot-otp-input").value = "";
+      document.getElementById("forgot-new-password").value = "";
+      document.getElementById("forgot-step-1").style.display = "block";
+      document.getElementById("forgot-step-2").style.display = "none";
+    }
+
+    function updateCheckoutDisplay() {
+      const finalPrice = Math.max(0, storePrice - (storePrice * (appliedDiscountPercent / 100)));
+      document.getElementById("dom-checkout-price").innerText = `₹ ${finalPrice.toFixed(2)}`;
+      const discInfo = document.getElementById("dom-discount-info");
+      if (appliedDiscountPercent > 0) {
+        discInfo.style.display = "block";
+        discInfo.innerText = `Coupon Applied: ${appliedDiscountPercent}% Discount!`;
+      } else {
+        discInfo.style.display = "none";
+      }
+    }
+
+    function cbtRenderWindow2() {
+      const container = document.getElementById("dom-win2-topics");
+      container.innerHTML = "";
+      storeTopics.forEach((t) => {
+        const card = document.createElement("div");
+        card.className = "cbt-selection-card";
+        card.innerText = t;
+        card.onclick = () => {
+          activeTopic = t.trim();
+          document.getElementById("win3-topic-heading").innerText = activeTopic;
+          document.getElementById("win3-time-preview").innerText = `Time : ${storeDuration}:00 min`;
+          cbtRenderWindow3();
+          cbtNavigate("win-3");
+        };
+        container.appendChild(card);
       });
 
-      if (!response.ok) {
-        const errJson = await response.json().catch(() => ({}));
-        throw new Error(errJson.error?.message || "HTTP Error " + response.status);
+      const notesContainer = document.getElementById("dom-notes-container");
+      notesContainer.innerHTML = "";
+      if (storeNotes.length === 0) {
+        notesContainer.innerHTML = "<div style='font-size:13px; color:#64748b;'>No study PDFs uploaded yet.</div>";
+      } else {
+        storeNotes.forEach((n) => {
+          const div = document.createElement("div");
+          div.className = "pdf-card";
+          div.innerHTML = `
+            <div><b>${n.title}</b></div>
+            <a href="${n.url}" target="_blank" style="padding:6px 12px; background:#2563eb; color:#fff; text-decoration:none; border-radius:4px; font-size:12px; white-space:nowrap;">Download PDF</a>
+          `;
+          notesContainer.appendChild(div);
+        });
+      }
+    }
+
+    function cbtRenderWindow3() {
+      const catBox = document.getElementById("dom-win3-paper-types");
+      const setBox = document.getElementById("dom-win3-practice-sets");
+      catBox.innerHTML = "";
+      setBox.innerHTML = "";
+
+      storePaperTypes.forEach((cat) => {
+        const card = document.createElement("div");
+        card.className = "cbt-selection-card";
+        card.innerText = cat;
+        card.onclick = () => cbtPrepareInstructions(cat);
+        catBox.appendChild(card);
+      });
+
+      storeSets.forEach((setLabel) => {
+        const card = document.createElement("div");
+        card.className = "cbt-selection-card";
+        card.innerText = setLabel;
+        card.onclick = () => cbtPrepareInstructions(setLabel);
+        setBox.appendChild(card);
+      });
+    }
+
+    function cbtPrepareInstructions(categoryName) {
+      activeCategory = (categoryName || "").trim();
+      const targetTopic = (activeTopic || "").trim().toLowerCase();
+      const targetCat = activeCategory.toLowerCase();
+
+      activeExamQuestions = storeQuestions.filter((q) => {
+        const qTopic = (q.topic || "").trim().toLowerCase();
+        const qCat = (q.category || "").trim().toLowerCase();
+        return qTopic === targetTopic && qCat === targetCat;
+      });
+
+      if (activeExamQuestions.length === 0) {
+        showInAppMessage(
+          "No Questions Available",
+          `There are currently 0 questions available for "${activeTopic}" under "${activeCategory}".`
+        );
+        return;
       }
 
-      const data = await response.json();
-      return data.choices[0].message.content.trim();
+      document.getElementById("inst-heading").innerText = `${activeTopic} - ${activeCategory}`;
+      document.getElementById("inst-pos-mark").innerText = `+${storeMarkPositive.toFixed(2)}`;
+      document.getElementById("inst-neg-mark").innerText = `-${storeMarkNegative.toFixed(2)}`;
+
+      const chk = document.getElementById("inst-agree-chk");
+      const btn = document.getElementById("btn-start-locked-exam");
+      chk.checked = false;
+      btn.disabled = true;
+
+      chk.onchange = () => {
+        btn.disabled = !chk.checked;
+      };
+
+      cbtNavigate("win-instructions");
+    }
+
+    function cbtLaunchTestExecution() {
+      isExamActive = true;
+      currentQuestionIndex = 0;
+      candidateAnswers = {};
+      remainingSeconds = storeDuration * 60;
+
+      document.getElementById("win4-banner").innerText = `${brandConfig.name} | ${activeTopic} (${activeCategory})`;
+      document.getElementById("win4-mark-info").innerText = `+${storeMarkPositive.toFixed(2)} / -${storeMarkNegative.toFixed(2)}`;
+
+      cbtNavigate("win-4");
+      enterFullScreen();
+      cbtRenderQuestion();
+      cbtUpdatePalette();
+      cbtStartTimer();
+      saveExamSnapshot();
+    }
+
+    function cbtResumeTest(snap) {
+      isExamActive = true;
+      activeTopic = snap.activeTopic;
+      activeCategory = snap.activeCategory;
+      activeLanguage = snap.activeLanguage || "en";
+      activeExamQuestions = snap.activeExamQuestions || [];
+      currentQuestionIndex = snap.currentQuestionIndex || 0;
+      candidateAnswers = snap.candidateAnswers || {};
+
+      const elapsed = Math.floor((Date.now() - snap.timestamp) / 1000);
+      remainingSeconds = Math.max(5, (snap.remainingSeconds || 1800) - elapsed);
+
+      document.getElementById("win4-lang-toggle").value = activeLanguage;
+      document.getElementById("win4-banner").innerText = `${brandConfig.name} | ${activeTopic} (${activeCategory})`;
+      document.getElementById("win4-mark-info").innerText = `+${storeMarkPositive.toFixed(2)} / -${storeMarkNegative.toFixed(2)}`;
+
+      cbtNavigate("win-4");
+      enterFullScreen();
+      cbtRenderQuestion();
+      cbtUpdatePalette();
+      cbtStartTimer();
+    }
+
+    function cbtRenderQuestion() {
+      const cur = activeExamQuestions[currentQuestionIndex];
+      document.getElementById("win4-counter").innerText =
+        `Question ${currentQuestionIndex + 1} of ${activeExamQuestions.length}`;
+
+      const container = document.getElementById("dom-test-container");
+      const questionText = (activeLanguage === "hi" && cur.text_hi) ? cur.text_hi : cur.text;
+
+      let html = `<div style="font-size:18px; font-weight:800; margin-bottom:16px; line-height:1.5; color:#0f172a;">Q${currentQuestionIndex + 1}. ${questionText}</div>`;
+
+      for (let i = 0; i < cur.options.length; i++) {
+        const isChecked = candidateAnswers[currentQuestionIndex] === i;
+        const checkedAttr = isChecked ? "checked" : "";
+        const selectedClass = isChecked ? "selected-opt" : "";
+
+        html += `
+          <label class="cbt-opt-label ${selectedClass}" id="opt-label-${i}">
+            <input type="radio" name="cbt-choice" value="${i}" ${checkedAttr} />
+            <span><b>${String.fromCharCode(65 + i)}.</b> &nbsp; ${cur.options[i]}</span>
+          </label>`;
+      }
+      container.innerHTML = html;
+
+      container.querySelectorAll('input[name="cbt-choice"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          container.querySelectorAll('.cbt-opt-label').forEach(lbl => lbl.classList.remove('selected-opt'));
+          const parent = e.target.closest('.cbt-opt-label');
+          if (parent) parent.classList.add('selected-opt');
+        });
+      });
+    }
+
+    function cbtUpdatePalette() {
+      const paletteGrid = document.getElementById("dom-palette-grid");
+      paletteGrid.innerHTML = "";
+      let attempted = 0;
+
+      activeExamQuestions.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "palette-btn";
+        btn.innerText = idx + 1;
+
+        if (candidateAnswers.hasOwnProperty(idx)) {
+          btn.classList.add("bg-attempted");
+          attempted++;
+        } else {
+          btn.classList.add("bg-unattempted");
+        }
+
+        btn.onclick = () => {
+          const checked = document.querySelector('input[name="cbt-choice"]:checked');
+          if (checked) {
+            candidateAnswers[currentQuestionIndex] = parseInt(checked.value, 10);
+          }
+          currentQuestionIndex = idx;
+          cbtRenderQuestion();
+          cbtUpdatePalette();
+          saveExamSnapshot();
+        };
+        paletteGrid.appendChild(btn);
+      });
+
+      document.getElementById("stat-attempted").innerText = attempted;
+      document.getElementById("stat-unattempted").innerText = activeExamQuestions.length - attempted;
+    }
+
+    function cbtStartTimer() {
+      clearInterval(countdownRef);
+      countdownRef = setInterval(() => {
+        const m = Math.floor(remainingSeconds / 60);
+        const s = remainingSeconds % 60;
+        document.getElementById("win4-clock").innerText =
+          (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+
+        if (remainingSeconds <= 0) {
+          clearInterval(countdownRef);
+          showInAppMessage("Time Expired!", "Allotted time is over. Finalizing your test...", () => {
+            cbtFinishTest();
+          });
+        }
+        remainingSeconds--;
+
+        if (remainingSeconds % 5 === 0) saveExamSnapshot();
+      }, 1000);
+    }
+
+    function cbtFinishTest() {
+      clearInterval(countdownRef);
+      exitFullScreen();
+      clearExamSnapshot();
+
+      let correctCount = 0;
+      let wrongCount = 0;
+
+      activeExamQuestions.forEach((q, idx) => {
+        if (candidateAnswers.hasOwnProperty(idx)) {
+          if (candidateAnswers[idx] === q.correct) {
+            correctCount++;
+          } else {
+            wrongCount++;
+          }
+        }
+      });
+
+      const totalQuestions = activeExamQuestions.length || 1;
+      const attemptedCount = Object.keys(candidateAnswers).length;
+      const unattemptedCount = totalQuestions - attemptedCount;
+
+      const positiveMarksEarned = correctCount * storeMarkPositive;
+      const negativeMarksDeducted = wrongCount * storeMarkNegative;
+      const maxPossibleMarks = totalQuestions * storeMarkPositive;
+      const netMarks = Math.max(0, positiveMarksEarned - negativeMarksDeducted);
+      const netPct = Math.round((netMarks / maxPossibleMarks) * 100);
+      const accuracy = attemptedCount > 0 ? Math.round((correctCount / attemptedCount) * 100) : 0;
+
+      if (activeUser && activeUser.username) {
+        if (!userPerformance[activeUser.username]) {
+          userPerformance[activeUser.username] = [];
+        }
+        userPerformance[activeUser.username].push({
+          topic: activeTopic,
+          category: activeCategory,
+          total: totalQuestions,
+          correct: correctCount,
+          wrong: wrongCount,
+          unattempted: unattemptedCount,
+          netScore: netMarks.toFixed(2),
+          maxMarks: maxPossibleMarks.toFixed(2),
+          pct: netPct,
+          date: new Date().toLocaleDateString()
+        });
+        syncAllData();
+        updateNavbarAuthState();
+      }
+
+      document.getElementById("dom-result-stats").innerHTML = `
+        <div style="font-size:38px; font-weight:800; color:#2563eb; margin-bottom:4px;">${netMarks.toFixed(2)} <span style="font-size:16px; color:#64748b;">/ ${maxPossibleMarks.toFixed(2)} pts</span></div>
+        <div style="font-size:16px; font-weight:700; color:#0f172a; margin-bottom:12px;">Percentage: ${netPct}% | Accuracy: ${accuracy}%</div>
+
+        <div class="cbt-responsive-result-grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; max-width:540px; margin:0 auto 14px auto; font-size:13px;">
+          <div style="background:#ecfdf5; border:1px solid #a7f3d0; padding:8px; border-radius:6px;">
+            <div style="color:#059669; font-weight:700;">${correctCount} Correct</div>
+            <div style="font-size:11px; color:#065f46;">+${positiveMarksEarned.toFixed(2)} pts</div>
+          </div>
+          <div style="background:#fef2f2; border:1px solid #fecaca; padding:8px; border-radius:6px;">
+            <div style="color:#dc2626; font-weight:700;">${wrongCount} Incorrect</div>
+            <div style="font-size:11px; color:#991b1b;">-${negativeMarksDeducted.toFixed(2)} pts</div>
+          </div>
+          <div style="background:#f5f3ff; border:1px solid #ddd6fe; padding:8px; border-radius:6px;">
+            <div style="color:#7c3aed; font-weight:700;">${unattemptedCount} Skipped</div>
+            <div style="font-size:11px; color:#5b21b6;">0.00 pts</div>
+          </div>
+        </div>
+        <div style="font-size:12px; color:#64748b;">Test Paper: <b>${activeTopic} (${activeCategory})</b></div>
+      `;
+
+      cbtNavigate("win-result");
+    }
+
+    function updateAdminLivePreview() {
+      const topic = document.getElementById("adm-sel-topic").value || "Topic";
+      const cat = document.getElementById("adm-sel-cat").value || "Category";
+      const title = document.getElementById("adm-q-title").value.trim() || "Type question text to see preview...";
+      const o0 = document.getElementById("adm-q-op0").value.trim() || "Option A text";
+      const o1 = document.getElementById("adm-q-op1").value.trim() || "Option B text";
+      const o2 = document.getElementById("adm-q-op2").value.trim() || "Option C text";
+      const o3 = document.getElementById("adm-q-op3").value.trim() || "Option D text";
+      const sol = document.getElementById("adm-q-solution").value.trim();
+      const correct = parseInt(document.getElementById("adm-q-ans").value, 10);
+
+      document.getElementById("preview-meta-tag").innerText = `[${topic} • ${cat}]`;
+      document.getElementById("preview-live-text").innerText = title;
+
+      const ops = [o0, o1, o2, o3];
+      let html = "";
+      ops.forEach((text, i) => {
+        const isCorrect = correct === i;
+        html += `
+          <div class="cbt-opt-label" style="background:#ffffff; border-color:${isCorrect ? '#10b981' : '#e2e8f0'}; padding:10px 12px; margin-bottom:8px;">
+            <input type="radio" name="preview-demo-radio" ${isCorrect ? "checked" : ""} disabled />
+            <span style="font-weight:${isCorrect ? '700' : 'normal'}; color:${isCorrect ? '#059669' : 'inherit'}; font-size:13px;">
+              <b>${String.fromCharCode(65 + i)}.</b> ${text}
+            </span>
+            ${isCorrect ? '<span class="preview-correct-badge">Correct</span>' : ''}
+          </div>
+        `;
+      });
+      document.getElementById("preview-live-options").innerHTML = html;
+
+      const solEl = document.getElementById("preview-live-solution");
+      if (sol) {
+        solEl.style.display = "block";
+        solEl.innerHTML = `<b>Solution & Trick:</b>\n${sol}`;
+      } else {
+        solEl.style.display = "none";
+      }
+    }
+
+    function resetQuestionEditor() {
+      editingQuestionIndex = null;
+      document.getElementById("adm-form-mode").innerText = "CREATE NEW QUESTION";
+      document.getElementById("adm-form-mode").style.color = "#2563eb";
+      document.getElementById("btn-adm-save-q").innerText = "Save Question";
+      document.getElementById("btn-adm-cancel-edit").style.display = "none";
+
+      document.getElementById("adm-q-title").value = "";
+      document.getElementById("adm-q-title-hi").value = "";
+      document.getElementById("adm-q-op0").value = "";
+      document.getElementById("adm-q-op1").value = "";
+      document.getElementById("adm-q-op2").value = "";
+      document.getElementById("adm-q-op3").value = "";
+      document.getElementById("adm-q-solution").value = "";
+      document.getElementById("adm-q-ans").value = "0";
+      updateAdminLivePreview();
+    }
+
+    function cbtRefreshAdmin() {
+      document.getElementById("adm-base-price").value = storePrice;
+      const cList = document.getElementById("dom-adm-coupons-list");
+      cList.innerHTML = "";
+      storeCoupons.forEach((c, idx) => {
+        const chip = document.createElement("div");
+        chip.className = "cbt-item-chip";
+        chip.innerHTML = `${c.code} (${c.discount}%) <span>&times;</span>`;
+        chip.querySelector("span").onclick = () => {
+          storeCoupons.splice(idx, 1);
+          syncAllData();
+          cbtRefreshAdmin();
+        };
+        cList.appendChild(chip);
+      });
+
+      document.getElementById("adm-brand-name").value = brandConfig.name;
+      document.getElementById("adm-brand-badge").value = brandConfig.badge;
+      document.getElementById("adm-brand-favicon").value = brandConfig.favicon;
+      document.getElementById("adm-brand-pic-url").value = brandConfig.profilePic || "";
+
+      const prevImg = document.getElementById("adm-profile-preview");
+      const removeBtn = document.getElementById("btn-remove-profile-pic");
+      if (brandConfig.profilePic) {
+        prevImg.src = brandConfig.profilePic;
+        prevImg.style.display = "inline-block";
+        removeBtn.style.display = "inline-block";
+      } else {
+        prevImg.style.display = "none";
+        removeBtn.style.display = "none";
+      }
+
+      document.getElementById("adm-mark-pos").value = storeMarkPositive;
+      document.getElementById("adm-mark-neg").value = storeMarkNegative;
+      document.getElementById("adm-exam-min").value = storeDuration;
+
+      document.getElementById("adm-ai-key").value = openAiApiKey;
+      document.getElementById("chk-ai-admin").checked = aiAdminEnabled;
+      document.getElementById("chk-ai-candidate").checked = aiCandidateEnabled;
+
+      const btnAi = document.getElementById("btn-ai-gen-solution");
+      if (btnAi) btnAi.style.display = aiAdminEnabled ? "inline-flex" : "none";
+
+      const tChips = document.getElementById("dom-adm-topic-chips");
+      const selTopic = document.getElementById("adm-sel-topic");
+      tChips.innerHTML = "";
+      selTopic.innerHTML = "";
+      storeTopics.forEach((t, idx) => {
+        const chip = document.createElement("div");
+        chip.className = "cbt-item-chip";
+        chip.innerHTML = `${t} <span>&times;</span>`;
+        chip.querySelector("span").onclick = () => {
+          storeTopics.splice(idx, 1);
+          syncAllData();
+          cbtRefreshAdmin();
+        };
+        tChips.appendChild(chip);
+
+        const o = document.createElement("option");
+        o.value = t; o.innerText = t;
+        selTopic.appendChild(o);
+      });
+
+      const cChips = document.getElementById("dom-adm-category-chips");
+      cChips.innerHTML = "";
+      storePaperTypes.forEach((c, idx) => {
+        const chip = document.createElement("div");
+        chip.className = "cbt-item-chip";
+        chip.innerHTML = `${c} <span>&times;</span>`;
+        chip.querySelector("span").onclick = () => {
+          storePaperTypes.splice(idx, 1);
+          syncAllData();
+          cbtRefreshAdmin();
+        };
+        cChips.appendChild(chip);
+      });
+
+      const sChips = document.getElementById("dom-adm-set-chips");
+      sChips.innerHTML = "";
+      storeSets.forEach((s, idx) => {
+        const chip = document.createElement("div");
+        chip.className = "cbt-item-chip";
+        chip.innerHTML = `${s} <span>&times;</span>`;
+        chip.querySelector("span").onclick = () => {
+          storeSets.splice(idx, 1);
+          syncAllData();
+          cbtRefreshAdmin();
+        };
+        sChips.appendChild(chip);
+      });
+
+      const selCat = document.getElementById("adm-sel-cat");
+      selCat.innerHTML = "";
+
+      const grpPapers = document.createElement("optgroup");
+      grpPapers.label = "Paper Types";
+      storePaperTypes.forEach((c) => {
+        const o = document.createElement("option");
+        o.value = c; o.innerText = c;
+        grpPapers.appendChild(o);
+      });
+      selCat.appendChild(grpPapers);
+
+      const grpSets = document.createElement("optgroup");
+      grpSets.label = "Practice Sets";
+      storeSets.forEach((s) => {
+        const o = document.createElement("option");
+        o.value = s; o.innerText = s;
+        grpSets.appendChild(o);
+      });
+      selCat.appendChild(grpSets);
+
+      const qTable = document.getElementById("dom-table-q-list");
+      qTable.innerHTML = "";
+      storeQuestions.forEach((q, idx) => {
+        const tr = document.createElement("tr");
+        tr.style.borderBottom = "1px solid #e2e8f0";
+        tr.innerHTML = `
+          <td style="padding:6px;"><b>[${q.topic} &bull; ${q.category}]</b> ${q.text}</td>
+          <td style="padding:6px; text-align:right; white-space:nowrap;">
+            <button class="cbt-btn-edit">Edit</button>
+            <button class="cbt-btn-del">Del</button>
+          </td>
+        `;
+        tr.querySelector(".cbt-btn-edit").onclick = () => {
+          editingQuestionIndex = idx;
+          document.getElementById("adm-form-mode").innerText = `EDITING #${idx + 1}`;
+          document.getElementById("adm-form-mode").style.color = "#dc2626";
+          document.getElementById("btn-adm-save-q").innerText = "Update Question";
+          document.getElementById("btn-adm-cancel-edit").style.display = "inline-block";
+
+          document.getElementById("adm-sel-topic").value = q.topic;
+          document.getElementById("adm-sel-cat").value = q.category;
+          document.getElementById("adm-q-title").value = q.text;
+          document.getElementById("adm-q-title-hi").value = q.text_hi || "";
+          document.getElementById("adm-q-op0").value = q.options[0] || "";
+          document.getElementById("adm-q-op1").value = q.options[1] || "";
+          document.getElementById("adm-q-op2").value = q.options[2] || "";
+          document.getElementById("adm-q-op3").value = q.options[3] || "";
+          document.getElementById("adm-q-solution").value = q.solution || "";
+          document.getElementById("adm-q-ans").value = q.correct.toString();
+
+          updateAdminLivePreview();
+          document.getElementById("adm-q-title").scrollIntoView({ behavior: "smooth" });
+        };
+
+        tr.querySelector(".cbt-btn-del").onclick = () => {
+          showInAppConfirm("Delete Question", "Remove this question permanently?", () => {
+            storeQuestions.splice(idx, 1);
+            if (editingQuestionIndex === idx) resetQuestionEditor();
+            syncAllData();
+            cbtRefreshAdmin();
+          });
+        };
+        qTable.appendChild(tr);
+      });
+
+      const pdfList = document.getElementById("dom-adm-pdf-list");
+      pdfList.innerHTML = "";
+      storeNotes.forEach((n, idx) => {
+        const div = document.createElement("div");
+        div.className = "pdf-card";
+        div.innerHTML = `
+          <div><b>${n.title}</b></div>
+          <button class="cbt-btn-del">Delete</button>
+        `;
+        div.querySelector("button").onclick = () => {
+          storeNotes.splice(idx, 1);
+          syncAllData();
+          cbtRefreshAdmin();
+        };
+        pdfList.appendChild(div);
+      });
+
+      updateAdminLivePreview();
     }
 
     /* ==========================================================================
-       SECTION 5: CSS STYLESHEET
-       ========================================================================== */
-    const styleEl = document.createElement("style");
-    styleEl.textContent = `
-      * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-      html, body { width: 100%; min-height: 100%; overflow-x: hidden; }
-      #cbt-portal {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-        color: #0f172a; background: #f8fafc; min-height: 100vh; display: flex; flex-direction: column; width: 100%;
-      }
-      .cbt-nav {
-        display: flex; justify-content: space-between; align-items: center;
-        background: #0f172a; padding: 12px 18px; color: #ffffff; position: relative; z-index: 1000; flex-wrap: wrap; gap: 10px;
-      }
-      .cbt-logo-area { display: flex; align-items: center; gap: 8px; }
-      .cbt-logo-badge {
-        background: #2563eb; color: white; font-weight: 800; padding: 5px 8px; border-radius: 6px; font-size: 13px;
-      }
-      .cbt-profile-img-header {
-        width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; display: none;
-      }
-      .cbt-brand-name { font-size: 16px; font-weight: 700; color: #f8fafc; white-space: nowrap; }
-      .cbt-nav-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-      .cbt-btn-pay {
-        background: #10b981; color: #fff; border: none; padding: 7px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;
-      }
-      .cbt-btn-admin-nav {
-        background: #475569; color: #fff; border: none; padding: 7px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; white-space: nowrap;
-      }
-      
-      .cbt-profile-menu-container { position: relative; display: none; padding: 4px 0; }
-      .cbt-candidate-badge-logo {
-        background: #2563eb; color: #ffffff; font-weight: 800; font-size: 12px;
-        padding: 6px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px;
-        border: 1px solid rgba(255,255,255,0.2);
-      }
-      .cbt-profile-dropdown {
-        display: none; position: absolute; right: 0; top: 100%; width: 300px; max-width: 90vw;
-        background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px;
-        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15); padding: 14px; color: #1e293b; z-index: 2000;
-      }
-      .cbt-profile-menu-container:hover .cbt-profile-dropdown { display: block; }
-      .drop-divider { height: 1px; background: #e2e8f0; margin: 10px 0; }
-      .drop-info-title { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
-      .drop-detail-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
-
-      .cbt-view {
-        display: none; padding: 20px; max-width: 860px; margin: 16px auto; width: 94%; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0;
-      }
-      .cbt-view.active { display: block; }
-      
-      /* Full-Screen Exam Terminal */
-      #win-4.active {
-        display: flex; flex-direction: column; max-width: 100% !important; width: 100% !important;
-        height: 100vh !important; margin: 0 !important; padding: 0 !important; border-radius: 0 !important; border: none !important;
-        position: fixed; inset: 0; z-index: 99999; background: #ffffff;
-      }
-      .test-fullscreen-body { display: flex; flex: 1; overflow: hidden; }
-      .test-main-area { flex: 1; padding: 22px; overflow-y: auto; border-right: 2px solid #e2e8f0; display: flex; flex-direction: column; }
-      .test-sidebar { width: 320px; background: #ffffff; padding: 18px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
-      
-      .cbt-h1 { font-size: 22px; font-weight: 800; text-align: center; margin-bottom: 6px; color: #0f172a; }
-      .cbt-h2 { font-size: 14px; color: #475569; text-align: center; margin-bottom: 18px; }
-      .cbt-field { width: 100%; padding: 11px 12px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; }
-      .cbt-field:focus { border-color: #2563eb; }
-      .cbt-btn-primary { width: 100%; padding: 11px 14px; background: #2563eb; color: #ffffff; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; text-align: center; }
-      .cbt-btn-primary:hover { background: #1d4ed8; }
-      .cbt-btn-secondary { width: 100%; padding: 11px 14px; background: #e2e8f0; color: #334155; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; }
-      .cbt-btn-secondary:hover { background: #cbd5e1; }
-      .cbt-btn-ai {
-        background: linear-gradient(135deg, #8b5cf6, #d946ef); color: #fff; border: none; padding: 7px 12px;
-        border-radius: 4px; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
-      }
-      .cbt-btn-ai:hover { opacity: 0.92; }
-      
-      .cbt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
-      .cbt-selection-card {
-        background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 18px 12px;
-        text-align: center; cursor: pointer; font-weight: 700; font-size: 15px; color: #1e293b;
-        word-break: break-word; transition: all 0.2s ease;
-      }
-      .cbt-selection-card:hover { background: #eff6ff; border-color: #2563eb; color: #1d4ed8; transform: translateY(-2px); }
-      
-      .palette-legend { display: flex; gap: 10px; font-size: 12px; font-weight: 600; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; flex-wrap: wrap; }
-      .legend-item { display: flex; align-items: center; gap: 6px; }
-      .circle-icon { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
-      .bg-attempted { background-color: #10b981; }
-      .bg-unattempted { background-color: #8b5cf6; }
-      .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-      .palette-btn { padding: 9px 0; border: none; border-radius: 4px; font-weight: 700; color: white; cursor: pointer; font-size: 12px; text-align: center; }
-      
-      .cbt-opt-label {
-        display: flex; align-items: center; padding: 14px 16px; margin-bottom: 12px;
-        border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer;
-        font-size: 15px; font-weight: 500; color: #0f172a; line-height: 1.5; background: #ffffff;
-        transition: background 0.15s ease, border-color 0.15s ease;
-      }
-      .cbt-opt-label:hover { background: #f1f5f9; border-color: #94a3b8; }
-      .cbt-opt-label input[type="radio"] {
-        margin-right: 14px; width: 18px; height: 18px; flex-shrink: 0; accent-color: #2563eb; cursor: pointer;
-      }
-      .cbt-opt-label.selected-opt {
-        background: #eff6ff; border-color: #2563eb; font-weight: 600;
-      }
-      
-      .cbt-tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 16px; overflow-x: auto; gap: 6px; -webkit-overflow-scrolling: touch; }
-      .cbt-tab-btn { padding: 9px 12px; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; white-space: nowrap; font-size: 13px; }
-      .cbt-tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; }
-      .cbt-pane { display: none; }
-      .cbt-pane.active { display: block; }
-      
-      .cbt-item-chip { display: inline-flex; align-items: center; gap: 6px; background: #f1f5f9; padding: 4px 8px; border-radius: 20px; margin: 3px; font-size: 12px; }
-      .cbt-item-chip span { color: #dc2626; cursor: pointer; font-weight: bold; }
-      .cbt-btn-del { background: #ef4444; color: white; border: none; padding: 4px 7px; border-radius: 4px; cursor: pointer; font-size: 11px; }
-      .cbt-btn-edit { background: #3b82f6; color: white; border: none; padding: 4px 7px; border-radius: 4px; cursor: pointer; font-size: 11px; margin-right: 4px; }
-      .cbt-link-back { color: #2563eb; font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer; margin-bottom: 12px; display: inline-flex; align-items: center; gap: 4px; }
-      .pdf-card { display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 10px; background: #fff; gap: 8px; flex-wrap: wrap; }
-
-      .rules-list { margin: 14px 0; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px; font-size: 13px; line-height: 1.5; }
-      .rules-list li { margin-bottom: 6px; list-style-position: inside; }
-      .scheme-badge { display: inline-flex; gap: 6px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 6px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; }
-
-      .solution-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 14px; background: #fff; }
-      .solution-card.correct-ans { border-left: 5px solid #10b981; }
-      .solution-card.wrong-ans { border-left: 5px solid #ef4444; }
-      .solution-card.skipped-ans { border-left: 5px solid #8b5cf6; }
-      .sol-explanation-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 6px; margin-top: 8px; font-size: 13px; color: #334155; line-height: 1.5; white-space: pre-line; }
-
-      .cbt-modal-backdrop {
-        display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75);
-        z-index: 999999; justify-content: center; align-items: center; padding: 16px;
-      }
-      .cbt-modal-backdrop.active { display: flex; }
-      .cbt-modal-box {
-        background: #ffffff; width: 100%; max-width: 440px; border-radius: 10px;
-        padding: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); max-height: 90vh; overflow-y: auto;
-      }
-      .cbt-modal-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
-      .cbt-modal-text { font-size: 13px; color: #475569; line-height: 1.5; margin-bottom: 16px; }
-      .cbt-modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
-
-      .preview-editor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-      .preview-box-container { background: #f8fafc; border: 1px dashed #3b82f6; border-radius: 6px; padding: 12px; }
-      .preview-correct-badge { display: inline-block; background: #10b981; color: #fff; font-size: 10px; padding: 2px 5px; border-radius: 4px; margin-left: auto; }
-      .cbt-responsive-flex-row { display: flex; gap: 8px; align-items: center; }
-
-      .toggle-switch-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
-      .toggle-switch-label { font-size: 13px; font-weight: 600; color: #334155; }
-      .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-      .toggle-switch input { opacity: 0; width: 0; height: 0; }
-      .toggle-slider { position: absolute; cursor: pointer; inset: 0; background-color: #cbd5e1; transition: .3s; border-radius: 24px; }
-      .toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
-      input:checked + .toggle-slider { background-color: #8b5cf6; }
-      input:checked + .toggle-slider:before { transform: translateX(20px); }
-
-      @media (max-width: 768px) {
-        .cbt-nav { padding: 10px 12px; }
-        .cbt-brand-name { font-size: 14px; }
-        .cbt-view { width: 96%; padding: 14px; margin: 10px auto; }
-        .test-fullscreen-body { flex-direction: column; overflow-y: auto; }
-        .test-main-area { border-right: none; border-bottom: 2px solid #e2e8f0; padding: 14px; overflow-y: visible; }
-        .test-sidebar { width: 100%; border-top: 1px solid #e2e8f0; padding: 14px; overflow-y: visible; }
-        .preview-editor-grid { grid-template-columns: 1fr; }
-        .cbt-responsive-grid-admin { grid-template-columns: 1fr !important; }
-        .cbt-responsive-flex-row { flex-direction: column; align-items: stretch; }
-        .cbt-responsive-flex-row button { width: 100% !important; }
-        .cbt-responsive-result-grid { grid-template-columns: 1fr !important; gap: 8px !important; }
-        .cbt-action-btn-group { flex-direction: column; gap: 8px; }
-        .cbt-action-btn-group button { width: 100% !important; max-width: 100% !important; margin-left: 0 !important; }
-        .cbt-profile-dropdown { right: -10px; width: 280px; }
-      }
-    `;
-    document.head.appendChild(styleEl);
-
-    /* ==========================================================================
-       SECTION 6: INJECT APPLICATION DOM STRUCTURE
-       ========================================================================== */
-    const portalDiv = document.createElement("div");
-    portalDiv.id = "cbt-portal";
-    portalDiv.innerHTML = `
-      <div class="cbt-nav" id="dom-main-navbar">
-        <div class="cbt-logo-area">
-          <img id="dom-brand-pic" class="cbt-profile-img-header" src="" alt="Portal Logo" />
-          <span class="cbt-logo-badge" id="dom-brand-badge"></span>
-          <span class="cbt-brand-name" id="dom-brand-name"></span>
-        </div>
-        <div class="cbt-nav-actions">
-          <button class="cbt-btn-pay" id="btn-open-payment">Payment & Register</button>
-          <button class="cbt-btn-admin-nav" id="btn-open-admin">Admin Portal</button>
-          
-          <div class="cbt-profile-menu-container" id="cbt-candidate-menu-wrapper">
-            <div class="cbt-candidate-badge-logo" id="dom-candidate-logo-btn">
-              <span id="dom-cand-logo-text">🎓 AW</span>
-              <span style="font-size:10px;">▼</span>
-            </div>
-
-            <div class="cbt-profile-dropdown">
-              <div style="font-size:14px; font-weight:800; color:#0f172a; margin-bottom:2px;" id="drop-display-username">Candidate</div>
-              <div style="font-size:11px; color:#64748b; margin-bottom:8px;">Status: <span style="color:#10b981; font-weight:700;">Verified Active</span></div>
-
-              <div class="drop-info-title">Contact & Subscription</div>
-              <div class="drop-detail-row"><span style="color:#64748b;">Phone:</span><span style="font-weight:600;" id="drop-display-phone">+91 ----------</span></div>
-              <div class="drop-detail-row"><span style="color:#64748b;">Fee Paid:</span><span style="font-weight:700; color:#10b981;" id="drop-display-price">₹ 0.00</span></div>
-              <div class="drop-detail-row"><span style="color:#64748b;">Coupon:</span><span style="font-weight:600;" id="drop-display-coupon">None</span></div>
-
-              <div class="drop-divider"></div>
-              <div class="drop-info-title">Performance Summary</div>
-              <div id="drop-perf-summary" style="font-size:12px; color:#475569; margin-bottom:8px;">No tests taken yet.</div>
-
-              <div class="drop-divider"></div>
-              <div class="drop-info-title">Update Credentials</div>
-              <input type="text" id="drop-edit-name" class="cbt-field" placeholder="Change Display Name" />
-              <input type="password" id="drop-edit-pass" class="cbt-field" placeholder="Set New Password" />
-              <button class="cbt-btn-primary" id="btn-drop-save-credentials" style="margin-bottom:6px;">Update</button>
-              <button class="cbt-btn-secondary" id="btn-drop-logout" style="background:#fee2e2; color:#dc2626; border:1px solid #fecaca;">Logout</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="win-1" class="cbt-view">
-        <div class="cbt-h1">Candidate Examination Login</div>
-        <div class="cbt-h2">Registration is strictly required to login (Except Admin)</div>
-        <input type="text" id="login-username" class="cbt-field" placeholder="Candidate Username" />
-        <input type="password" id="login-password" class="cbt-field" placeholder="Candidate Password" />
-        <button class="cbt-btn-primary" id="btn-action-login">Login to Portal</button>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; font-size:12px; flex-wrap:wrap; gap:8px;">
-          <span class="cbt-link-back" id="link-open-forgot" style="margin:0;">Forgot Password?</span>
-          <span style="color:#64748b;">New student? Click "Payment & Register"</span>
-        </div>
-      </div>
-
-      <div id="win-forgot" class="cbt-view">
-        <span class="cbt-link-back" id="link-back-login-from-forgot">&larr; Back to Login</span>
-        <div id="forgot-step-1">
-          <div class="cbt-h1">Reset Candidate Password</div>
-          <div class="cbt-h2">Enter your registered 10-digit mobile number</div>
-          <input type="text" id="forgot-mobile" class="cbt-field" placeholder="10 Digit Mobile Number" />
-          <button class="cbt-btn-primary" id="btn-forgot-send-otp">Send Password Reset OTP</button>
-        </div>
-        <div id="forgot-step-2" style="display:none;">
-          <div class="cbt-h1">Enter OTP & New Password</div>
-          <div class="cbt-h2">Verify identity and choose a secure password</div>
-          <input type="text" id="forgot-otp-input" class="cbt-field" placeholder="Enter Received 4-Digit OTP" />
-          <input type="password" id="forgot-new-password" class="cbt-field" placeholder="Enter New Password" />
-          <button class="cbt-btn-primary" id="btn-forgot-confirm">Update & Reset Password</button>
-        </div>
-      </div>
-
-      <div id="win-register" class="cbt-view">
-        <span class="cbt-link-back" id="link-back-login">&larr; Back to Login</span>
-        <div id="pay-step-1">
-          <div class="cbt-h1">Registration Fee Payment</div>
-          <div class="cbt-h2">Pay application fee to unlock candidate credentials</div>
-          
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:6px; margin: 14px 0; text-align:center;">
-            <div style="font-size:13px; color:#64748b;">Standard Enrollment Fee:</div>
-            <div style="font-size:24px; font-weight:800; color:#10b981;" id="dom-checkout-price">₹ 0.00</div>
-            <div style="font-size:12px; color:#059669; font-weight:600; display:none;" id="dom-discount-info"></div>
-          </div>
-
-          <div class="cbt-responsive-flex-row" style="margin-bottom:12px;">
-            <input type="text" id="coupon-code-input" class="cbt-field" style="margin:0;" placeholder="Have a Coupon Code?" />
-            <button class="cbt-btn-primary" style="width:120px;" id="btn-apply-coupon">Apply</button>
-          </div>
-
-          <button class="cbt-btn-primary" id="btn-mock-pay">Pay & Continue to Verification</button>
-        </div>
-
-        <div id="pay-step-2" style="display:none;">
-          <div class="cbt-h1">OTP Mobile Verification</div>
-          <div class="cbt-h2">Enter your 10-digit mobile number</div>
-          <input type="text" id="reg-mobile" class="cbt-field" placeholder="10 Digit Mobile Number" />
-          <button class="cbt-btn-primary" id="btn-send-otp">Send Verification OTP</button>
-        </div>
-
-        <div id="pay-step-3" style="display:none;">
-          <div class="cbt-h1">Create Candidate Account</div>
-          <div class="cbt-h2">Verify OTP & set your login username/password</div>
-          <input type="text" id="reg-otp" class="cbt-field" placeholder="Enter Received OTP" />
-          <input type="text" id="reg-username" class="cbt-field" placeholder="Choose Unique Username" />
-          <input type="password" id="reg-password" class="cbt-field" placeholder="Create Secret Password" />
-          <button class="cbt-btn-primary" id="btn-complete-reg">Confirm & Create Account</button>
-        </div>
-      </div>
-
-      <div id="win-2" class="cbt-view">
-        <div class="cbt-h1">Welcome, start your practice</div>
-        <div class="cbt-h2">Select Your Topic</div>
-        <div class="cbt-grid" id="dom-win2-topics"></div>
-
-        <div style="border-top:2px solid #f1f5f9; padding-top:14px; margin-top:16px;">
-          <div style="font-size:15px; font-weight:700; margin-bottom:8px;">Study Material & PDF Notes</div>
-          <div id="dom-notes-container"></div>
-        </div>
-      </div>
-
-      <div id="win-3" class="cbt-view">
-        <span class="cbt-link-back" id="link-back-topics">&larr; Back to Topics</span>
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:8px; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
-          <span id="win3-topic-heading" style="font-weight:700; font-size:16px;"></span>
-          <span style="color:#dc2626; font-weight:700; font-size:13px;" id="win3-time-preview">Time : 30:00 min</span>
-        </div>
-        <div style="font-size:13px; font-weight:700; color:#475569; margin-bottom:8px;">Paper Categories / Test Types:</div>
-        <div class="cbt-grid" id="dom-win3-paper-types"></div>
-        <div style="font-size:13px; font-weight:700; color:#475569; margin-bottom:8px;">Practice Sets:</div>
-        <div class="cbt-grid" id="dom-win3-practice-sets"></div>
-      </div>
-
-      <div id="win-instructions" class="cbt-view">
-        <span class="cbt-link-back" id="link-back-from-instructions">&larr; Back to Categories</span>
-        <div class="cbt-h1" id="inst-heading" style="text-align:left;">Examination Instructions & Confirmation</div>
-        <div class="cbt-h2" id="inst-subheading" style="text-align:left;">Please read terms carefully before starting the test</div>
-
-        <div style="display:flex; gap:10px; margin: 12px 0; flex-wrap:wrap;">
-          <div class="scheme-badge">Marks Correct: <span id="inst-pos-mark">+2.0</span></div>
-          <div class="scheme-badge" style="background:#fef2f2; border-color:#fecaca; color:#991b1b;">Negative Marking: <span id="inst-neg-mark">-0.50</span></div>
-        </div>
-
-        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:12px; margin-bottom:14px;">
-          <label style="font-weight:700; font-size:13px; display:block; margin-bottom:6px;">Choose Default Examination Language:</label>
-          <select id="exam-lang-select" class="cbt-field" style="margin:0; max-width:100%;">
-            <option value="en">English</option>
-            <option value="hi">हिंदी (Hindi)</option>
-          </select>
-        </div>
-
-        <div class="rules-list">
-          <b>Rules, Terms & Conditions:</b>
-          <ol style="margin-top:6px;">
-            <li>Once started, the test screen will lock into <b>Full-Screen Mode</b>.</li>
-            <li>Page refresh or closing the tab will not terminate the exam; timer continues.</li>
-            <li>Negative marking is applied for every incorrect answer. Skipped questions carry zero deduction.</li>
-            <li>Do not exit full screen or switch browser tabs.</li>
-          </ol>
-        </div>
-
-        <div style="margin:14px 0; display:flex; align-items:flex-start; gap:8px;">
-          <input type="checkbox" id="inst-agree-chk" style="margin-top:4px; transform:scale(1.1); cursor:pointer;" />
-          <label for="inst-agree-chk" style="font-size:12px; color:#334155; cursor:pointer;">
-            I have read and understood all the instructions, negative marking scheme, and rules.
-          </label>
-        </div>
-
-        <button class="cbt-btn-primary" id="btn-start-locked-exam" style="padding:12px; font-size:15px; background:#10b981;" disabled>I Am Ready to Begin (Start Test)</button>
-      </div>
-
-      <div id="win-4" class="cbt-view">
-        <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; color:#fff; padding:10px 14px; flex-wrap:wrap; gap:8px;">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="background:#ef4444; color:#fff; font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px;">LOCKED</span>
-            <div style="font-weight:700; font-size:13px;" id="win4-banner">Exam Terminal</div>
-          </div>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <select id="win4-lang-toggle" style="background:#1e293b; color:#fff; border:1px solid #475569; padding:2px 4px; border-radius:4px; font-size:11px;">
-              <option value="en">English</option>
-              <option value="hi">हिंदी</option>
-            </select>
-            <div style="font-size:18px; font-weight:800; color:#ef4444;" id="win4-clock">30:00</div>
-          </div>
-        </div>
-
-        <div class="test-fullscreen-body">
-          <div class="test-main-area">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">
-              <span style="font-size:13px; font-weight:700; color:#64748b;" id="win4-counter">Question 1</span>
-              <span style="font-size:11px; font-weight:700; color:#2563eb;" id="win4-mark-info">+2.0 / -0.50</span>
-            </div>
-            <div id="dom-test-container" style="flex:1;"></div>
-            <div class="cbt-action-btn-group" style="display:flex; gap:10px; margin-top:16px;">
-              <button class="cbt-btn-primary" id="btn-save-next" style="width:auto; padding:10px 22px;">Save & Next</button>
-              <button class="cbt-btn-primary" id="btn-submit-exam" style="width:auto; padding:10px 22px; background:#dc2626; margin-left:auto;">Submit Final Exam</button>
-            </div>
-          </div>
-
-          <div class="test-sidebar">
-            <div style="font-weight:700; font-size:14px;">Question Palette</div>
-            <div class="palette-legend">
-              <div class="legend-item"><span class="circle-icon bg-attempted"></span> Attempted: <span id="stat-attempted" style="color:#10b981;">0</span></div>
-              <div class="legend-item"><span class="circle-icon bg-unattempted"></span> Unattempted: <span id="stat-unattempted" style="color:#8b5cf6;">0</span></div>
-            </div>
-            <div style="font-size:11px; font-weight:600; color:#64748b;">Click question number to jump:</div>
-            <div class="palette-grid" id="dom-palette-grid"></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="win-result" class="cbt-view">
-        <div class="cbt-h1">Examination Scorecard & Result</div>
-        <div class="cbt-h2">Review detailed performance metrics & score</div>
-        <div id="dom-result-stats" style="text-align:center; margin: 18px 0;"></div>
-        <div class="cbt-action-btn-group" style="display:flex; gap:10px; justify-content:center;">
-          <button class="cbt-btn-primary" id="btn-view-solutions" style="background:#10b981;">View Detailed Solutions</button>
-          <button class="cbt-btn-secondary" id="btn-restart-flow">Back to Topics</button>
-        </div>
-      </div>
-
-      <div id="win-solutions" class="cbt-view">
-        <span class="cbt-link-back" id="link-back-result">&larr; Back to Result</span>
-        <div class="cbt-h1" style="text-align:left; margin-bottom:4px;">Test Questions & Solutions</div>
-        <div class="cbt-h2" style="text-align:left; margin-bottom:14px;" id="dom-solutions-header">Detailed breakdown of answers:</div>
-        <div id="dom-solutions-container"></div>
-        <button class="cbt-btn-primary" id="btn-sol-back-topics" style="margin-top:14px;">Finish & Back to Topics</button>
-      </div>
-
-      <div id="win-admin-auth" class="cbt-view">
-        <span class="cbt-link-back" id="link-admin-back-login">&larr; Back to Login</span>
-        <div class="cbt-h1">Admin Authentication</div>
-        <div class="cbt-h2">Enter admin access PIN to manage portal</div>
-        <input type="password" id="admin-pass-input" class="cbt-field" placeholder="Enter Admin Password / PIN" />
-        <button class="cbt-btn-primary" id="btn-admin-verify">Unlock Control Dashboard</button>
-      </div>
-
-      <div id="win-admin-dash" class="cbt-view">
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:8px; margin-bottom:14px;">
-          <span style="font-weight:700; font-size:16px;">Admin Center</span>
-          <button class="cbt-btn-del" id="btn-admin-exit">Logout Admin</button>
-        </div>
-        <div class="cbt-tabs">
-          <button class="cbt-tab-btn active" data-pane="pane-pricing">Pricing & Coupons</button>
-          <button class="cbt-tab-btn" data-pane="pane-branding">Branding & Logo</button>
-          <button class="cbt-tab-btn" data-pane="pane-w2">Topics</button>
-          <button class="cbt-tab-btn" data-pane="pane-w3-papers">Categories</button>
-          <button class="cbt-tab-btn" data-pane="pane-w3-sets">Sets</button>
-          <button class="cbt-tab-btn" data-pane="pane-w4-questions">Questions</button>
-          <button class="cbt-tab-btn" data-pane="pane-notes">PDF & Notes</button>
-          <button class="cbt-tab-btn" data-pane="pane-security">Settings & AI</button>
-        </div>
-
-        <div id="pane-pricing" class="cbt-pane active">
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:6px; margin-bottom:14px;">
-            <div style="font-weight:600; margin-bottom:6px;">Base Enrollment Fee (₹):</div>
-            <div class="cbt-responsive-flex-row">
-              <input type="number" id="adm-base-price" class="cbt-field" style="margin:0;" min="0" step="1" />
-              <button class="cbt-btn-primary" style="width:140px;" id="btn-adm-save-price">Save Price</button>
-            </div>
-          </div>
-
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:6px; margin-bottom:14px;">
-            <div style="font-weight:600; margin-bottom:6px;">Create Discount Coupon:</div>
-            <div class="cbt-responsive-grid-admin" style="display:grid; grid-template-columns: 2fr 1fr 100px; gap:6px;">
-              <input type="text" id="adm-coupon-code" class="cbt-field" style="margin:0;" placeholder="Code" />
-              <input type="number" id="adm-coupon-pct" class="cbt-field" style="margin:0;" placeholder="%" min="1" max="100" />
-              <button class="cbt-btn-primary" id="btn-adm-add-coupon">Add</button>
-            </div>
-          </div>
-          <div style="font-weight:600; margin-bottom:6px;">Active Coupon Codes:</div>
-          <div id="dom-adm-coupons-list"></div>
-        </div>
-
-        <div id="pane-branding" class="cbt-pane">
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:6px;">
-            <div style="font-weight:600; margin-bottom:4px;">Website / Brand Name:</div>
-            <input type="text" id="adm-brand-name" class="cbt-field" />
-            
-            <div style="font-weight:600; margin-bottom:4px;">Logo Badge Text:</div>
-            <input type="text" id="adm-brand-badge" class="cbt-field" />
-            
-            <div style="font-weight:600; margin-bottom:4px;">Favicon URL / SVG Data:</div>
-            <input type="text" id="adm-brand-favicon" class="cbt-field" />
-
-            <div class="drop-divider"></div>
-            <div style="font-weight:700; margin-bottom:6px; color:#1e293b;">Profile Picture / Circular Logo Image:</div>
-            <input type="text" id="adm-brand-pic-url" class="cbt-field" placeholder="Paste Direct Image URL" />
-            <div style="font-size:12px; color:#64748b; margin-bottom:6px;">Or upload from device:</div>
-            <input type="file" id="adm-brand-pic-file" accept="image/*" class="cbt-field" style="background:#fff;" />
-
-            <div style="display:flex; align-items:center; gap:12px; margin: 10px 0;">
-              <span style="font-size:12px; font-weight:600;">Current Preview:</span>
-              <img id="adm-profile-preview" src="" alt="Profile Preview" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:1px solid #cbd5e1; display:none;" />
-              <button class="cbt-btn-del" id="btn-remove-profile-pic" style="display:none;">Remove Picture</button>
-            </div>
-
-            <button class="cbt-btn-primary" id="btn-adm-save-branding">Update Branding & Profile Picture</button>
-          </div>
-        </div>
-
-        <div id="pane-w2" class="cbt-pane">
-          <div style="font-weight:600; margin-bottom:4px;">Add New Topic:</div>
-          <div class="cbt-responsive-flex-row" style="margin-bottom:12px;">
-            <input type="text" id="adm-add-topic" class="cbt-field" style="margin:0;" placeholder="Topic Name" />
-            <button class="cbt-btn-primary" style="width:100px;" id="btn-adm-add-topic">Add</button>
-          </div>
-          <div id="dom-adm-topic-chips"></div>
-        </div>
-
-        <div id="pane-w3-papers" class="cbt-pane">
-          <div style="font-weight:600; margin-bottom:4px;">Add Paper Type / Category:</div>
-          <div class="cbt-responsive-flex-row" style="margin-bottom:12px;">
-            <input type="text" id="adm-add-category" class="cbt-field" style="margin:0;" placeholder="e.g. Lines" />
-            <button class="cbt-btn-primary" style="width:100px;" id="btn-adm-add-cat">Add</button>
-          </div>
-          <div id="dom-adm-category-chips"></div>
-        </div>
-
-        <div id="pane-w3-sets" class="cbt-pane">
-          <div style="font-weight:600; margin-bottom:4px;">Add Set Label:</div>
-          <div class="cbt-responsive-flex-row" style="margin-bottom:12px;">
-            <input type="text" id="adm-add-set" class="cbt-field" style="margin:0;" placeholder="e.g. Practice Set 01" />
-            <button class="cbt-btn-primary" style="width:100px;" id="btn-adm-add-set">Add</button>
-          </div>
-          <div id="dom-adm-set-chips"></div>
-        </div>
-
-        <div id="pane-w4-questions" class="cbt-pane">
-          <div class="preview-editor-grid">
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:6px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <span id="adm-form-mode" style="font-weight:700; color:#2563eb; font-size:12px;">CREATE NEW QUESTION</span>
-                <button id="btn-adm-cancel-edit" style="display:none; background:#94a3b8; color:#fff; border:none; border-radius:4px; padding:2px 6px; font-size:10px; cursor:pointer;">Cancel</button>
-              </div>
-              <select id="adm-sel-topic" class="cbt-field"></select>
-              <select id="adm-sel-cat" class="cbt-field"></select>
-              <input type="text" id="adm-q-title" class="cbt-field" placeholder="Question Text (English)" />
-              <input type="text" id="adm-q-title-hi" class="cbt-field" placeholder="Question Text (Hindi Translation)" />
-              <input type="text" id="adm-q-op0" class="cbt-field" placeholder="Option A" />
-              <input type="text" id="adm-q-op1" class="cbt-field" placeholder="Option B" />
-              <input type="text" id="adm-q-op2" class="cbt-field" placeholder="Option C" />
-              <input type="text" id="adm-q-op3" class="cbt-field" placeholder="Option D" />
-              <select id="adm-q-ans" class="cbt-field">
-                <option value="0">Correct: Option A</option>
-                <option value="1">Correct: Option B</option>
-                <option value="2">Correct: Option C</option>
-                <option value="3">Correct: Option D</option>
-              </select>
-              
-              <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0;">
-                <span style="font-size:12px; font-weight:700; color:#475569;">Explanation & Trick:</span>
-                <button type="button" class="cbt-btn-ai" id="btn-ai-gen-solution">✨ AI Generate Solution & Trick</button>
-              </div>
-              <textarea id="adm-q-solution" class="cbt-field" style="resize:vertical; height:70px;" placeholder="Detailed Solution & Memory Trick"></textarea>
-              
-              <button class="cbt-btn-primary" id="btn-adm-save-q">Save Question</button>
-            </div>
-
-            <div class="preview-box-container">
-              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #cbd5e1; padding-bottom:4px; margin-bottom:8px;">
-                <span style="font-weight:700; font-size:12px;">LIVE PREVIEW</span>
-                <span id="preview-meta-tag" style="font-size:11px; color:#64748b; font-weight:600;">[Topic • Cat]</span>
-              </div>
-              <div id="preview-live-text" style="font-weight:700; font-size:13px; margin-bottom:8px; min-height:30px;">Preview renders here...</div>
-              <div id="preview-live-options"></div>
-              <div id="preview-live-solution" style="margin-top:8px; font-size:11px; color:#475569; background:#e2e8f0; padding:6px; border-radius:4px; display:none; white-space:pre-line;"></div>
-            </div>
-          </div>
-
-          <div style="font-weight:600; margin:10px 0 6px 0; font-size:13px;">Question Pool:</div>
-          <div style="max-height:180px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:6px;">
-            <table style="width:100%; border-collapse:collapse; font-size:12px;" id="dom-table-q-list"></table>
-          </div>
-        </div>
-
-        <div id="pane-notes" class="cbt-pane">
-          <div style="font-weight:600; margin-bottom:4px;">Add Study Document:</div>
-          <input type="text" id="adm-pdf-title" class="cbt-field" placeholder="Title" />
-          <input type="text" id="adm-pdf-url" class="cbt-field" placeholder="URL" />
-          <button class="cbt-btn-primary" id="btn-adm-save-pdf" style="margin-bottom:12px;">Add Document</button>
-          <div id="dom-adm-pdf-list"></div>
-        </div>
-
-        <div id="pane-security" class="cbt-pane">
-          <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:14px; border-radius:6px; margin-bottom:14px;">
-            <div style="font-weight:700; font-size:14px; color:#8b5cf6; margin-bottom:4px;">OpenAI / ChatGPT Automation Controls:</div>
-            <div style="font-size:12px; color:#64748b; margin-bottom:10px;">Paste your API Key below to power automatic solutions, facts, and short tricks.</div>
-            
-            <label style="font-size:12px; font-weight:700; color:#334155;">OpenAI Secret API Key:</label>
-            <input type="password" id="adm-ai-key" class="cbt-field" placeholder="sk-proj-dummy-key-paste-here..." />
-
-            <div class="toggle-switch-row">
-              <div>
-                <div class="toggle-switch-label">Admin 1-Click AI Auto-Fill Button</div>
-                <div style="font-size:11px; color:#64748b;">Enables the '✨ AI Generate Solution & Trick' button while editing questions.</div>
-              </div>
-              <label class="toggle-switch">
-                <input type="checkbox" id="chk-ai-admin" />
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-
-            <div class="toggle-switch-row">
-              <div>
-                <div class="toggle-switch-label">Candidate Dynamic AI Fallback</div>
-                <div style="font-size:11px; color:#64748b;">Automatically fetches solutions & tricks in real-time if a question was saved without any explanation.</div>
-              </div>
-              <label class="toggle-switch">
-                <input type="checkbox" id="chk-ai-candidate" />
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-
-            <button class="cbt-btn-primary" id="btn-adm-save-ai" style="margin-top:10px; background:linear-gradient(135deg, #7c3aed, #c026d3);">Save AI Settings & Key</button>
-          </div>
-
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:6px; margin-bottom:12px;">
-            <div style="font-weight:600; margin-bottom:6px;">Reset Admin PIN:</div>
-            <div class="cbt-responsive-flex-row">
-              <input type="password" id="adm-new-pin" class="cbt-field" style="margin:0;" placeholder="New PIN" />
-              <button class="cbt-btn-primary" style="width:120px;" id="btn-adm-reset-pin">Update PIN</button>
-            </div>
-          </div>
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:6px;">
-            <div style="font-weight:600; margin-bottom:6px;">Exam Marking & Duration:</div>
-            <label style="font-size:11px; font-weight:700;">Marks for Correct (+):</label>
-            <input type="number" id="adm-mark-pos" class="cbt-field" step="0.5" />
-            <label style="font-size:11px; font-weight:700;">Negative Marks per Wrong (-):</label>
-            <input type="number" id="adm-mark-neg" class="cbt-field" step="0.25" />
-            <label style="font-size:11px; font-weight:700;">Duration (Minutes):</label>
-            <input type="number" id="adm-exam-min" class="cbt-field" min="1" max="180" />
-            <button class="cbt-btn-primary" id="btn-adm-save-scheme">Save Settings</button>
-          </div>
-        </div>
-      </div>
-
-      <div id="dom-cbt-modal" class="cbt-modal-backdrop">
-        <div class="cbt-modal-box">
-          <div class="cbt-modal-title" id="cbt-modal-heading">Notification</div>
-          <div class="cbt-modal-text" id="cbt-modal-body">Message content goes here.</div>
-          <div class="cbt-modal-actions" id="cbt-modal-btns"></div>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(portalDiv);
-
-    /* ==========================================================================
-       SECTION 7: EVENT LISTENERS & LOGIC
+       SECTION 4: EVENT BINDINGS
        ========================================================================== */
     document.getElementById("btn-open-payment").addEventListener("click", () => {
       resetRegistrationForm();
@@ -2193,6 +2186,64 @@ Provide:
       cbtNavigate("win-2");
     });
 
+    document.getElementById("btn-drop-save-credentials").addEventListener("click", () => {
+      if (!activeUser) return;
+      const newName = document.getElementById("drop-edit-name").value.trim();
+      const newPass = document.getElementById("drop-edit-pass").value.trim();
+
+      if (!newName) {
+        showInAppMessage("Validation Error", "Candidate name cannot be empty.");
+        return;
+      }
+
+      if (newName.toLowerCase() !== activeUser.username.toLowerCase()) {
+        const exists = registeredUsers.some((u) => u.username.toLowerCase() === newName.toLowerCase());
+        if (exists) {
+          showInAppMessage("Duplicate Name", "This username is already taken. Please choose another.");
+          return;
+        }
+      }
+
+      const oldName = activeUser.username;
+      const idx = registeredUsers.findIndex((u) => u.username === oldName);
+      if (idx !== -1) {
+        registeredUsers[idx].username = newName;
+        if (newPass) registeredUsers[idx].password = newPass;
+        activeUser = registeredUsers[idx];
+
+        if (oldName !== newName && userPerformance[oldName]) {
+          userPerformance[newName] = userPerformance[oldName];
+          delete userPerformance[oldName];
+        }
+
+        syncAllData();
+        updateNavbarAuthState();
+        showInAppMessage("Account Updated", "Your profile details have been saved successfully!");
+      }
+    });
+
+    document.getElementById("btn-drop-logout").addEventListener("click", () => {
+      showInAppConfirm("Logout Confirmation", "Do you want to log out of your session?", () => {
+        if (isExamActive) {
+          showInAppMessage("Test In Progress", "You cannot logout while an exam is running.");
+          return;
+        }
+        activeUser = null;
+        candidateAnswers = {};
+        activeExamQuestions = [];
+        clearInterval(countdownRef);
+
+        syncAllData();
+        updateNavbarAuthState();
+
+        document.getElementById("login-username").value = "";
+        document.getElementById("login-password").value = "";
+
+        cbtNavigate("win-1");
+        showInAppMessage("Logged Out", "You have been logged out successfully.");
+      });
+    });
+
     document.getElementById("btn-open-admin").addEventListener("click", () => {
       if (isAdminAuthenticated) {
         cbtNavigate("win-admin-dash");
@@ -2332,6 +2383,88 @@ Provide:
           "Yes, Submit Now"
         );
       });
+    });
+
+    document.getElementById("btn-view-solutions").addEventListener("click", () => {
+      const solContainer = document.getElementById("dom-solutions-container");
+      solContainer.innerHTML = "";
+      document.getElementById("dom-solutions-header").innerText = `Solutions for ${activeTopic} - ${activeCategory}:`;
+
+      activeExamQuestions.forEach((q, idx) => {
+        const userAns = candidateAnswers[idx];
+        const isAttempted = userAns !== undefined;
+        const isCorrect = userAns === q.correct;
+
+        let statusClass = "skipped-ans";
+        let statusText = "<span style='color:#8b5cf6; font-weight:700;'>SKIPPED (0 pts)</span>";
+
+        if (isAttempted) {
+          if (isCorrect) {
+            statusClass = "correct-ans";
+            statusText = `<span style='color:#10b981; font-weight:700;'>CORRECT (+${storeMarkPositive.toFixed(2)} pts)</span>`;
+          } else {
+            statusClass = "wrong-ans";
+            statusText = `<span style='color:#ef4444; font-weight:700;'>INCORRECT (-${storeMarkNegative.toFixed(2)} pts)</span>`;
+          }
+        }
+
+        const card = document.createElement("div");
+        card.className = `solution-card ${statusClass}`;
+
+        let opsHtml = "";
+        q.options.forEach((opt, oIdx) => {
+          let optStyle = "padding:8px 12px; border-radius:6px; margin-bottom:6px; font-size:13px;";
+          if (oIdx === q.correct) {
+            optStyle += " background:#dcfce7; border:1.5px solid #86efac; font-weight:700; color:#166534;";
+          } else if (isAttempted && userAns === oIdx) {
+            optStyle += " background:#fee2e2; border:1.5px solid #fca5a5; color:#991b1b;";
+          } else {
+            optStyle += " background:#f8fafc; border:1px solid #e2e8f0;";
+          }
+
+          const isUserChoice = isAttempted && userAns === oIdx ? " <b>(Your Answer)</b>" : "";
+          const isRightChoice = oIdx === q.correct ? " <b>(Correct Answer)</b>" : "";
+
+          opsHtml += `<div style="${optStyle}"><b>${String.fromCharCode(65 + oIdx)}.</b> ${opt} ${isUserChoice} ${isRightChoice}</div>`;
+        });
+
+        const qText = (activeLanguage === "hi" && q.text_hi) ? q.text_hi : q.text;
+
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px; flex-wrap:wrap; gap:4px;">
+            <span style="font-weight:700; font-size:13px; color:#475569;">Question ${idx + 1}</span>
+            <div>${statusText}</div>
+          </div>
+          <div style="font-size:15px; font-weight:700; margin-bottom:10px; color:#0f172a;">${qText}</div>
+          <div style="margin-bottom:8px;">${opsHtml}</div>
+          <div class="sol-explanation-box" id="sol-box-${idx}">
+            <b>Detailed Solution & Memory Trick:</b><br>
+            <span class="sol-text-content">${q.solution ? q.solution : (aiCandidateEnabled ? "<em>Fetching AI Solution & Trick...</em>" : "No detailed explanation provided.")}</span>
+          </div>
+        `;
+        solContainer.appendChild(card);
+
+        if (!q.solution && aiCandidateEnabled) {
+          const correctOptStr = q.options[q.correct] || "";
+          callOpenAiForSolution(q.text, correctOptStr)
+            .then((aiText) => {
+              q.solution = aiText;
+              syncAllData();
+              const box = document.getElementById(`sol-box-${idx}`);
+              if (box) {
+                box.querySelector(".sol-text-content").innerText = aiText;
+              }
+            })
+            .catch(() => {
+              const box = document.getElementById(`sol-box-${idx}`);
+              if (box) {
+                box.querySelector(".sol-text-content").innerText = "Explanation currently unavailable.";
+              }
+            });
+        }
+      });
+
+      cbtNavigate("win-solutions");
     });
 
     document.getElementById("btn-ai-gen-solution").addEventListener("click", async () => {
@@ -2561,43 +2694,39 @@ Provide:
     });
 
     /* ==========================================================================
-       SECTION 8: INITIAL APPLICATION BOOTSTRAP
+       SECTION 5: APPLICATION BOOTSTRAP
        ========================================================================== */
-    function bootApplication() {
-      applyBrandIdentity();
-      updateNavbarAuthState();
+    applyBrandIdentity();
+    updateNavbarAuthState();
 
-      const runningSnap = localStorage.getItem("tb_exam_running_snapshot");
-      if (activeUser && activeUser.username && runningSnap) {
-        try {
-          const snap = JSON.parse(runningSnap);
-          if (snap && snap.activeExamQuestions && snap.activeExamQuestions.length > 0) {
-            cbtResumeTest(snap);
-            return;
-          }
-        } catch (e) {
-          clearExamSnapshot();
+    const runningSnap = localStorage.getItem("tb_exam_running_snapshot");
+    if (activeUser && activeUser.username && runningSnap) {
+      try {
+        const snap = JSON.parse(runningSnap);
+        if (snap && snap.activeExamQuestions && snap.activeExamQuestions.length > 0) {
+          cbtResumeTest(snap);
+          return;
         }
-      }
-
-      if (isAdminAuthenticated) {
-        cbtNavigate("win-admin-dash");
-        cbtRefreshAdmin();
-        return;
-      }
-
-      if (activeUser && activeUser.username) {
-        cbtRenderWindow2();
-        cbtNavigate("win-2");
-      } else {
-        cbtNavigate("win-1");
+      } catch (e) {
+        clearExamSnapshot();
       }
     }
 
-    bootApplication();
+    if (isAdminAuthenticated) {
+      cbtNavigate("win-admin-dash");
+      cbtRefreshAdmin();
+      return;
+    }
+
+    if (activeUser && activeUser.username) {
+      cbtRenderWindow2();
+      cbtNavigate("win-2");
+    } else {
+      cbtNavigate("win-1");
+    }
   }
 
-  // Safe DOM-Ready Execution
+  // Safe DOM-Ready Boot
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", startPortalApp);
   } else {
