@@ -2815,5 +2815,4 @@ Provide:
     }
   }
 
-  bootApplication();
-})();
+  
