@@ -34,7 +34,7 @@
       text_hi: "शेक्सपियर के नाटकों का पहला फोलियो (First Folio) किस वर्ष प्रकाशित हुआ था?",
       options: ["1616", "1623", "1632", "1609"],
       correct: 1,
-      solution: "The First Folio was published in 1623 by John Heminges and Henry Condell.\n\n💡 Short Trick: '23 me Folio Free' (1623)."
+      solution: "The First Folio was published in 1623 by John Heminges and Henry Condell."
     },
     {
       topic: "William Shakespeare",
@@ -54,12 +54,10 @@
       text_hi: "वर्ड्सवर्थ की 'द प्रील्यूड' उनके मरणोपरांत किस वर्ष प्रकाशित हुई थी?",
       options: ["1798", "1805", "1850", "1832"],
       correct: 2,
-      solution: "The Prelude was published in 1850 by Wordsworth's widow, Mary Wordsworth, shortly after his death."
+      solution: "The Prelude was published in 1850 by Wordsworth's widow, Mary Wordsworth."
     },
 
-    // =========================================================================
-    // JOHN GALSWORTHY - CATEGORY: PYQS (From Images)
-    // =========================================================================
+    // ----------------- John Galsworthy: PYQS -----------------
     {
       topic: "John Galsworthy",
       category: "PYQS",
@@ -67,7 +65,7 @@
       text_hi: "गाल्सवर्दी 1893 में उनसे मिले और आजीवन मित्रता बनी रही। उन्हें पहचानें।",
       options: ["Conrad", "Hardy", "Shaw", "Ibsen"],
       correct: 0,
-      solution: "Galsworthy met Joseph Conrad in 1893 aboard the ship Torrens and they became lifelong close friends.\n\n💡 Short Trick: 1893 = Galsworthy meets Conrad aboard Torrens."
+      solution: "Galsworthy met Joseph Conrad in 1893 aboard the ship Torrens and they became lifelong close friends[span_5](start_span)[span_5](end_span)."
     },
     {
       topic: "John Galsworthy",
@@ -76,48 +74,48 @@
       text_hi: "'From the Four Winds' (1897) किस उपनाम (pseudonym) के तहत प्रकाशित हुआ था?",
       options: ["John Gals", "John Sinjohn", "Boz", "Elia"],
       correct: 1,
-      solution: "Galsworthy published his earliest collections including 'From the Four Winds' under the pen-name 'John Sinjohn'.\n\n💡 Short Trick: Sinjohn = John Sinjohn (Sin-John)."
+      solution: "Galsworthy published his earliest collections including 'From the Four Winds' under the pen-name 'John Sinjohn[span_6](start_span)'[span_6](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
       text: "Galsworthy's first novel published in 1898 was:",
       text_hi: "गाल्सवर्दी का पहला उपन्यास जो 1898 में प्रकाशित हुआ, कौन सा था?",
-      options: ["Jocelyn", "Villa Rubein", "A Man of Devon", "The Island Pharisees"],
+      options: ["Jocelyn", "Villa Rubein", "A Man of Devon, A Knight", "The Science"],
       correct: 0,
-      solution: "'Jocelyn' (1898) was John Galsworthy's first full-length novel, published under John Sinjohn."
+      solution: "'Jocelyn' (1898) was John Galsworthy's first full-length novel, published under John Sinjohn[span_7](start_span)[span_7](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "The first work that earned Galsworthy his name as a novelist (identified under his own name) was:",
-      text_hi: "गाल्सवर्दी का पहला उपन्यास जिसने उन्हें उपन्यासकार के रूप में पहचान दिलाई:",
+      text: "The first work that earned Galsworthy was the novel. Identify it.",
+      text_hi: "गाल्सवर्दी का पहला उपन्यास जिसने उन्हें पहचान दिलाई:",
       options: ["Fraternity", "Country Mouse", "The Island Pharisees", "Jocelyn"],
       correct: 2,
-      solution: "'The Island Pharisees' (1904) was the first book published under his own real name, John Galsworthy."
+      solution: "'The Island Pharisees' (1904) was the first novel published under his own real name[span_8](start_span)[span_8](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
       text: "The first play that made Galsworthy famous as a playwright is:",
       text_hi: "गाल्सवर्दी का पहला नाटक जिसने उन्हें नाटककार के रूप में प्रसिद्ध बनाया:",
-      options: ["Justice", "Loyalties", "The Silver Box", "Strife"],
+      options: ["Justice", "Loyalties", "The Silver Box", "None of these"],
       correct: 2,
-      solution: "'The Silver Box' (1906) was Galsworthy's first play, dealing with one law for the rich and another for the poor."
+      solution: "'The Silver Box' (1906) was Galsworthy's first play[span_9](start_span)[span_9](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
       text: "Galsworthy's reputation as a novelist was established by:",
       text_hi: "गाल्सवर्दी की एक उपन्यासकार के रूप में प्रतिष्ठा किससे स्थापित हुई?",
-      options: ["The Forsyte Saga", "Justice", "Jocelyn", "The Silver Box"],
+      options: ["The Forsyte Saga", "Loyalties", "Jocelyn", "The Silver Box"],
       correct: 0,
-      solution: "'The Forsyte Saga' trilogy established him as a premier English novelist."
+      solution: "'The Forsyte Saga' established his reputation as a master novelist[span_10](start_span)[span_10](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "The Forsyte Saga includes 'The Man of Property' (1906), 'In Chancery' (1920), 'To Let' (1921), and two Interludes. Find the Interlude:",
+      text: "The Forsyte Saga includes: The Man of Property (1906), In Chancery (1920), To Let (1921) and two Interludes. Find the Interlude.",
       text_hi: "द फॉरसाइट सागा में शामिल इंटरल्यूड (Interlude) को पहचानें:",
       options: [
         "Indian Winter of a Forsyte Tales and Awakening",
@@ -126,34 +124,34 @@
         "None of these"
       ],
       correct: 2,
-      solution: "The two famous interludes are 'Indian Summer of a Forsyte' (1918) and 'Awakening' (1920).\n\n💡 Short Trick: Indian Summer = Interlude."
+      solution: "The two interludes are 'Indian Summer of a Forsyte' and 'Awakening[span_11](start_span)'[span_11](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "Which play of Galsworthy deals with the inadequacy of administration of justice and attitudes towards an escaped prisoner?",
-      text_hi: "गाल्सवर्दी का कौन सा नाटक एक भागे हुए कैदी (escaped prisoner) और न्याय प्रशासन से संबंधित है?",
-      options: ["The Show", "Jocelyn", "Escape", "The Mob"],
+      text: "Which play of Galsworthy deals with the inadequacy of the administration of justice and the attitude of different types of people towards an escaped prisoner?",
+      text_hi: "गाल्सवर्दी का कौन सा नाटक भागे हुए कैदी और न्याय प्रशासन से संबंधित है?",
+      options: ["The Show", "Jocelyn", "Escape", "None of these"],
       correct: 2,
-      solution: "'Escape' (1926) deals with Matt Denant, an escaped convict, and how various members of society react to him."
+      solution: "'Escape' (1926) deals with Matt Denant, an escaped convict[span_12](start_span)[span_12](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "Which play analyses the impact of modern publicity and press on private domestic tragedy?",
+      text: "Which play analyses the impact of modern publicity on private domestic tragedy?",
       text_hi: "कौन सा नाटक निजी घरेलू त्रासदी पर आधुनिक मीडिया/प्रेस के प्रभाव का विश्लेषण करता है?",
-      options: ["The Show", "Jocelyn", "Escape", "The Pigeon"],
+      options: ["The Show", "Jocelyn", "Escape", "None of these"],
       correct: 0,
-      solution: "'The Show' (1925) satirizes the relentless journalism and sensationalism invading private lives."
+      solution: "'The Show' (1925) satirizes press journalism and sensation[span_13](start_span)[span_13](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "The year in which Galsworthy's father died was also the year of publication of 'The Island Pharisees'. Find out the year:",
+      text: "The year in which Galsworthy's father died was also the year of the publication of The Island Pharisees. Find out the year.",
       text_hi: "जिस वर्ष गाल्सवर्दी के पिता की मृत्यु हुई, उसी वर्ष 'The Island Pharisees' प्रकाशित हुई। वह वर्ष है:",
       options: ["1904", "1905", "1906", "1907"],
       correct: 0,
-      solution: "1904 was the milestone year when his father died and 'The Island Pharisees' was published."
+      solution: "In 1904 his father died and 'The Island Pharisees' appeared[span_14](start_span)[span_14](end_span)."
     },
     {
       topic: "John Galsworthy",
@@ -162,26 +160,26 @@
       text_hi: "गाल्सवर्दी 1921 में क्या बने?",
       options: [
         "President of Literary Club",
-        "President of the P.E.N. Club London",
+        "President of the P. E. N. Club London",
         "Assistant in the P.E.N. Club London",
         "None of these"
       ],
       correct: 1,
-      solution: "Galsworthy became the first President of the International P.E.N. Club in London in 1921.\n\n💡 Short Trick: 1921 = 1st P.E.N. President."
+      solution: "Galsworthy became the first President of the P.E.N. Club London in 1921[span_15](start_span)[span_15](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
       text: "What was conferred upon Galsworthy in 1929?",
       text_hi: "1929 में गाल्सवर्दी को कौन सा सम्मान प्रदान किया गया था?",
-      options: ["Order of demerit", "Booker Prize", "Order of Merit", "Nobel Prize"],
+      options: ["Order of demerit", "Booker Prize", "Order of Merit", "None of these"],
       correct: 2,
-      solution: "He was awarded the Order of Merit (O.M.) in 1929 (Later received Nobel Prize in Literature in 1932)."
+      solution: "He received the Order of Merit in 1929[span_16](start_span)[span_16](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "In the play 'Strife', the strike takes place at:",
+      text: "In Strife, the strike takes place at:",
       text_hi: "'Strife' नाटक में हड़ताल (strike) किस स्थान पर होती है?",
       options: [
         "Trenartha Tin Plate Works",
@@ -190,39 +188,37 @@
         "None of these"
       ],
       correct: 0,
-      solution: "The industrial strike in 'Strife' takes place at Trenartha Tin Plate Works."
+      solution: "The strike took place at Trenartha Tin Plate Works[span_17](start_span)[span_17](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "Who is the leader of the labourers in 'Strife'?",
+      text: "Who is the leader of the labourers in Strife?",
       text_hi: "'Strife' में मजदूरों का नेता कौन है?",
       options: ["Jack Barthwick", "Falder", "David Roberts", "None of these"],
       correct: 2,
-      solution: "David Roberts represents the uncompromising working-class labourers against John Anthony (Company Chairman)."
+      solution: "David Roberts is the leader of the striking labourers[span_18](start_span)[span_18](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "William Falder, a young clerk who forges a cheque, is the central tragic character in:",
-      text_hi: "विलियम फाल्डर (William Falder) किस नाटक का केंद्रीय पात्र है?",
-      options: ["The Silver Box", "Loyalties", "Justice", "The Skin Game"],
+      text: "Falder appears in:",
+      text_hi: "फाल्डर (Falder) किस नाटक में दिखाई देता है?",
+      options: ["Silver Box", "Loyalties", "Justice", "None of these"],
       correct: 2,
-      solution: "William Falder is the tragic junior clerk imprisoned for forgery in 'Justice' (1910)."
+      solution: "William Falder is the tragic protagonist of 'Justice' (1910)[span_19](start_span)[span_19](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "This Hindi author translated Galsworthy's 'The Silver Box' as 'Chandi Ki Dibiya', 'Strife' as 'Hartal', and 'Justice' as 'Nyaya':",
-      text_hi: "किस प्रसिद्ध हिंदी लेखक ने गाल्सवर्दी के नाटकों का अनुवाद 'चांदी की डिबिया', 'हड़ताल' और 'न्याय' नाम से किया?",
-      options: ["Dharam Veer Bharti", "Mohan Rakesh", "Munshi Prem Chand", "Jaishankar Prasad"],
+      text: "This Hindi author is famous for his stories and novels. He translated The Silver Box as Chandi Ki Dibiya, Strife as Hartal and Justice as Nyaya. Who is this Hindi author?",
+      text_hi: "किस प्रसिद्ध हिंदी लेखक ने 'चांदी की डिबिया', 'हड़ताल' और 'न्याय' नाम से अनुवाद किया?",
+      options: ["Dharam Veer Bharti", "Mohan Rakesh", "Prem Chand", "None of these"],
       correct: 2,
-      solution: "Munshi Premchand translated three of Galsworthy's plays into Hindi: The Silver Box (Chandi Ki Dibiya), Strife (Hartal), and Justice (Nyaya).\n\n💡 Short Trick: Premchand = Chandi Ki Dibiya, Hartal, Nyaya."
+      solution: "Munshi Premchand translated The Silver Box, Strife, and Justice into Hindi[span_20](start_span)[span_20](end_span)."
     },
 
-    // =========================================================================
-    // JOHN GALSWORTHY - CATEGORY: Lines (Quotes, Dialogues & Critical Statements)
-    // =========================================================================
+    // ----------------- John Galsworthy: Lines -----------------
     {
       topic: "John Galsworthy",
       category: "Lines",
@@ -230,52 +226,52 @@
       text_hi: "\"The law is what it is—a majestic edifice...\" यह पंक्ति किस नाटक में आती है?",
       options: ["The Roof", "The Skin Game", "Windows", "Justice"],
       correct: 3,
-      solution: "Spoken by the Judge in 'Justice' (1910) during William Falder's trial."
+      solution: "Spoken by the Judge in 'Justice' (1910)[span_21](start_span)[span_21](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "Lines",
-      text: "\"Loyalty comes before everything... A wife's memory is not very good when her husband is in danger.\" These sayings are from:",
+      text: "\"Loyalty comes before everything\", \"A wife's memory is not very good when her husband is in danger.\" are some of the sayings from:",
       text_hi: "\"Loyalty comes before everything...\" यह प्रसिद्ध संवाद किस नाटक से है?",
       options: ["The Roof", "The Skin Game", "Windows", "Loyalties"],
       correct: 3,
-      solution: "From 'Loyalties' (1922), highlighting club, class, and marriage loyalties over impartial ethics."
+      solution: "These lines appear in Galsworthy's play 'Loyalties' (1922)[span_22](start_span)[span_22](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "Lines",
-      text: "\"We all cut each other's throats from the best of motives.\" Where does this dialogue appear?",
+      text: "\"We all cut each other's throats from the best of motives.\" Where does it appear?",
       text_hi: "\"We all cut each other's throats from the best of motives.\" यह संवाद किस नाटक में आता है?",
-      options: ["Loyalties", "The Skin Game", "The Eldest Son", "Strife"],
+      options: ["Loyalties", "The Skin Game", "The Eldest Son", "None of these"],
       correct: 0,
-      solution: "Spoken by Margaret Orme in the final lines of 'Loyalties' (1922).\n\n💡 Short Trick: Throat cut from best motives = Loyalties."
+      solution: "It appears in 'Loyalties[span_23](start_span)'[span_23](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "Lines",
-      text: "\"Literature is its own reward.\" Who said this?",
+      text: "\"Literature is its own reward.\" Who said?",
       text_hi: "\"Literature is its own reward.\" यह कथन किसका है?",
       options: ["Shaw", "Ibsen", "Wordsworth", "Galsworthy"],
       correct: 3,
-      solution: "John Galsworthy stated: 'Literature is its own reward.'"
+      solution: "Said by John Galsworthy[span_24](start_span)[span_24](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "Lines",
       text: "\"Justice is a machine that, when someone has once given it the starting push, rolls on of itself.\" Where does this line appear?",
       text_hi: "\"Justice is a machine that... rolls on of itself.\" यह पंक्ति कहाँ आती है?",
-      options: ["The Skin Game", "The Mob", "Justice", "The Silver Box"],
+      options: ["The Skin Game", "The Mob", "Justice", "None of these"],
       correct: 2,
-      solution: "Spoken by managing clerk Robert Cokeson in 'Justice' (1910) describing the merciless legal machine."
+      solution: "Spoken by managing clerk Cokeson in 'Justice[span_25](start_span)'[span_25](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "Lines",
-      text: "\"In Justice we feel the waste implied by Falder's suicide.\" Whose critical statement is this?",
+      text: "\"In Justice we feel the waste implied by Falder's suicide.\" Whose statement is this?",
       text_hi: "\"In Justice we feel the waste implied by Falder's suicide.\" यह आलोचनात्मक टिप्पणी किसकी है?",
-      options: ["Allardyce Nicoll", "George Sampson", "W.L. Phelps", "Oliver Elton"],
+      options: ["Allardyce Nicoll", "George Sampson", "W.L. Phelps", "None of these"],
       correct: 0,
-      solution: "Allardyce Nicoll made this observation regarding the tragedy of William Falder in 'Justice'."
+      solution: "Critic Allardyce Nicoll made this statement about Justice[span_26](start_span)[span_26](end_span)."
     },
     {
       topic: "John Galsworthy",
@@ -284,50 +280,68 @@
       text_hi: "आर. एच. कोट (R.H. Coat) का यह कथन किसके बारे में है?",
       options: ["Milton", "Shakespeare", "Galsworthy", "Shaw"],
       correct: 2,
-      solution: "R.H. Coat wrote this in his critical work 'John Galsworthy as a Dramatic Artist' (1926)."
+      solution: "Said by R.H. Coat about John Galsworthy[span_27](start_span)[span_27](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "Lines",
-      text: "\"Masters are masters, men are men! Yield one demand and they will make it six...\" Who is the speaker in 'Strife'?",
+      text: "\"Masters are masters, men are men! Yield one demand and they will make it six...\" Who is the speaker?",
       text_hi: "\"Masters are masters, men are men! Yield one demand...\" 'Strife' में यह कौन कहता है?",
-      options: ["Anthony", "Roberts", "Harness", "Falder"],
+      options: ["Anthony in Strife", "Roberts in Strife", "Harness in Strife", "Falder in Justice"],
       correct: 0,
-      solution: "Spoken by John Anthony, the stubborn old chairman in 'Strife', refusing to surrender to labour demands."
+      solution: "Said by John Anthony in 'Strife[span_28](start_span)'[span_28](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "Lines",
-      text: "\"No one will touch him now! Never again! He is safe with gentle Jesus!\" Who says this over Falder's body?",
-      text_hi: "\"No one will touch him now! Never again! He is safe with gentle Jesus!\" फाल्डर की मृत्यु पर यह कौन कहता है?",
+      text: "\"No one will touch him now! Never again! He is safe with gentle Jesus!\" Who says?",
+      text_hi: "\"No one will touch him now! Never again! He is safe with gentle Jesus!\" यह कौन कहता है?",
       options: ["Falder about Cokeson", "Cokeson about Falder", "Ruth about Falder", "None of these"],
       correct: 1,
-      solution: "Spoken by the sympathetic head clerk Cokeson in Act 4 of 'Justice' after Falder jumps to his death."
+      solution: "Said by Robert Cokeson over Falder's body in 'Justice[span_29](start_span)'[span_29](end_span)."
     },
     {
       topic: "John Galsworthy",
       category: "Lines",
-      text: "\"You mob, are most contemptible thing under the sun... Brain you have none. Spirit not the least of it.\" Who wrote this in 'The Mob'?",
+      text: "\"You mob, are most contemptible thing under the sun...\" Who wrote this play?",
       text_hi: "\"You mob, are most contemptible thing under the sun...\" यह 'The Mob' में किसने लिखा?",
       options: ["Shaw", "Yeats", "Eliot", "Galsworthy"],
       correct: 3,
-      solution: "Written by John Galsworthy in his anti-war idealistic play 'The Mob' (1914)."
+      solution: "Written by John Galsworthy in 'The Mob[span_30](start_span)'[span_30](end_span)."
     }
   ];
 
   const defaultNotes = [
     { title: "English Literature Hand-Written Summary", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
-    { title: "John Galsworthy Complete Study Notes (PDF)", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" }
+    { title: "John Galsworthy Master Notes (PDF)", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" }
   ];
   const defaultCoupons = [
     { code: "AKASH50", discount: 50 },
     { code: "FREE100", discount: 100 }
   ];
 
+  // FORCE INJECTION TO PREVENT MISSING JOHN GALSWORTHY
   let storeTopics = JSON.parse(localStorage.getItem("tb_portal_topics")) || defaultTopics;
+  if (!storeTopics.some(t => t.toLowerCase() === "john galsworthy")) {
+    storeTopics.push("John Galsworthy");
+    localStorage.setItem("tb_portal_topics", JSON.stringify(storeTopics));
+  }
+
   let storePaperTypes = JSON.parse(localStorage.getItem("tb_portal_categories")) || defaultPaperTypes;
   let storeSets = JSON.parse(localStorage.getItem("tb_portal_sets")) || defaultSets;
   let storeQuestions = JSON.parse(localStorage.getItem("tb_portal_questions")) || defaultQuestions;
+
+  // Sync questions from memory to storage
+  defaultQuestions.forEach(dq => {
+    if (dq.topic === "John Galsworthy") {
+      const exists = storeQuestions.some(sq => sq.topic === "John Galsworthy" && sq.text === dq.text);
+      if (!exists) {
+        storeQuestions.push(dq);
+      }
+    }
+  });
+  localStorage.setItem("tb_portal_questions", JSON.stringify(storeQuestions));
+
   let storeNotes = JSON.parse(localStorage.getItem("tb_portal_notes")) || defaultNotes;
   let storeCoupons = JSON.parse(localStorage.getItem("tb_portal_coupons")) || defaultCoupons;
   let storeDuration = parseInt(localStorage.getItem("tb_portal_duration"), 10) || 30;
@@ -337,19 +351,6 @@
   let registeredUsers = JSON.parse(localStorage.getItem("tb_registered_users")) || [];
   let userPerformance = JSON.parse(localStorage.getItem("tb_user_performance")) || {};
   let adminPin = localStorage.getItem("tb_admin_pin") || "1234";
-
-  // AUTO-SYNC PATCH: Ensure "John Galsworthy" topic & questions are merged into existing localStorage
-  if (!storeTopics.includes("John Galsworthy")) {
-    storeTopics.push("John Galsworthy");
-  }
-  defaultQuestions.forEach((dq) => {
-    if (dq.topic === "John Galsworthy") {
-      const exists = storeQuestions.some((sq) => sq.topic === "John Galsworthy" && sq.text === dq.text);
-      if (!exists) {
-        storeQuestions.push(dq);
-      }
-    }
-  });
 
   // AI Configuration State
   let openAiApiKey = localStorage.getItem("tb_openai_api_key") || "sk-proj-dummy-key-paste-here";
@@ -480,17 +481,14 @@
       throw new Error("Valid OpenAI API Key is not set in Admin Settings.");
     }
 
-    const prompt = `You are an elite competitive exam teacher for UGC NET, PGT, and TGT.
-For this question:
+    const prompt = `You are an elite competitive exam teacher for English Literature.
 Question: "${questionText}"
 Correct Option: "${correctOptionText}"
 
 Provide:
 1. Short, precise Conceptual Explanation (2-3 lines).
-2. Key Exam Facts / Memory Points.
-3. A memorable and catchy SHORT TRICK or MNEMONIC (short trick in Hindi/Hinglish or English) to memorize this answer instantly.
-
-Keep the tone professional, scannable, and clean.`;
+2. Key Facts.
+3. Catchy Short Trick or Mnemonic.`;
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -515,7 +513,7 @@ Keep the tone professional, scannable, and clean.`;
   }
 
   /* ==========================================================================
-     SECTION 5: CSS STYLESHEET INJECTION (RESPONSIVE)
+     SECTION 5: CSS STYLESHEET WITH ACCESSIBLE OPTIONS & UI ENHANCEMENTS
      ========================================================================== */
   const styleEl = document.createElement("style");
   styleEl.textContent = `
@@ -523,7 +521,7 @@ Keep the tone professional, scannable, and clean.`;
     html, body { width: 100%; min-height: 100%; overflow-x: hidden; }
     #cbt-portal {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      color: #1e293b; background: #f8fafc; min-height: 100vh; display: flex; flex-direction: column; width: 100%;
+      color: #0f172a; background: #f8fafc; min-height: 100vh; display: flex; flex-direction: column; width: 100%;
     }
     .cbt-nav {
       display: flex; justify-content: space-between; align-items: center;
@@ -562,7 +560,7 @@ Keep the tone professional, scannable, and clean.`;
     .drop-detail-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
 
     .cbt-view {
-      display: none; padding: 18px; max-width: 860px; margin: 16px auto; width: 94%; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0;
+      display: none; padding: 20px; max-width: 860px; margin: 16px auto; width: 94%; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0;
     }
     .cbt-view.active { display: block; }
     
@@ -573,26 +571,30 @@ Keep the tone professional, scannable, and clean.`;
       position: fixed; inset: 0; z-index: 99999; background: #ffffff;
     }
     .test-fullscreen-body { display: flex; flex: 1; overflow: hidden; }
-    .test-main-area { flex: 1; padding: 20px; overflow-y: auto; border-right: 2px solid #e2e8f0; display: flex; flex-direction: column; }
-    .test-sidebar { width: 300px; background: #ffffff; padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+    .test-main-area { flex: 1; padding: 22px; overflow-y: auto; border-right: 2px solid #e2e8f0; display: flex; flex-direction: column; }
+    .test-sidebar { width: 320px; background: #ffffff; padding: 18px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
     
-    .cbt-h1 { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 6px; }
-    .cbt-h2 { font-size: 13px; color: #64748b; text-align: center; margin-bottom: 18px; }
-    .cbt-field { width: 100%; padding: 10px 12px; margin-bottom: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; }
+    .cbt-h1 { font-size: 22px; font-weight: 800; text-align: center; margin-bottom: 6px; color: #0f172a; }
+    .cbt-h2 { font-size: 14px; color: #475569; text-align: center; margin-bottom: 18px; }
+    .cbt-field { width: 100%; padding: 11px 12px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; }
     .cbt-field:focus { border-color: #2563eb; }
-    .cbt-btn-primary { width: 100%; padding: 10px 14px; background: #2563eb; color: #ffffff; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; }
+    .cbt-btn-primary { width: 100%; padding: 11px 14px; background: #2563eb; color: #ffffff; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; text-align: center; }
     .cbt-btn-primary:hover { background: #1d4ed8; }
-    .cbt-btn-secondary { width: 100%; padding: 10px 14px; background: #e2e8f0; color: #334155; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; }
+    .cbt-btn-secondary { width: 100%; padding: 11px 14px; background: #e2e8f0; color: #334155; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; }
     .cbt-btn-secondary:hover { background: #cbd5e1; }
     .cbt-btn-ai {
-      background: linear-gradient(135deg, #8b5cf6, #d946ef); color: #fff; border: none; padding: 6px 12px;
+      background: linear-gradient(135deg, #8b5cf6, #d946ef); color: #fff; border: none; padding: 7px 12px;
       border-radius: 4px; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
     }
     .cbt-btn-ai:hover { opacity: 0.92; }
     
-    .cbt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
-    .cbt-selection-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 14px 10px; text-align: center; cursor: pointer; font-weight: 600; font-size: 13px; word-break: break-word; }
-    .cbt-selection-card:hover { background: #eff6ff; border-color: #3b82f6; color: #1d4ed8; }
+    .cbt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .cbt-selection-card {
+      background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 18px 12px;
+      text-align: center; cursor: pointer; font-weight: 700; font-size: 15px; color: #1e293b;
+      word-break: break-word; transition: all 0.2s ease;
+    }
+    .cbt-selection-card:hover { background: #eff6ff; border-color: #2563eb; color: #1d4ed8; transform: translateY(-2px); }
     
     .palette-legend { display: flex; gap: 10px; font-size: 12px; font-weight: 600; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; flex-wrap: wrap; }
     .legend-item { display: flex; align-items: center; gap: 6px; }
@@ -600,14 +602,25 @@ Keep the tone professional, scannable, and clean.`;
     .bg-attempted { background-color: #10b981; }
     .bg-unattempted { background-color: #8b5cf6; }
     .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-    .palette-btn { padding: 8px 0; border: none; border-radius: 4px; font-weight: 700; color: white; cursor: pointer; font-size: 12px; text-align: center; }
+    .palette-btn { padding: 9px 0; border: none; border-radius: 4px; font-weight: 700; color: white; cursor: pointer; font-size: 12px; text-align: center; }
     
-    .cbt-opt-label { display: flex; align-items: center; padding: 12px 14px; margin-bottom: 10px; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; line-height: 1.4; }
-    .cbt-opt-label:hover { background: #f8fafc; }
-    .cbt-opt-label input { margin-right: 12px; flex-shrink: 0; }
+    /* CLEAR & HIGH VISIBILITY FOR OPTIONS */
+    .cbt-opt-label {
+      display: flex; align-items: center; padding: 14px 16px; margin-bottom: 12px;
+      border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer;
+      font-size: 15px; font-weight: 500; color: #0f172a; line-height: 1.5; background: #ffffff;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .cbt-opt-label:hover { background: #f1f5f9; border-color: #94a3b8; }
+    .cbt-opt-label input[type="radio"] {
+      margin-right: 14px; width: 18px; height: 18px; flex-shrink: 0; accent-color: #2563eb; cursor: pointer;
+    }
+    .cbt-opt-label.selected-opt {
+      background: #eff6ff; border-color: #2563eb; font-weight: 600;
+    }
     
     .cbt-tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 16px; overflow-x: auto; gap: 6px; -webkit-overflow-scrolling: touch; }
-    .cbt-tab-btn { padding: 8px 10px; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; white-space: nowrap; font-size: 13px; }
+    .cbt-tab-btn { padding: 9px 12px; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; white-space: nowrap; font-size: 13px; }
     .cbt-tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; }
     .cbt-pane { display: none; }
     .cbt-pane.active { display: block; }
@@ -676,7 +689,7 @@ Keep the tone professional, scannable, and clean.`;
   document.head.appendChild(styleEl);
 
   /* ==========================================================================
-     SECTION 6: INJECT APPLICATION DOM STRUCTURE
+     SECTION 6: INJECT DOM STRUCTURE
      ========================================================================== */
   const portalDiv = document.createElement("div");
   portalDiv.id = "cbt-portal";
@@ -925,7 +938,7 @@ Keep the tone professional, scannable, and clean.`;
       <button class="cbt-btn-primary" id="btn-admin-verify">Unlock Control Dashboard</button>
     </div>
 
-    <!-- Window Admin Dash: Master Administrative Control Dashboard -->
+    <!-- Window Admin Dash: Master Control Dashboard -->
     <div id="win-admin-dash" class="cbt-view">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:8px; margin-bottom:14px;">
         <span style="font-weight:700; font-size:16px;">Admin Center</span>
@@ -1139,7 +1152,7 @@ Keep the tone professional, scannable, and clean.`;
   document.body.appendChild(portalDiv);
 
   /* ==========================================================================
-     SECTION 7: MODAL NOTIFICATIONS & POPUP DIALOGS
+     SECTION 7: MODAL NOTIFICATIONS
      ========================================================================== */
   function showInAppMessage(title, message, callback) {
     const modal = document.getElementById("dom-cbt-modal");
@@ -1646,7 +1659,7 @@ Keep the tone professional, scannable, and clean.`;
   });
 
   /* ==========================================================================
-     SECTION 13: EXAM ENGINE, TIMER & DOUBLE CONFIRMATION
+     SECTION 13: EXAM ENGINE, TIMER & ACCESSIBLE QUESTION RENDERING
      ========================================================================== */
   function cbtLaunchTestExecution() {
     isExamActive = true;
@@ -1696,17 +1709,29 @@ Keep the tone professional, scannable, and clean.`;
     const container = document.getElementById("dom-test-container");
     const questionText = (activeLanguage === "hi" && cur.text_hi) ? cur.text_hi : cur.text;
 
-    let html = `<div style="font-size:16px; font-weight:700; margin-bottom:14px; line-height:1.4;">Q${currentQuestionIndex + 1}. ${questionText}</div>`;
+    let html = `<div style="font-size:18px; font-weight:800; margin-bottom:16px; line-height:1.5; color:#0f172a;">Q${currentQuestionIndex + 1}. ${questionText}</div>`;
 
     for (let i = 0; i < cur.options.length; i++) {
-      const checked = candidateAnswers[currentQuestionIndex] === i ? "checked" : "";
+      const isChecked = candidateAnswers[currentQuestionIndex] === i;
+      const checkedAttr = isChecked ? "checked" : "";
+      const selectedClass = isChecked ? "selected-opt" : "";
+
       html += `
-        <label class="cbt-opt-label">
-          <input type="radio" name="cbt-choice" value="${i}" ${checked} />
-          ${String.fromCharCode(65 + i)}) ${cur.options[i]}
+        <label class="cbt-opt-label ${selectedClass}" id="opt-label-${i}">
+          <input type="radio" name="cbt-choice" value="${i}" ${checkedAttr} />
+          <span><b>${String.fromCharCode(65 + i)}.</b> &nbsp; ${cur.options[i]}</span>
         </label>`;
     }
     container.innerHTML = html;
+
+    // Attach immediate visual selection feedback
+    container.querySelectorAll('input[name="cbt-choice"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        container.querySelectorAll('.cbt-opt-label').forEach(lbl => lbl.classList.remove('selected-opt'));
+        const parent = e.target.closest('.cbt-opt-label');
+        if (parent) parent.classList.add('selected-opt');
+      });
+    });
   }
 
   document.getElementById("win4-lang-toggle").addEventListener("change", (e) => {
@@ -1893,7 +1918,7 @@ Keep the tone professional, scannable, and clean.`;
   }
 
   /* ==========================================================================
-     SECTION 14: DETAILED SOLUTIONS REVIEW & CANDIDATE DYNAMIC AI FALLBACK
+     SECTION 14: DETAILED SOLUTIONS REVIEW
      ========================================================================== */
   document.getElementById("btn-view-solutions").addEventListener("click", () => {
     const solContainer = document.getElementById("dom-solutions-container");
@@ -1923,11 +1948,11 @@ Keep the tone professional, scannable, and clean.`;
 
       let opsHtml = "";
       q.options.forEach((opt, oIdx) => {
-        let optStyle = "padding:6px 8px; border-radius:4px; margin-bottom:4px; font-size:12px;";
+        let optStyle = "padding:8px 12px; border-radius:6px; margin-bottom:6px; font-size:13px;";
         if (oIdx === q.correct) {
-          optStyle += " background:#dcfce7; border:1px solid #86efac; font-weight:700; color:#166534;";
+          optStyle += " background:#dcfce7; border:1.5px solid #86efac; font-weight:700; color:#166534;";
         } else if (isAttempted && userAns === oIdx) {
-          optStyle += " background:#fee2e2; border:1px solid #fca5a5; color:#991b1b;";
+          optStyle += " background:#fee2e2; border:1.5px solid #fca5a5; color:#991b1b;";
         } else {
           optStyle += " background:#f8fafc; border:1px solid #e2e8f0;";
         }
@@ -1935,7 +1960,7 @@ Keep the tone professional, scannable, and clean.`;
         const isUserChoice = isAttempted && userAns === oIdx ? " <b>(Your Answer)</b>" : "";
         const isRightChoice = oIdx === q.correct ? " <b>(Correct Answer)</b>" : "";
 
-        opsHtml += `<div style="${optStyle}">${String.fromCharCode(65 + oIdx)}) ${opt} ${isUserChoice} ${isRightChoice}</div>`;
+        opsHtml += `<div style="${optStyle}"><b>${String.fromCharCode(65 + oIdx)}.</b> ${opt} ${isUserChoice} ${isRightChoice}</div>`;
       });
 
       const qText = (activeLanguage === "hi" && q.text_hi) ? q.text_hi : q.text;
@@ -1945,7 +1970,7 @@ Keep the tone professional, scannable, and clean.`;
           <span style="font-weight:700; font-size:13px; color:#475569;">Question ${idx + 1}</span>
           <div>${statusText}</div>
         </div>
-        <div style="font-size:14px; font-weight:700; margin-bottom:10px;">${qText}</div>
+        <div style="font-size:15px; font-weight:700; margin-bottom:10px; color:#0f172a;">${qText}</div>
         <div style="margin-bottom:8px;">${opsHtml}</div>
         <div class="sol-explanation-box" id="sol-box-${idx}">
           <b>Detailed Solution & Memory Trick:</b><br>
@@ -1999,10 +2024,10 @@ Keep the tone professional, scannable, and clean.`;
     ops.forEach((text, i) => {
       const isCorrect = correct === i;
       html += `
-        <div class="cbt-opt-label" style="background:#ffffff; border-color:${isCorrect ? '#10b981' : '#e2e8f0'}; padding:8px 10px; margin-bottom:6px;">
+        <div class="cbt-opt-label" style="background:#ffffff; border-color:${isCorrect ? '#10b981' : '#e2e8f0'}; padding:10px 12px; margin-bottom:8px;">
           <input type="radio" name="preview-demo-radio" ${isCorrect ? "checked" : ""} disabled />
-          <span style="font-weight:${isCorrect ? '700' : 'normal'}; color:${isCorrect ? '#059669' : 'inherit'}; font-size:12px;">
-            ${String.fromCharCode(65 + i)}) ${text}
+          <span style="font-weight:${isCorrect ? '700' : 'normal'}; color:${isCorrect ? '#059669' : 'inherit'}; font-size:13px;">
+            <b>${String.fromCharCode(65 + i)}.</b> ${text}
           </span>
           ${isCorrect ? '<span class="preview-correct-badge">Correct</span>' : ''}
         </div>
@@ -2062,7 +2087,7 @@ Keep the tone professional, scannable, and clean.`;
       const generatedSolution = await callOpenAiForSolution(qText, correctOptText);
       solTextarea.value = generatedSolution;
       updateAdminLivePreview();
-      showInAppMessage("AI Generation Complete", "Solution and short trick generated successfully! Review before saving.");
+      showInAppMessage("AI Generation Complete", "Solution and short trick generated successfully!");
     } catch (err) {
       showInAppMessage("AI Error", "Could not generate solution: " + err.message);
     } finally {
@@ -2082,7 +2107,7 @@ Keep the tone professional, scannable, and clean.`;
   document.getElementById("btn-adm-cancel-edit").addEventListener("click", resetQuestionEditor);
 
   /* ==========================================================================
-     SECTION 16: ADMIN AUTHENTICATION, SETTINGS & AI CONFIGURATION
+     SECTION 16: ADMIN DASHBOARD CONFIGURATION
      ========================================================================== */
   document.getElementById("btn-open-admin").addEventListener("click", () => {
     if (isAdminAuthenticated) {
