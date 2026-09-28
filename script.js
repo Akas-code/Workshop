@@ -15,10 +15,18 @@
   /* ==========================================================================
      SECTION 2: DEFAULT DATA & LOCAL STORAGE STATE
      ========================================================================== */
-  const defaultTopics = ["William Shakespeare", "William Wordsworth", "John Milton", "Literary Terms"];
+  const defaultTopics = [
+    "William Shakespeare",
+    "William Wordsworth",
+    "John Milton",
+    "John Galsworthy",
+    "Literary Terms"
+  ];
   const defaultPaperTypes = ["PYQS", "Lines", "Most Probable", "NET JRF"];
   const defaultSets = ["Practice Set 01", "Practice Set 02", "Practice Set 03", "Practice Set 04"];
+
   const defaultQuestions = [
+    // ----------------- William Shakespeare -----------------
     {
       topic: "William Shakespeare",
       category: "PYQS",
@@ -35,8 +43,10 @@
       text_hi: "'Life's but a walking shadow, a poor player...' पंक्ति किस नाटक में आती है?",
       options: ["Hamlet", "Othello", "Macbeth", "King Lear"],
       correct: 2,
-      solution: "This line is spoken by Macbeth in Act 5, Scene 5 after hearing of Lady Macbeth's death.\n\n💡 Short Trick: Shadow & Candle = Macbeth's Tragedy."
+      solution: "This line is spoken by Macbeth in Act 5, Scene 5 after hearing of Lady Macbeth's death."
     },
+
+    // ----------------- William Wordsworth -----------------
     {
       topic: "William Wordsworth",
       category: "PYQS",
@@ -44,11 +54,270 @@
       text_hi: "वर्ड्सवर्थ की 'द प्रील्यूड' उनके मरणोपरांत किस वर्ष प्रकाशित हुई थी?",
       options: ["1798", "1805", "1850", "1832"],
       correct: 2,
-      solution: "The Prelude was published in 1850 by Wordsworth's widow, Mary Wordsworth, shortly after his death.\n\n💡 Short Trick: Wordsworth died in 1850 = Prelude in 1850."
+      solution: "The Prelude was published in 1850 by Wordsworth's widow, Mary Wordsworth, shortly after his death."
+    },
+
+    // =========================================================================
+    // JOHN GALSWORTHY - CATEGORY: PYQS (From Images)
+    // =========================================================================
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "Galsworthy met him in 1893 and formed a life long friendship with him. Identify him.",
+      text_hi: "गाल्सवर्दी 1893 में उनसे मिले और आजीवन मित्रता बनी रही। उन्हें पहचानें।",
+      options: ["Conrad", "Hardy", "Shaw", "Ibsen"],
+      correct: 0,
+      solution: "Galsworthy met Joseph Conrad in 1893 aboard the ship Torrens and they became lifelong close friends.\n\n💡 Short Trick: 1893 = Galsworthy meets Conrad aboard Torrens."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "The first volume of Galsworthy entitled 'From the Four Winds' appeared in 1897 under the pseudonym:",
+      text_hi: "'From the Four Winds' (1897) किस उपनाम (pseudonym) के तहत प्रकाशित हुआ था?",
+      options: ["John Gals", "John Sinjohn", "Boz", "Elia"],
+      correct: 1,
+      solution: "Galsworthy published his earliest collections including 'From the Four Winds' under the pen-name 'John Sinjohn'.\n\n💡 Short Trick: Sinjohn = John Sinjohn (Sin-John)."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "Galsworthy's first novel published in 1898 was:",
+      text_hi: "गाल्सवर्दी का पहला उपन्यास जो 1898 में प्रकाशित हुआ, कौन सा था?",
+      options: ["Jocelyn", "Villa Rubein", "A Man of Devon", "The Island Pharisees"],
+      correct: 0,
+      solution: "'Jocelyn' (1898) was John Galsworthy's first full-length novel, published under John Sinjohn."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "The first work that earned Galsworthy his name as a novelist (identified under his own name) was:",
+      text_hi: "गाल्सवर्दी का पहला उपन्यास जिसने उन्हें उपन्यासकार के रूप में पहचान दिलाई:",
+      options: ["Fraternity", "Country Mouse", "The Island Pharisees", "Jocelyn"],
+      correct: 2,
+      solution: "'The Island Pharisees' (1904) was the first book published under his own real name, John Galsworthy."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "The first play that made Galsworthy famous as a playwright is:",
+      text_hi: "गाल्सवर्दी का पहला नाटक जिसने उन्हें नाटककार के रूप में प्रसिद्ध बनाया:",
+      options: ["Justice", "Loyalties", "The Silver Box", "Strife"],
+      correct: 2,
+      solution: "'The Silver Box' (1906) was Galsworthy's first play, dealing with one law for the rich and another for the poor."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "Galsworthy's reputation as a novelist was established by:",
+      text_hi: "गाल्सवर्दी की एक उपन्यासकार के रूप में प्रतिष्ठा किससे स्थापित हुई?",
+      options: ["The Forsyte Saga", "Justice", "Jocelyn", "The Silver Box"],
+      correct: 0,
+      solution: "'The Forsyte Saga' trilogy established him as a premier English novelist."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "The Forsyte Saga includes 'The Man of Property' (1906), 'In Chancery' (1920), 'To Let' (1921), and two Interludes. Find the Interlude:",
+      text_hi: "द फॉरसाइट सागा में शामिल इंटरल्यूड (Interlude) को पहचानें:",
+      options: [
+        "Indian Winter of a Forsyte Tales and Awakening",
+        "Indian Autumn of a Forsyte Tales and Awakening",
+        "Indian Summer of a Forsyte Tales and Awakening",
+        "None of these"
+      ],
+      correct: 2,
+      solution: "The two famous interludes are 'Indian Summer of a Forsyte' (1918) and 'Awakening' (1920).\n\n💡 Short Trick: Indian Summer = Interlude."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "Which play of Galsworthy deals with the inadequacy of administration of justice and attitudes towards an escaped prisoner?",
+      text_hi: "गाल्सवर्दी का कौन सा नाटक एक भागे हुए कैदी (escaped prisoner) और न्याय प्रशासन से संबंधित है?",
+      options: ["The Show", "Jocelyn", "Escape", "The Mob"],
+      correct: 2,
+      solution: "'Escape' (1926) deals with Matt Denant, an escaped convict, and how various members of society react to him."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "Which play analyses the impact of modern publicity and press on private domestic tragedy?",
+      text_hi: "कौन सा नाटक निजी घरेलू त्रासदी पर आधुनिक मीडिया/प्रेस के प्रभाव का विश्लेषण करता है?",
+      options: ["The Show", "Jocelyn", "Escape", "The Pigeon"],
+      correct: 0,
+      solution: "'The Show' (1925) satirizes the relentless journalism and sensationalism invading private lives."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "The year in which Galsworthy's father died was also the year of publication of 'The Island Pharisees'. Find out the year:",
+      text_hi: "जिस वर्ष गाल्सवर्दी के पिता की मृत्यु हुई, उसी वर्ष 'The Island Pharisees' प्रकाशित हुई। वह वर्ष है:",
+      options: ["1904", "1905", "1906", "1907"],
+      correct: 0,
+      solution: "1904 was the milestone year when his father died and 'The Island Pharisees' was published."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "What did Galsworthy become in 1921?",
+      text_hi: "गाल्सवर्दी 1921 में क्या बने?",
+      options: [
+        "President of Literary Club",
+        "President of the P.E.N. Club London",
+        "Assistant in the P.E.N. Club London",
+        "None of these"
+      ],
+      correct: 1,
+      solution: "Galsworthy became the first President of the International P.E.N. Club in London in 1921.\n\n💡 Short Trick: 1921 = 1st P.E.N. President."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "What was conferred upon Galsworthy in 1929?",
+      text_hi: "1929 में गाल्सवर्दी को कौन सा सम्मान प्रदान किया गया था?",
+      options: ["Order of demerit", "Booker Prize", "Order of Merit", "Nobel Prize"],
+      correct: 2,
+      solution: "He was awarded the Order of Merit (O.M.) in 1929 (Later received Nobel Prize in Literature in 1932)."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "In the play 'Strife', the strike takes place at:",
+      text_hi: "'Strife' नाटक में हड़ताल (strike) किस स्थान पर होती है?",
+      options: [
+        "Trenartha Tin Plate Works",
+        "Thirtana Tine Plate Works",
+        "Thirtankar Tin Plate Works",
+        "None of these"
+      ],
+      correct: 0,
+      solution: "The industrial strike in 'Strife' takes place at Trenartha Tin Plate Works."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "Who is the leader of the labourers in 'Strife'?",
+      text_hi: "'Strife' में मजदूरों का नेता कौन है?",
+      options: ["Jack Barthwick", "Falder", "David Roberts", "None of these"],
+      correct: 2,
+      solution: "David Roberts represents the uncompromising working-class labourers against John Anthony (Company Chairman)."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "William Falder, a young clerk who forges a cheque, is the central tragic character in:",
+      text_hi: "विलियम फाल्डर (William Falder) किस नाटक का केंद्रीय पात्र है?",
+      options: ["The Silver Box", "Loyalties", "Justice", "The Skin Game"],
+      correct: 2,
+      solution: "William Falder is the tragic junior clerk imprisoned for forgery in 'Justice' (1910)."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "This Hindi author translated Galsworthy's 'The Silver Box' as 'Chandi Ki Dibiya', 'Strife' as 'Hartal', and 'Justice' as 'Nyaya':",
+      text_hi: "किस प्रसिद्ध हिंदी लेखक ने गाल्सवर्दी के नाटकों का अनुवाद 'चांदी की डिबिया', 'हड़ताल' और 'न्याय' नाम से किया?",
+      options: ["Dharam Veer Bharti", "Mohan Rakesh", "Munshi Prem Chand", "Jaishankar Prasad"],
+      correct: 2,
+      solution: "Munshi Premchand translated three of Galsworthy's plays into Hindi: The Silver Box (Chandi Ki Dibiya), Strife (Hartal), and Justice (Nyaya).\n\n💡 Short Trick: Premchand = Chandi Ki Dibiya, Hartal, Nyaya."
+    },
+
+    // =========================================================================
+    // JOHN GALSWORTHY - CATEGORY: Lines (Quotes, Dialogues & Critical Statements)
+    // =========================================================================
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "\"The law is what it is—a majestic edifice, sheltering all of us, each stone of which rests on another.\" Where does this line appear?",
+      text_hi: "\"The law is what it is—a majestic edifice...\" यह पंक्ति किस नाटक में आती है?",
+      options: ["The Roof", "The Skin Game", "Windows", "Justice"],
+      correct: 3,
+      solution: "Spoken by the Judge in 'Justice' (1910) during William Falder's trial."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "\"Loyalty comes before everything... A wife's memory is not very good when her husband is in danger.\" These sayings are from:",
+      text_hi: "\"Loyalty comes before everything...\" यह प्रसिद्ध संवाद किस नाटक से है?",
+      options: ["The Roof", "The Skin Game", "Windows", "Loyalties"],
+      correct: 3,
+      solution: "From 'Loyalties' (1922), highlighting club, class, and marriage loyalties over impartial ethics."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "\"We all cut each other's throats from the best of motives.\" Where does this dialogue appear?",
+      text_hi: "\"We all cut each other's throats from the best of motives.\" यह संवाद किस नाटक में आता है?",
+      options: ["Loyalties", "The Skin Game", "The Eldest Son", "Strife"],
+      correct: 0,
+      solution: "Spoken by Margaret Orme in the final lines of 'Loyalties' (1922).\n\n💡 Short Trick: Throat cut from best motives = Loyalties."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "\"Literature is its own reward.\" Who said this?",
+      text_hi: "\"Literature is its own reward.\" यह कथन किसका है?",
+      options: ["Shaw", "Ibsen", "Wordsworth", "Galsworthy"],
+      correct: 3,
+      solution: "John Galsworthy stated: 'Literature is its own reward.'"
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "\"Justice is a machine that, when someone has once given it the starting push, rolls on of itself.\" Where does this line appear?",
+      text_hi: "\"Justice is a machine that... rolls on of itself.\" यह पंक्ति कहाँ आती है?",
+      options: ["The Skin Game", "The Mob", "Justice", "The Silver Box"],
+      correct: 2,
+      solution: "Spoken by managing clerk Robert Cokeson in 'Justice' (1910) describing the merciless legal machine."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "\"In Justice we feel the waste implied by Falder's suicide.\" Whose critical statement is this?",
+      text_hi: "\"In Justice we feel the waste implied by Falder's suicide.\" यह आलोचनात्मक टिप्पणी किसकी है?",
+      options: ["Allardyce Nicoll", "George Sampson", "W.L. Phelps", "Oliver Elton"],
+      correct: 0,
+      solution: "Allardyce Nicoll made this observation regarding the tragedy of William Falder in 'Justice'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "\"His plots are not the unwinding of a skein of complicated happenings... His climaxes are good.\" This statement of Coats is about:",
+      text_hi: "आर. एच. कोट (R.H. Coat) का यह कथन किसके बारे में है?",
+      options: ["Milton", "Shakespeare", "Galsworthy", "Shaw"],
+      correct: 2,
+      solution: "R.H. Coat wrote this in his critical work 'John Galsworthy as a Dramatic Artist' (1926)."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "\"Masters are masters, men are men! Yield one demand and they will make it six...\" Who is the speaker in 'Strife'?",
+      text_hi: "\"Masters are masters, men are men! Yield one demand...\" 'Strife' में यह कौन कहता है?",
+      options: ["Anthony", "Roberts", "Harness", "Falder"],
+      correct: 0,
+      solution: "Spoken by John Anthony, the stubborn old chairman in 'Strife', refusing to surrender to labour demands."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "\"No one will touch him now! Never again! He is safe with gentle Jesus!\" Who says this over Falder's body?",
+      text_hi: "\"No one will touch him now! Never again! He is safe with gentle Jesus!\" फाल्डर की मृत्यु पर यह कौन कहता है?",
+      options: ["Falder about Cokeson", "Cokeson about Falder", "Ruth about Falder", "None of these"],
+      correct: 1,
+      solution: "Spoken by the sympathetic head clerk Cokeson in Act 4 of 'Justice' after Falder jumps to his death."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "\"You mob, are most contemptible thing under the sun... Brain you have none. Spirit not the least of it.\" Who wrote this in 'The Mob'?",
+      text_hi: "\"You mob, are most contemptible thing under the sun...\" यह 'The Mob' में किसने लिखा?",
+      options: ["Shaw", "Yeats", "Eliot", "Galsworthy"],
+      correct: 3,
+      solution: "Written by John Galsworthy in his anti-war idealistic play 'The Mob' (1914)."
     }
   ];
+
   const defaultNotes = [
-    { title: "English Literature Hand-Written Summary", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" }
+    { title: "English Literature Hand-Written Summary", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+    { title: "John Galsworthy Complete Study Notes (PDF)", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" }
   ];
   const defaultCoupons = [
     { code: "AKASH50", discount: 50 },
@@ -69,10 +338,23 @@
   let userPerformance = JSON.parse(localStorage.getItem("tb_user_performance")) || {};
   let adminPin = localStorage.getItem("tb_admin_pin") || "1234";
 
+  // AUTO-SYNC PATCH: Ensure "John Galsworthy" topic & questions are merged into existing localStorage
+  if (!storeTopics.includes("John Galsworthy")) {
+    storeTopics.push("John Galsworthy");
+  }
+  defaultQuestions.forEach((dq) => {
+    if (dq.topic === "John Galsworthy") {
+      const exists = storeQuestions.some((sq) => sq.topic === "John Galsworthy" && sq.text === dq.text);
+      if (!exists) {
+        storeQuestions.push(dq);
+      }
+    }
+  });
+
   // AI Configuration State
   let openAiApiKey = localStorage.getItem("tb_openai_api_key") || "sk-proj-dummy-key-paste-here";
-  let aiAdminEnabled = localStorage.getItem("tb_ai_admin_enabled") !== "false"; // default ON
-  let aiCandidateEnabled = localStorage.getItem("tb_ai_candidate_enabled") === "true"; // default OFF
+  let aiAdminEnabled = localStorage.getItem("tb_ai_admin_enabled") !== "false";
+  let aiCandidateEnabled = localStorage.getItem("tb_ai_candidate_enabled") === "true";
 
   // Persistent Admin Session State
   let isAdminAuthenticated = localStorage.getItem("tb_admin_active") === "true";
@@ -365,7 +647,6 @@ Keep the tone professional, scannable, and clean.`;
     .preview-correct-badge { display: inline-block; background: #10b981; color: #fff; font-size: 10px; padding: 2px 5px; border-radius: 4px; margin-left: auto; }
     .cbt-responsive-flex-row { display: flex; gap: 8px; align-items: center; }
 
-    /* Custom Toggle Switch */
     .toggle-switch-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
     .toggle-switch-label { font-size: 13px; font-weight: 600; color: #334155; }
     .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
@@ -1673,12 +1954,11 @@ Keep the tone professional, scannable, and clean.`;
       `;
       solContainer.appendChild(card);
 
-      // Method 2: Dynamic Candidate AI Fallback Trigger
       if (!q.solution && aiCandidateEnabled) {
         const correctOptStr = q.options[q.correct] || "";
         callOpenAiForSolution(q.text, correctOptStr)
           .then((aiText) => {
-            q.solution = aiText; // Save to question pool so next time it is instant
+            q.solution = aiText;
             syncAllData();
             const box = document.getElementById(`sol-box-${idx}`);
             if (box) {
@@ -1757,7 +2037,6 @@ Keep the tone professional, scannable, and clean.`;
     updateAdminLivePreview();
   }
 
-  // Method 1: 1-Click AI Auto-Generate Solution & Trick Button Listener
   document.getElementById("btn-ai-gen-solution").addEventListener("click", async () => {
     if (!aiAdminEnabled) {
       showInAppMessage("Feature Disabled", "Admin AI Generator button is toggled OFF in Admin Settings.");
@@ -1896,7 +2175,6 @@ Keep the tone professional, scannable, and clean.`;
     document.getElementById("adm-mark-neg").value = storeMarkNegative;
     document.getElementById("adm-exam-min").value = storeDuration;
 
-    // AI Configuration fields
     document.getElementById("adm-ai-key").value = openAiApiKey;
     document.getElementById("chk-ai-admin").checked = aiAdminEnabled;
     document.getElementById("chk-ai-candidate").checked = aiCandidateEnabled;
@@ -1904,7 +2182,6 @@ Keep the tone professional, scannable, and clean.`;
     const btnAi = document.getElementById("btn-ai-gen-solution");
     if (btnAi) btnAi.style.display = aiAdminEnabled ? "inline-flex" : "none";
 
-    // Refresh chips & select elements
     const tChips = document.getElementById("dom-adm-topic-chips");
     const selTopic = document.getElementById("adm-sel-topic");
     tChips.innerHTML = "";
@@ -2039,7 +2316,6 @@ Keep the tone professional, scannable, and clean.`;
     updateAdminLivePreview();
   }
 
-  // Save AI Settings
   document.getElementById("btn-adm-save-ai").addEventListener("click", () => {
     const keyVal = document.getElementById("adm-ai-key").value.trim();
     openAiApiKey = keyVal;
@@ -2051,7 +2327,6 @@ Keep the tone professional, scannable, and clean.`;
     showInAppMessage("AI Settings Saved", "OpenAI API Key and switches have been successfully saved!");
   });
 
-  // Profile Picture File Upload Listener
   document.getElementById("adm-brand-pic-file").addEventListener("change", function () {
     const file = this.files[0];
     if (file) {
@@ -2230,7 +2505,6 @@ Keep the tone professional, scannable, and clean.`;
     applyBrandIdentity();
     updateNavbarAuthState();
 
-    // 1. Recover active running exam if page was reloaded
     const runningSnap = localStorage.getItem("tb_exam_running_snapshot");
     if (activeUser && activeUser.username && runningSnap) {
       try {
@@ -2244,14 +2518,12 @@ Keep the tone professional, scannable, and clean.`;
       }
     }
 
-    // 2. Recover admin session if logged in
     if (isAdminAuthenticated) {
       cbtNavigate("win-admin-dash");
       cbtRefreshAdmin();
       return;
     }
 
-    // 3. Normal candidate route
     if (activeUser && activeUser.username) {
       cbtRenderWindow2();
       cbtNavigate("win-2");
