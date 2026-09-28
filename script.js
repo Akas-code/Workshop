@@ -25,10 +25,10 @@
     
     /* Windows/Views */
     .cbt-view { display: none; padding: 22px; max-width: 860px; margin: 18px auto; width: 94%; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; }
-    .cbt-view.active { display: block; }
+    .cbt-view.active { display: block !important; }
     
     /* Full-Screen Exam Room */
-    #win-4.active { display: flex; flex-direction: column; width: 100% !important; height: 100vh !important; position: fixed; inset: 0; z-index: 99999; background: #ffffff; margin: 0; padding: 0; border: none; border-radius: 0; }
+    #win-4.active { display: flex !important; flex-direction: column; width: 100% !important; height: 100vh !important; position: fixed; inset: 0; z-index: 99999; background: #ffffff; margin: 0; padding: 0; border: none; border-radius: 0; }
     .test-fullscreen-body { display: flex; flex: 1; overflow: hidden; }
     .test-main-area { flex: 1; padding: 22px; overflow-y: auto; border-right: 2px solid #e2e8f0; display: flex; flex-direction: column; }
     .test-sidebar { width: 300px; background: #ffffff; padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
@@ -71,7 +71,7 @@
     
     /* Modal Alerts */
     .cbt-modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); z-index: 999999; justify-content: center; align-items: center; padding: 16px; }
-    .cbt-modal-backdrop.active { display: flex; }
+    .cbt-modal-backdrop.active { display: flex !important; }
     .cbt-modal-box { background: #ffffff; width: 100%; max-width: 420px; border-radius: 8px; padding: 20px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
     
     @media(max-width: 768px) {
@@ -104,8 +104,8 @@
     </div>
   </div>
 
-  <!-- Window 1: Login -->
-  <div id="win-1" class="cbt-view active">
+  <!-- Window 1: Login (Visible by default) -->
+  <div id="win-1" class="cbt-view active" style="display: block;">
     <div class="cbt-h1">Candidate Examination Login</div>
     <div class="cbt-h2">Registration is required to login (Default demo credentials available below)</div>
     <input type="text" id="login-username" class="cbt-field" placeholder="Candidate Username" value="demo" />
@@ -232,18 +232,29 @@
 
   <!-- Portal Logic Engine -->
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      // 1. Core Data
+    (function initExamEngine() {
+      // Safe Storage Wrapper
+      const memStorage = {};
+      const storage = {
+        getItem: function(key) {
+          try { return localStorage.getItem(key); } catch (e) { return memStorage[key] || null; }
+        },
+        setItem: function(key, val) {
+          try { localStorage.setItem(key, val); } catch (e) { memStorage[key] = String(val); }
+        },
+        removeItem: function(key) {
+          try { localStorage.removeItem(key); } catch (e) { delete memStorage[key]; }
+        }
+      };
+
       const defaultTopics = ["William Shakespeare", "William Wordsworth", "John Milton", "John Galsworthy", "Literary Terms"];
       const defaultPaperTypes = ["PYQS", "Lines", "Most Probable", "NET JRF"];
       const defaultSets = ["Practice Set 01", "Practice Set 02", "Practice Set 03", "Practice Set 04"];
-      
+
       const defaultQuestions = [
         { topic: "William Shakespeare", category: "PYQS", text: "In which year was the First Folio published?", options: ["1616", "1623", "1632", "1609"], correct: 1, solution: "Published in 1623." },
         { topic: "William Shakespeare", category: "Lines", text: "'Life's but a walking shadow...' occurs in:", options: ["Hamlet", "Othello", "Macbeth", "King Lear"], correct: 2, solution: "Spoken by Macbeth in Act 5." },
         { topic: "William Wordsworth", category: "PYQS", text: "The Prelude was published in:", options: ["1798", "1805", "1850", "1832"], correct: 2, solution: "Published posthumously in 1850." },
-        
-        // John Galsworthy: PYQS
         { topic: "John Galsworthy", category: "PYQS", text: "In The Fugitive, how are the temperaments of Clare and George contrasted?", options: ["Clare is practical while George is romantic", "Clare is poetic while George is prosaic", "Clare is ambitious while George is indifferent", "Clare is uneducated while George is scholarly"], correct: 1, solution: "Clare is poetic and imaginative while George is unimaginative and prosaic." },
         { topic: "John Galsworthy", category: "PYQS", text: "What occupation does Clare briefly take up after leaving Malise in The Fugitive?", options: ["Selling gloves", "Governess", "Typist", "Factory worker"], correct: 0, solution: "Selling gloves." },
         { topic: "John Galsworthy", category: "PYQS", text: "What is Clare's tragic end in The Fugitive?", options: ["Dies of illness", "Murdered", "Commits suicide", "Returns to George"], correct: 2, solution: "She commits suicide." },
@@ -263,8 +274,6 @@
         { topic: "John Galsworthy", category: "PYQS", text: "Falder appears in:", options: ["Silver Box", "Loyalties", "Justice", "None of these"], correct: 2, solution: "Justice." },
         { topic: "John Galsworthy", category: "PYQS", text: "Who suffers solitary confinement in Justice?", options: ["Falder", "Jack Barthwick", "Ruth", "None of these"], correct: 0, solution: "William Falder." },
         { topic: "John Galsworthy", category: "PYQS", text: "Premchand translated The Silver Box as:", options: ["Chandi Ki Dibiya", "Hartal", "Nyaya", "None of these"], correct: 0, solution: "Chandi Ki Dibiya." },
-        
-        // John Galsworthy: Lines
         { topic: "John Galsworthy", category: "Lines", text: "The law is what it is—a majestic edifice, sheltering all of us... appears in:", options: ["The Roof", "The Skin Game", "Windows", "Justice"], correct: 3, solution: "Spoken by the Judge in Justice." },
         { topic: "John Galsworthy", category: "Lines", text: "We all cut each other's throats from the best of motives appears in:", options: ["Loyalties", "The Skin Game", "The Eldest Son", "None of these"], correct: 0, solution: "Spoken by Margaret Orme in Loyalties." },
         { topic: "John Galsworthy", category: "Lines", text: "Literature is its own reward. Who said?", options: ["Shaw", "Ibsen", "Wordsworth", "Galsworthy"], correct: 3, solution: "John Galsworthy." },
@@ -273,7 +282,6 @@
         { topic: "John Galsworthy", category: "Lines", text: "No one will touch him now! Never again! He is safe with gentle Jesus! Who says?", options: ["Falder", "Cokeson about Falder", "Ruth", "None of these"], correct: 1, solution: "Cokeson in Justice." }
       ];
 
-      // Safe Data Loading
       let storeTopics = defaultTopics;
       let storePaperTypes = defaultPaperTypes;
       let storeSets = defaultSets;
@@ -283,40 +291,42 @@
       let isAdminAuthenticated = false;
 
       try {
-        let t = JSON.parse(localStorage.getItem("tb_portal_topics"));
+        let t = JSON.parse(storage.getItem("tb_portal_topics"));
         if (Array.isArray(t)) storeTopics = t;
-        let q = JSON.parse(localStorage.getItem("tb_portal_questions"));
+        let q = JSON.parse(storage.getItem("tb_portal_questions"));
         if (Array.isArray(q)) storeQuestions = q;
-        let u = JSON.parse(localStorage.getItem("tb_registered_users"));
+        let u = JSON.parse(storage.getItem("tb_registered_users"));
         if (Array.isArray(u)) registeredUsers = u;
-        let au = JSON.parse(localStorage.getItem("tb_active_user"));
+        let au = JSON.parse(storage.getItem("tb_active_user"));
         if (au) activeUser = au;
-        isAdminAuthenticated = localStorage.getItem("tb_admin_active") === "true";
-      } catch (e) {}
+        isAdminAuthenticated = storage.getItem("tb_admin_active") === "true";
+      } catch (err) {}
 
-      // Ensure default questions and topics exist
       if (!storeTopics.includes("John Galsworthy")) storeTopics.push("John Galsworthy");
       defaultQuestions.forEach(dq => {
         if (!storeQuestions.some(sq => sq.text === dq.text)) storeQuestions.push(dq);
       });
 
       function sync() {
-        try {
-          localStorage.setItem("tb_portal_topics", JSON.stringify(storeTopics));
-          localStorage.setItem("tb_portal_questions", JSON.stringify(storeQuestions));
-          localStorage.setItem("tb_registered_users", JSON.stringify(registeredUsers));
-          localStorage.setItem("tb_admin_active", isAdminAuthenticated.toString());
-          if (activeUser) localStorage.setItem("tb_active_user", JSON.stringify(activeUser));
-          else localStorage.removeItem("tb_active_user");
-        } catch (e) {}
+        storage.setItem("tb_portal_topics", JSON.stringify(storeTopics));
+        storage.setItem("tb_portal_questions", JSON.stringify(storeQuestions));
+        storage.setItem("tb_registered_users", JSON.stringify(registeredUsers));
+        storage.setItem("tb_admin_active", isAdminAuthenticated ? "true" : "false");
+        if (activeUser) storage.setItem("tb_active_user", JSON.stringify(activeUser));
+        else storage.removeItem("tb_active_user");
       }
       sync();
 
-      // View Handling
       function showView(id) {
-        document.querySelectorAll(".cbt-view").forEach(el => el.classList.remove("active"));
+        document.querySelectorAll(".cbt-view").forEach(el => {
+          el.classList.remove("active");
+          el.style.display = "none";
+        });
         const target = document.getElementById(id);
-        if (target) target.classList.add("active");
+        if (target) {
+          target.classList.add("active");
+          target.style.display = (id === "win-4") ? "flex" : "block";
+        }
         const nav = document.getElementById("dom-main-navbar");
         if (nav) nav.style.display = (id === "win-4") ? "none" : "flex";
       }
@@ -326,8 +336,10 @@
         document.getElementById("cbt-modal-body").innerText = msg;
         const m = document.getElementById("dom-cbt-modal");
         m.classList.add("active");
+        m.style.display = "flex";
         document.getElementById("cbt-modal-ok").onclick = () => {
           m.classList.remove("active");
+          m.style.display = "none";
           if (cb) cb();
         };
       }
@@ -422,18 +434,16 @@
 
       function renderExamQ() {
         const q = examQuestions[currentIdx];
-        document.getElementById("win4-counter").innerText = `Question ${currentIdx + 1} of ${examQuestions.length}`;
+        document.getElementById("win4-counter").innerText = "Question " + (currentIdx + 1) + " of " + examQuestions.length;
         const box = document.getElementById("dom-test-container");
-        let html = `<div style="font-size:17px; font-weight:700; margin-bottom:14px;">Q${currentIdx + 1}. ${q.text}</div>`;
+        let html = '<div style="font-size:17px; font-weight:700; margin-bottom:14px;">Q' + (currentIdx + 1) + '. ' + q.text + '</div>';
         for (let i = 0; i < q.options.length; i++) {
           const checked = userAnswers[currentIdx] === i ? "checked" : "";
           const selClass = userAnswers[currentIdx] === i ? "selected-opt" : "";
-          html += `
-            <label class="cbt-opt-label ${selClass}">
-              <input type="radio" name="opt" value="${i}" ${checked} />
-              <span><b>${String.fromCharCode(65 + i)}.</b> ${q.options[i]}</span>
-            </label>
-          `;
+          html += '<label class="cbt-opt-label ' + selClass + '">' +
+            '<input type="radio" name="opt" value="' + i + '" ' + checked + ' />' +
+            '<span><b>' + String.fromCharCode(65 + i) + '.</b> ' + q.options[i] + '</span>' +
+          '</label>';
         }
         box.innerHTML = html;
 
@@ -482,14 +492,13 @@
         examQuestions.forEach((q, idx) => {
           if (userAnswers[idx] === q.correct) score++;
         });
-        document.getElementById("dom-result-stats").innerHTML = `
-          <div style="font-size:36px; font-weight:800; color:#2563eb; margin-bottom:8px;">${score} / ${examQuestions.length}</div>
-          <div style="font-size:16px; font-weight:700;">Score: ${Math.round((score/examQuestions.length)*100)}%</div>
-        `;
+        document.getElementById("dom-result-stats").innerHTML =
+          '<div style="font-size:36px; font-weight:800; color:#2563eb; margin-bottom:8px;">' + score + ' / ' + examQuestions.length + '</div>' +
+          '<div style="font-size:16px; font-weight:700;">Score: ' + Math.round((score / examQuestions.length) * 100) + '%</div>';
         showView("win-result");
       }
 
-      // Event Bindings
+      // Event Listeners
       document.getElementById("btn-action-login").onclick = () => {
         const u = document.getElementById("login-username").value.trim();
         const p = document.getElementById("login-password").value.trim();
@@ -562,11 +571,10 @@
         examQuestions.forEach((q, idx) => {
           const div = document.createElement("div");
           div.className = "solution-card";
-          div.innerHTML = `
-            <div style="font-weight:700; margin-bottom:6px;">Q${idx + 1}. ${q.text}</div>
-            <div style="color:#10b981; font-weight:600; margin-bottom:4px;">Correct Answer: ${q.options[q.correct]}</div>
-            <div style="font-size:13px; color:#475569;">Explanation: ${q.solution || "None"}</div>
-          `;
+          div.innerHTML =
+            '<div style="font-weight:700; margin-bottom:6px;">Q' + (idx + 1) + '. ' + q.text + '</div>' +
+            '<div style="color:#10b981; font-weight:600; margin-bottom:4px;">Correct Answer: ' + q.options[q.correct] + '</div>' +
+            '<div style="font-size:13px; color:#475569;">Explanation: ' + (q.solution || "None") + '</div>';
           c.appendChild(div);
         });
         showView("win-solutions");
@@ -600,7 +608,6 @@
         showView("win-1");
       };
 
-      // Admin Tab Switching
       document.querySelectorAll(".cbt-tab-btn").forEach(btn => {
         btn.onclick = () => {
           document.querySelectorAll(".cbt-tab-btn").forEach(b => b.classList.remove("active"));
@@ -628,7 +635,7 @@
           const d = document.createElement("div");
           d.style.padding = "8px 0";
           d.style.borderBottom = "1px solid #f1f5f9";
-          d.innerHTML = `<b>[${q.topic} - ${q.category}]</b> ${q.text}`;
+          d.innerHTML = "<b>[" + q.topic + " - " + q.category + "]</b> " + q.text;
           list.appendChild(d);
         });
       }
@@ -643,7 +650,7 @@
         }
       };
 
-      // Initial View Setup
+      // Initial Launch
       updateNav();
       if (isAdminAuthenticated) {
         renderAdminDash();
@@ -654,7 +661,7 @@
       } else {
         showView("win-1");
       }
-    });
+    })();
   </script>
 </body>
 </html>
