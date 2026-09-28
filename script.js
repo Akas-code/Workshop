@@ -6,7 +6,7 @@
   <title>Akash Workshop | Online Examination Portal</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { width: 100%; min-height: 100%; background: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #0f172a; }
+    html, body { width: 100%; min-height: 100vh; background: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #0f172a; }
     
     /* Top Navigation */
     .cbt-nav { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 12px 18px; color: #ffffff; flex-wrap: wrap; gap: 10px; }
@@ -23,13 +23,12 @@
     .cbt-profile-dropdown { display: none; position: absolute; right: 0; top: 100%; width: 200px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15); padding: 14px; color: #1e293b; z-index: 2000; }
     .cbt-profile-menu-container:hover .cbt-profile-dropdown { display: block; }
     
-    /* Windows/Views */
+    /* Views */
     .cbt-view { display: none; padding: 22px; max-width: 860px; margin: 18px auto; width: 94%; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; }
-    .cbt-view.active { display: block !important; }
     
     /* Full-Screen Exam Room */
-    #win-4.active { display: flex !important; flex-direction: column; width: 100% !important; height: 100vh !important; position: fixed; inset: 0; z-index: 99999; background: #ffffff; margin: 0; padding: 0; border: none; border-radius: 0; }
-    .test-fullscreen-body { display: flex; flex: 1; overflow: hidden; }
+    #win-4 { width: 100%; height: 100vh; position: fixed; inset: 0; z-index: 99999; background: #ffffff; margin: 0; padding: 0; border: none; border-radius: 0; }
+    .test-fullscreen-body { display: flex; flex: 1; overflow: hidden; height: calc(100vh - 52px); }
     .test-main-area { flex: 1; padding: 22px; overflow-y: auto; border-right: 2px solid #e2e8f0; display: flex; flex-direction: column; }
     .test-sidebar { width: 300px; background: #ffffff; padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
     
@@ -71,11 +70,10 @@
     
     /* Modal Alerts */
     .cbt-modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); z-index: 999999; justify-content: center; align-items: center; padding: 16px; }
-    .cbt-modal-backdrop.active { display: flex !important; }
     .cbt-modal-box { background: #ffffff; width: 100%; max-width: 420px; border-radius: 8px; padding: 20px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
     
     @media(max-width: 768px) {
-      .test-fullscreen-body { flex-direction: column; overflow-y: auto; }
+      .test-fullscreen-body { flex-direction: column; overflow-y: auto; height: auto; }
       .test-sidebar { width: 100%; }
       .cbt-view { width: 96%; padding: 16px; }
     }
@@ -86,8 +84,8 @@
   <!-- Top Global Navigation -->
   <div class="cbt-nav" id="dom-main-navbar">
     <div class="cbt-logo-area">
-      <span class="cbt-logo-badge" id="dom-brand-badge">AW</span>
-      <span class="cbt-brand-name" id="dom-brand-name">Akash Workshop</span>
+      <span class="cbt-logo-badge">AW</span>
+      <span class="cbt-brand-name">Akash Workshop</span>
     </div>
     <div class="cbt-nav-actions">
       <button class="cbt-btn-pay" id="btn-open-payment">Payment &amp; Register</button>
@@ -104,8 +102,8 @@
     </div>
   </div>
 
-  <!-- Window 1: Login (Visible by default) -->
-  <div id="win-1" class="cbt-view active" style="display: block;">
+  <!-- Window 1: Login (Guaranteed visible by default) -->
+  <div id="win-1" class="cbt-view" style="display: block;">
     <div class="cbt-h1">Candidate Examination Login</div>
     <div class="cbt-h2">Registration is required to login (Default demo credentials available below)</div>
     <input type="text" id="login-username" class="cbt-field" placeholder="Candidate Username" value="demo" />
@@ -121,7 +119,7 @@
     <span class="cbt-link-back" id="link-back-login">&larr; Back to Login</span>
     <div id="pay-step-1">
       <div class="cbt-h1">Registration Fee</div>
-      <div class="cbt-h2">Standard Fee: ₹ <span id="dom-checkout-price">99.00</span></div>
+      <div class="cbt-h2">Standard Fee: ₹ <span>99.00</span></div>
       <button class="cbt-btn-primary" id="btn-mock-pay">Pay &amp; Continue</button>
     </div>
     <div id="pay-step-2" style="display:none;">
@@ -230,32 +228,30 @@
     </div>
   </div>
 
-  <!-- Portal Logic Engine -->
+  <!-- JavaScript Engine -->
   <script>
-    (function initExamEngine() {
-      // Safe Storage Wrapper
-      const memStorage = {};
-      const storage = {
-        getItem: function(key) {
-          try { return localStorage.getItem(key); } catch (e) { return memStorage[key] || null; }
-        },
-        setItem: function(key, val) {
-          try { localStorage.setItem(key, val); } catch (e) { memStorage[key] = String(val); }
-        },
-        removeItem: function(key) {
-          try { localStorage.removeItem(key); } catch (e) { delete memStorage[key]; }
+    (function () {
+      // 1. CLEAR OLD CORRUPTED LOCAL STORAGE CACHE AUTOMATICALLY
+      try {
+        const cacheVersion = "v3_stable_clean";
+        if (localStorage.getItem("app_ver") !== cacheVersion) {
+          localStorage.clear();
+          localStorage.setItem("app_ver", cacheVersion);
         }
-      };
+      } catch (e) {
+        console.warn("Storage restricted", e);
+      }
 
+      // 2. DATA REGISTRY
       const defaultTopics = ["William Shakespeare", "William Wordsworth", "John Milton", "John Galsworthy", "Literary Terms"];
       const defaultPaperTypes = ["PYQS", "Lines", "Most Probable", "NET JRF"];
       const defaultSets = ["Practice Set 01", "Practice Set 02", "Practice Set 03", "Practice Set 04"];
 
       const defaultQuestions = [
         { topic: "William Shakespeare", category: "PYQS", text: "In which year was the First Folio published?", options: ["1616", "1623", "1632", "1609"], correct: 1, solution: "Published in 1623." },
-        { topic: "William Shakespeare", category: "Lines", text: "'Life's but a walking shadow...' occurs in:", options: ["Hamlet", "Othello", "Macbeth", "King Lear"], correct: 2, solution: "Spoken by Macbeth in Act 5." },
+        { topic: "William Shakespeare", category: "Lines", text: "'Life is but a walking shadow...' occurs in:", options: ["Hamlet", "Othello", "Macbeth", "King Lear"], correct: 2, solution: "Spoken by Macbeth in Act 5." },
         { topic: "William Wordsworth", category: "PYQS", text: "The Prelude was published in:", options: ["1798", "1805", "1850", "1832"], correct: 2, solution: "Published posthumously in 1850." },
-        { topic: "John Galsworthy", category: "PYQS", text: "In The Fugitive, how are the temperaments of Clare and George contrasted?", options: ["Clare is practical while George is romantic", "Clare is poetic while George is prosaic", "Clare is ambitious while George is indifferent", "Clare is uneducated while George is scholarly"], correct: 1, solution: "Clare is poetic and imaginative while George is unimaginative and prosaic." },
+        { topic: "John Galsworthy", category: "PYQS", text: "In The Fugitive, how are the temperaments of Clare and George contrasted?", options: ["Clare is practical while George is romantic", "Clare is poetic while George is prosaic", "Clare is ambitious while George is indifferent", "Clare is uneducated while George is scholarly"], correct: 1, solution: "Clare is poetic while George is prosaic." },
         { topic: "John Galsworthy", category: "PYQS", text: "What occupation does Clare briefly take up after leaving Malise in The Fugitive?", options: ["Selling gloves", "Governess", "Typist", "Factory worker"], correct: 0, solution: "Selling gloves." },
         { topic: "John Galsworthy", category: "PYQS", text: "What is Clare's tragic end in The Fugitive?", options: ["Dies of illness", "Murdered", "Commits suicide", "Returns to George"], correct: 2, solution: "She commits suicide." },
         { topic: "John Galsworthy", category: "PYQS", text: "Which character is a solicitor in The Fugitive?", options: ["Edward Fullarton", "Reginald Huntingdon", "Twisden", "Haywood"], correct: 2, solution: "Twisden." },
@@ -288,59 +284,28 @@
       let storeQuestions = defaultQuestions;
       let registeredUsers = [{ username: "demo", password: "1234" }];
       let activeUser = null;
-      let isAdminAuthenticated = false;
 
-      try {
-        let t = JSON.parse(storage.getItem("tb_portal_topics"));
-        if (Array.isArray(t)) storeTopics = t;
-        let q = JSON.parse(storage.getItem("tb_portal_questions"));
-        if (Array.isArray(q)) storeQuestions = q;
-        let u = JSON.parse(storage.getItem("tb_registered_users"));
-        if (Array.isArray(u)) registeredUsers = u;
-        let au = JSON.parse(storage.getItem("tb_active_user"));
-        if (au) activeUser = au;
-        isAdminAuthenticated = storage.getItem("tb_admin_active") === "true";
-      } catch (err) {}
-
-      if (!storeTopics.includes("John Galsworthy")) storeTopics.push("John Galsworthy");
-      defaultQuestions.forEach(dq => {
-        if (!storeQuestions.some(sq => sq.text === dq.text)) storeQuestions.push(dq);
-      });
-
-      function sync() {
-        storage.setItem("tb_portal_topics", JSON.stringify(storeTopics));
-        storage.setItem("tb_portal_questions", JSON.stringify(storeQuestions));
-        storage.setItem("tb_registered_users", JSON.stringify(registeredUsers));
-        storage.setItem("tb_admin_active", isAdminAuthenticated ? "true" : "false");
-        if (activeUser) storage.setItem("tb_active_user", JSON.stringify(activeUser));
-        else storage.removeItem("tb_active_user");
-      }
-      sync();
-
-      function showView(id) {
-        document.querySelectorAll(".cbt-view").forEach(el => {
-          el.classList.remove("active");
-          el.style.display = "none";
+      function showView(viewId) {
+        const views = document.querySelectorAll(".cbt-view");
+        views.forEach(v => {
+          v.style.display = "none";
         });
-        const target = document.getElementById(id);
+        const target = document.getElementById(viewId);
         if (target) {
-          target.classList.add("active");
-          target.style.display = (id === "win-4") ? "flex" : "block";
+          target.style.display = (viewId === "win-4") ? "flex" : "block";
         }
         const nav = document.getElementById("dom-main-navbar");
-        if (nav) nav.style.display = (id === "win-4") ? "none" : "flex";
+        if (nav) nav.style.display = (viewId === "win-4") ? "none" : "flex";
       }
 
-      function showModal(title, msg, cb) {
+      function showModal(title, msg, callback) {
         document.getElementById("cbt-modal-heading").innerText = title;
         document.getElementById("cbt-modal-body").innerText = msg;
-        const m = document.getElementById("dom-cbt-modal");
-        m.classList.add("active");
-        m.style.display = "flex";
-        document.getElementById("cbt-modal-ok").onclick = () => {
-          m.classList.remove("active");
-          m.style.display = "none";
-          if (cb) cb();
+        const modal = document.getElementById("dom-cbt-modal");
+        modal.style.display = "flex";
+        document.getElementById("cbt-modal-ok").onclick = function() {
+          modal.style.display = "none";
+          if (callback) callback();
         };
       }
 
@@ -355,8 +320,8 @@
           document.getElementById("dom-cand-logo-text").innerText = "🎓 " + activeUser.username;
           document.getElementById("drop-display-username").innerText = activeUser.username;
         } else {
-          btnPay.style.display = "block";
-          btnAdmin.style.display = "block";
+          btnPay.style.display = "inline-block";
+          btnAdmin.style.display = "inline-block";
           userMenu.style.display = "none";
         }
       }
@@ -448,7 +413,7 @@
         box.innerHTML = html;
 
         box.querySelectorAll('input[name="opt"]').forEach(r => {
-          r.onchange = (e) => {
+          r.onchange = function(e) {
             box.querySelectorAll('.cbt-opt-label').forEach(l => l.classList.remove('selected-opt'));
             e.target.closest('.cbt-opt-label').classList.add('selected-opt');
             userAnswers[currentIdx] = parseInt(e.target.value, 10);
@@ -498,17 +463,16 @@
         showView("win-result");
       }
 
-      // Event Listeners
-      document.getElementById("btn-action-login").onclick = () => {
+      // UI Click Handlers
+      document.getElementById("btn-action-login").onclick = function() {
         const u = document.getElementById("login-username").value.trim();
         const p = document.getElementById("login-password").value.trim();
         const found = registeredUsers.find(x => x.username.toLowerCase() === u.toLowerCase() && x.password === p);
         if (!found) {
-          showModal("Login Failed", "Invalid credentials. Use demo / 1234 or register.");
+          showModal("Login Failed", "Invalid credentials. Use demo / 1234");
           return;
         }
         activeUser = found;
-        sync();
         updateNav();
         renderTopics();
         showView("win-2");
@@ -520,12 +484,12 @@
       document.getElementById("btn-restart-flow").onclick = () => showView("win-2");
       document.getElementById("link-back-result").onclick = () => showView("win-result");
 
-      document.getElementById("btn-mock-pay").onclick = () => {
+      document.getElementById("btn-mock-pay").onclick = function() {
         document.getElementById("pay-step-1").style.display = "none";
         document.getElementById("pay-step-2").style.display = "block";
       };
 
-      document.getElementById("btn-send-otp").onclick = () => {
+      document.getElementById("btn-send-otp").onclick = function() {
         const mob = document.getElementById("reg-mobile").value.trim();
         if (mob.length !== 10) {
           showModal("Error", "Enter valid 10-digit number.");
@@ -537,7 +501,7 @@
         });
       };
 
-      document.getElementById("btn-complete-reg").onclick = () => {
+      document.getElementById("btn-complete-reg").onclick = function() {
         const entered = document.getElementById("reg-otp").value.trim();
         const u = document.getElementById("reg-username").value.trim();
         const p = document.getElementById("reg-password").value.trim();
@@ -546,13 +510,12 @@
           return;
         }
         registeredUsers.push({ username: u, password: p });
-        sync();
         showModal("Success", "Account created successfully! Please login.", () => {
           showView("win-1");
         });
       };
 
-      document.getElementById("btn-save-next").onclick = () => {
+      document.getElementById("btn-save-next").onclick = function() {
         if (currentIdx < examQuestions.length - 1) {
           currentIdx++;
           renderExamQ();
@@ -561,11 +524,11 @@
         }
       };
 
-      document.getElementById("btn-submit-exam").onclick = () => {
+      document.getElementById("btn-submit-exam").onclick = function() {
         showModal("Submit Exam", "Are you sure you want to finalize your exam?", finishExam);
       };
 
-      document.getElementById("btn-view-solutions").onclick = () => {
+      document.getElementById("btn-view-solutions").onclick = function() {
         const c = document.getElementById("dom-solutions-container");
         c.innerHTML = "";
         examQuestions.forEach((q, idx) => {
@@ -580,9 +543,8 @@
         showView("win-solutions");
       };
 
-      document.getElementById("btn-drop-logout").onclick = () => {
+      document.getElementById("btn-drop-logout").onclick = function() {
         activeUser = null;
-        sync();
         updateNav();
         showView("win-1");
       };
@@ -590,26 +552,20 @@
       document.getElementById("btn-open-admin").onclick = () => showView("win-admin-auth");
       document.getElementById("link-admin-back-login").onclick = () => showView("win-1");
 
-      document.getElementById("btn-admin-verify").onclick = () => {
+      document.getElementById("btn-admin-verify").onclick = function() {
         const val = document.getElementById("admin-pass-input").value.trim();
         if (val === "1234") {
-          isAdminAuthenticated = true;
-          sync();
           renderAdminDash();
           showView("win-admin-dash");
         } else {
-          showModal("Admin Error", "Incorrect PIN.");
+          showModal("Admin Error", "Incorrect PIN (Default: 1234).");
         }
       };
 
-      document.getElementById("btn-admin-exit").onclick = () => {
-        isAdminAuthenticated = false;
-        sync();
-        showView("win-1");
-      };
+      document.getElementById("btn-admin-exit").onclick = () => showView("win-1");
 
       document.querySelectorAll(".cbt-tab-btn").forEach(btn => {
-        btn.onclick = () => {
+        btn.onclick = function() {
           document.querySelectorAll(".cbt-tab-btn").forEach(b => b.classList.remove("active"));
           document.querySelectorAll(".cbt-pane").forEach(p => p.classList.remove("active"));
           btn.classList.add("active");
@@ -640,27 +596,18 @@
         });
       }
 
-      document.getElementById("btn-adm-add-topic").onclick = () => {
+      document.getElementById("btn-adm-add-topic").onclick = function() {
         const t = document.getElementById("adm-add-topic").value.trim();
         if (t && !storeTopics.includes(t)) {
           storeTopics.push(t);
-          sync();
           renderAdminDash();
           document.getElementById("adm-add-topic").value = "";
         }
       };
 
-      // Initial Launch
+      // Bootstrap app view safely
       updateNav();
-      if (isAdminAuthenticated) {
-        renderAdminDash();
-        showView("win-admin-dash");
-      } else if (activeUser) {
-        renderTopics();
-        showView("win-2");
-      } else {
-        showView("win-1");
-      }
+      showView("win-1");
     })();
   </script>
 </body>
