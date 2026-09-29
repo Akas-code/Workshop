@@ -1258,7 +1258,7 @@
     { code: "FREE100", discount: 100 }
   ];
 
-  // FORCE INJECTION TO PREVENT MISSING JOHN GALSWORTHY
+  // Force Injection to prevent missing John Galsworthy
   let storeTopics = JSON.parse(localStorage.getItem("tb_portal_topics")) || defaultTopics;
   if (!storeTopics.some(t => t.toLowerCase() === "john galsworthy")) {
     storeTopics.push("John Galsworthy");
@@ -1269,7 +1269,6 @@
   let storeSets = JSON.parse(localStorage.getItem("tb_portal_sets")) || defaultSets;
   let storeQuestions = JSON.parse(localStorage.getItem("tb_portal_questions")) || defaultQuestions;
 
-  // Sync questions from memory to storage
   defaultQuestions.forEach(dq => {
     if (dq.topic === "John Galsworthy") {
       const exists = storeQuestions.some(sq => sq.topic === "John Galsworthy" && sq.text === dq.text);
@@ -1331,6 +1330,7 @@
   let lastTransactionInfo = { amount: "0.00", coupon: "None" };
   let editingQuestionIndex = null;
   let isExamActive = false;
+  let isUntimedPractice = false; // Flag for Practice / Retry Mode without Timer
 
   /* ==========================================================================
      SECTION 3: DATA SYNCHRONIZATION HELPERS
@@ -1363,7 +1363,7 @@
   }
 
   function saveExamSnapshot() {
-    if (!isExamActive) return;
+    if (!isExamActive || isUntimedPractice) return;
     const snap = {
       activeTopic,
       activeCategory,
@@ -1542,7 +1542,7 @@ Provide:
     .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
     .palette-btn { padding: 9px 0; border: none; border-radius: 4px; font-weight: 700; color: white; cursor: pointer; font-size: 12px; text-align: center; }
     
-    /* CLEAR & HIGH VISIBILITY FOR OPTIONS */
+    /* Option Styling */
     .cbt-opt-label {
       display: flex; align-items: center; padding: 14px 16px; margin-bottom: 12px;
       border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer;
@@ -1555,6 +1555,12 @@ Provide:
     }
     .cbt-opt-label.selected-opt {
       background: #eff6ff; border-color: #2563eb; font-weight: 600;
+    }
+    .cbt-opt-label.opt-instant-correct {
+      background: #ecfdf5 !important; border-color: #10b981 !important; color: #065f46 !important; font-weight: 700;
+    }
+    .cbt-opt-label.opt-instant-wrong {
+      background: #fef2f2 !important; border-color: #ef4444 !important; color: #991b1b !important;
     }
     
     .cbt-tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 16px; overflow-x: auto; gap: 6px; -webkit-overflow-scrolling: touch; }
@@ -1806,11 +1812,11 @@ Provide:
       <button class="cbt-btn-primary" id="btn-start-locked-exam" style="padding:12px; font-size:15px; background:#10b981;" disabled>I Am Ready to Begin (Start Test)</button>
     </div>
 
-    <!-- Window 4: Locked Full-Screen Exam Terminal -->
+    <!-- Window 4: Locked Full-Screen Exam & Practice Terminal -->
     <div id="win-4" class="cbt-view">
       <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; color:#fff; padding:10px 14px; flex-wrap:wrap; gap:8px;">
         <div style="display:flex; align-items:center; gap:8px;">
-          <span style="background:#ef4444; color:#fff; font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px;">LOCKED</span>
+          <span id="win4-mode-badge" style="background:#ef4444; color:#fff; font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px;">LOCKED</span>
           <div style="font-weight:700; font-size:13px;" id="win4-banner">Exam Terminal</div>
         </div>
         <div style="display:flex; align-items:center; gap:10px;">
@@ -1819,6 +1825,7 @@ Provide:
             <option value="hi">हिंदी</option>
           </select>
           <div style="font-size:18px; font-weight:800; color:#ef4444;" id="win4-clock">30:00</div>
+          <button id="btn-exit-practice" style="display:none; background:#475569; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;">Exit Practice</button>
         </div>
       </div>
 
@@ -1847,22 +1854,30 @@ Provide:
       </div>
     </div>
 
-    <!-- Window Result: Performance Card -->
+    <!-- Window Result: Performance Card & Action Gateway -->
     <div id="win-result" class="cbt-view">
       <div class="cbt-h1">Examination Scorecard & Result</div>
-      <div class="cbt-h2">Review detailed performance metrics & score</div>
+      <div class="cbt-h2">Review detailed performance metrics & choose your next action</div>
       <div id="dom-result-stats" style="text-align:center; margin: 18px 0;"></div>
-      <div class="cbt-action-btn-group" style="display:flex; gap:10px; justify-content:center;">
-        <button class="cbt-btn-primary" id="btn-view-solutions" style="background:#10b981;">View Detailed Solutions</button>
-        <button class="cbt-btn-secondary" id="btn-restart-flow">Back to Topics</button>
+      
+      <!-- DUAL ACTIONS: DIRECT REVIEW VS UNTIMED RETRY -->
+      <div class="cbt-action-btn-group" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+        <button class="cbt-btn-primary" id="btn-view-solutions" style="background:#10b981; max-width:220px;">Review All Solutions</button>
+        <button class="cbt-btn-primary" id="btn-retry-untimed" style="background:#8b5cf6; max-width:240px;">Practice Mode (Untimed Retry)</button>
+        <button class="cbt-btn-secondary" id="btn-restart-flow" style="max-width:160px;">Back to Topics</button>
       </div>
     </div>
 
     <!-- Window Solutions: Question-by-question Review -->
     <div id="win-solutions" class="cbt-view">
       <span class="cbt-link-back" id="link-back-result">&larr; Back to Result</span>
-      <div class="cbt-h1" style="text-align:left; margin-bottom:4px;">Test Questions & Solutions</div>
-      <div class="cbt-h2" style="text-align:left; margin-bottom:14px;" id="dom-solutions-header">Detailed breakdown of answers:</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+        <div>
+          <div class="cbt-h1" style="text-align:left; margin-bottom:4px;">Test Questions & Solutions</div>
+          <div class="cbt-h2" style="text-align:left; margin-bottom:0;" id="dom-solutions-header">Detailed breakdown of answers:</div>
+        </div>
+        <button class="cbt-btn-primary" id="btn-sol-retry-untimed" style="width:auto; padding:8px 16px; background:#8b5cf6; font-size:13px;">Retry Test Without Timer</button>
+      </div>
       <div id="dom-solutions-container"></div>
       <button class="cbt-btn-primary" id="btn-sol-back-topics" style="margin-top:14px;">Finish & Back to Topics</button>
     </div>
@@ -2025,7 +2040,6 @@ Provide:
       </div>
 
       <div id="pane-security" class="cbt-pane">
-        <!-- OpenAI / ChatGPT Configuration Panel -->
         <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:14px; border-radius:6px; margin-bottom:14px;">
           <div style="font-weight:700; font-size:14px; color:#8b5cf6; margin-bottom:4px;">OpenAI / ChatGPT Automation Controls:</div>
           <div style="font-size:12px; color:#64748b; margin-bottom:10px;">Paste your API Key below to power automatic solutions, facts, and short tricks.</div>
@@ -2090,7 +2104,7 @@ Provide:
   document.body.appendChild(portalDiv);
 
   /* ==========================================================================
-     SECTION 7: MODAL NOTIFICATIONS
+     SECTION 7: MODAL NOTIFICATIONS & NAVIGATION
      ========================================================================== */
   function showInAppMessage(title, message, callback) {
     const modal = document.getElementById("dom-cbt-modal");
@@ -2167,7 +2181,7 @@ Provide:
   }
 
   window.addEventListener("beforeunload", (e) => {
-    if (isExamActive) {
+    if (isExamActive && !isUntimedPractice) {
       saveExamSnapshot();
       e.preventDefault();
       e.returnValue = "Your exam is currently in progress!";
@@ -2249,7 +2263,7 @@ Provide:
   });
 
   function candidateLogout() {
-    if (isExamActive) {
+    if (isExamActive && !isUntimedPractice) {
       showInAppMessage("Test In Progress", "You cannot logout while an exam is running.");
       return;
     }
@@ -2574,6 +2588,7 @@ Provide:
   document.getElementById("btn-start-locked-exam").addEventListener("click", () => {
     activeLanguage = document.getElementById("exam-lang-select").value;
     document.getElementById("win4-lang-toggle").value = activeLanguage;
+    isUntimedPractice = false;
     cbtLaunchTestExecution();
   });
 
@@ -2597,7 +2612,7 @@ Provide:
   });
 
   /* ==========================================================================
-     SECTION 13: EXAM ENGINE, TIMER & ACCESSIBLE QUESTION RENDERING
+     SECTION 13: EXAM ENGINE, PRACTICE MODE & TIMER
      ========================================================================== */
   function cbtLaunchTestExecution() {
     isExamActive = true;
@@ -2605,19 +2620,62 @@ Provide:
     candidateAnswers = {};
     remainingSeconds = storeDuration * 60;
 
+    const badgeEl = document.getElementById("win4-mode-badge");
+    const clockEl = document.getElementById("win4-clock");
+    const exitBtn = document.getElementById("btn-exit-practice");
+
+    if (isUntimedPractice) {
+      badgeEl.innerText = "UNTIMED PRACTICE";
+      badgeEl.style.background = "#8b5cf6";
+      clockEl.innerText = "NO TIMER";
+      clockEl.style.color = "#10b981";
+      exitBtn.style.display = "inline-block";
+      document.getElementById("btn-submit-exam").innerText = "Finish Practice";
+      document.getElementById("win4-mark-info").innerText = "Untimed Practice Mode";
+    } else {
+      badgeEl.innerText = "LOCKED EXAM";
+      badgeEl.style.background = "#ef4444";
+      clockEl.style.color = "#ef4444";
+      exitBtn.style.display = "none";
+      document.getElementById("btn-submit-exam").innerText = "Submit Final Exam";
+      document.getElementById("win4-mark-info").innerText = `+${storeMarkPositive.toFixed(2)} / -${storeMarkNegative.toFixed(2)}`;
+      enterFullScreen();
+      cbtStartTimer();
+      saveExamSnapshot();
+    }
+
     document.getElementById("win4-banner").innerText = `${brandConfig.name} | ${activeTopic} (${activeCategory})`;
-    document.getElementById("win4-mark-info").innerText = `+${storeMarkPositive.toFixed(2)} / -${storeMarkNegative.toFixed(2)}`;
 
     cbtNavigate("win-4");
-    enterFullScreen();
     cbtRenderQuestion();
     cbtUpdatePalette();
-    cbtStartTimer();
-    saveExamSnapshot();
   }
+
+  function startUntimedPractice() {
+    isUntimedPractice = true;
+    cbtLaunchTestExecution();
+  }
+
+  document.getElementById("btn-retry-untimed").addEventListener("click", () => {
+    startUntimedPractice();
+  });
+
+  document.getElementById("btn-sol-retry-untimed").addEventListener("click", () => {
+    startUntimedPractice();
+  });
+
+  document.getElementById("btn-exit-practice").addEventListener("click", () => {
+    showInAppConfirm("Exit Practice", "Do you want to stop this practice session and return to Topics?", () => {
+      isExamActive = false;
+      isUntimedPractice = false;
+      cbtRenderWindow2();
+      cbtNavigate("win-2");
+    });
+  });
 
   function cbtResumeTest(snap) {
     isExamActive = true;
+    isUntimedPractice = false;
     activeTopic = snap.activeTopic;
     activeCategory = snap.activeCategory;
     activeLanguage = snap.activeLanguage || "en";
@@ -2652,23 +2710,94 @@ Provide:
     for (let i = 0; i < cur.options.length; i++) {
       const isChecked = candidateAnswers[currentQuestionIndex] === i;
       const checkedAttr = isChecked ? "checked" : "";
-      const selectedClass = isChecked ? "selected-opt" : "";
+      let optClass = "cbt-opt-label";
+      if (isChecked) optClass += " selected-opt";
+
+      // If in practice mode and candidate already selected an answer, highlight correctness
+      if (isUntimedPractice && isChecked) {
+        if (i === cur.correct) {
+          optClass += " opt-instant-correct";
+        } else {
+          optClass += " opt-instant-wrong";
+        }
+      }
 
       html += `
-        <label class="cbt-opt-label ${selectedClass}" id="opt-label-${i}">
+        <label class="${optClass}" id="opt-label-${i}">
           <input type="radio" name="cbt-choice" value="${i}" ${checkedAttr} />
           <span><b>${String.fromCharCode(65 + i)}.</b> &nbsp; ${cur.options[i]}</span>
         </label>`;
     }
+
+    // In untimed practice mode, allow instant checking and solution revelation
+    if (isUntimedPractice) {
+      html += `
+        <div style="margin-top:14px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button type="button" class="cbt-btn-secondary" id="btn-practice-check" style="width:auto; padding:6px 14px; font-size:12px;">Check Answer</button>
+          <button type="button" class="cbt-btn-secondary" id="btn-practice-reset" style="width:auto; padding:6px 14px; font-size:12px;">Reset Question</button>
+        </div>
+        <div id="practice-live-sol-box" class="sol-explanation-box" style="display:${candidateAnswers.hasOwnProperty(currentQuestionIndex) ? 'block' : 'none'}; margin-top:12px;">
+          <b>Solution & Explanation:</b><br>
+          <span>${cur.solution || "No explanation provided for this question."}</span>
+        </div>
+      `;
+    }
+
     container.innerHTML = html;
 
     container.querySelectorAll('input[name="cbt-choice"]').forEach(radio => {
       radio.addEventListener('change', (e) => {
-        container.querySelectorAll('.cbt-opt-label').forEach(lbl => lbl.classList.remove('selected-opt'));
+        container.querySelectorAll('.cbt-opt-label').forEach(lbl => {
+          lbl.classList.remove('selected-opt', 'opt-instant-correct', 'opt-instant-wrong');
+        });
         const parent = e.target.closest('.cbt-opt-label');
         if (parent) parent.classList.add('selected-opt');
+        
+        const selVal = parseInt(e.target.value, 10);
+        candidateAnswers[currentQuestionIndex] = selVal;
+        cbtUpdatePalette();
+
+        if (isUntimedPractice) {
+          if (selVal === cur.correct) {
+            parent.classList.add('opt-instant-correct');
+          } else {
+            parent.classList.add('opt-instant-wrong');
+          }
+          const solBox = document.getElementById("practice-live-sol-box");
+          if (solBox) solBox.style.display = "block";
+        }
       });
     });
+
+    if (isUntimedPractice) {
+      const btnCheck = document.getElementById("btn-practice-check");
+      const btnReset = document.getElementById("btn-practice-reset");
+      if (btnCheck) {
+        btnCheck.onclick = () => {
+          const checked = document.querySelector('input[name="cbt-choice"]:checked');
+          if (!checked) {
+            showInAppMessage("No Option Selected", "Please select an option first.");
+            return;
+          }
+          const val = parseInt(checked.value, 10);
+          const parent = checked.closest('.cbt-opt-label');
+          if (val === cur.correct) {
+            parent.classList.add('opt-instant-correct');
+          } else {
+            parent.classList.add('opt-instant-wrong');
+          }
+          const solBox = document.getElementById("practice-live-sol-box");
+          if (solBox) solBox.style.display = "block";
+        };
+      }
+      if (btnReset) {
+        btnReset.onclick = () => {
+          delete candidateAnswers[currentQuestionIndex];
+          cbtRenderQuestion();
+          cbtUpdatePalette();
+        };
+      }
+    }
   }
 
   document.getElementById("win4-lang-toggle").addEventListener("change", (e) => {
@@ -2724,7 +2853,7 @@ Provide:
     } else {
       cbtUpdatePalette();
       saveExamSnapshot();
-      showInAppMessage("Last Question", "You are at the final question. Click 'Submit Final Exam' when ready.");
+      showInAppMessage("Last Question", "You are at the final question. Click 'Submit' or 'Finish Practice' when ready.");
     }
   });
 
@@ -2745,24 +2874,18 @@ Provide:
         <div style="color:#10b981;">Attempted Questions: <b>${attempted}</b></div>
         <div style="color:#ef4444;">Unattempted / Left: <b>${unattempted}</b></div>
       </div>
-      Are you sure you want to finish and submit your exam?
+      Are you sure you want to finish this session?
     `;
 
-    showInAppConfirm("Exam Submission (Check 1 of 2)", summaryMsg, () => {
-      showInAppConfirm(
-        "FINAL VERIFICATION (Check 2 of 2)",
-        `<div style="color:#dc2626; font-weight:700; margin-bottom:8px;">Warning: Once confirmed, you CANNOT change any answer or re-enter this test.</div>Do you strictly confirm final submission?`,
-        () => {
-          cbtFinishTest();
-        },
-        null,
-        "Yes, Submit Now"
-      );
+    showInAppConfirm("Finish Session", summaryMsg, () => {
+      cbtFinishTest();
     });
   });
 
   function cbtStartTimer() {
     clearInterval(countdownRef);
+    if (isUntimedPractice) return;
+
     countdownRef = setInterval(() => {
       const m = Math.floor(remainingSeconds / 60);
       const s = remainingSeconds % 60;
@@ -2810,7 +2933,8 @@ Provide:
     const netPct = Math.round((netMarks / maxPossibleMarks) * 100);
     const accuracy = attemptedCount > 0 ? Math.round((correctCount / attemptedCount) * 100) : 0;
 
-    if (activeUser && activeUser.username) {
+    // Record formal test results only for timed exam attempts
+    if (!isUntimedPractice && activeUser && activeUser.username) {
       if (!userPerformance[activeUser.username]) {
         userPerformance[activeUser.username] = [];
       }
@@ -2830,9 +2954,11 @@ Provide:
       updateNavbarAuthState();
     }
 
+    const modeLabel = isUntimedPractice ? "<span style='color:#8b5cf6;'>(Practice Mode - Untimed)</span>" : "<span style='color:#2563eb;'>(Official CBT Mode)</span>";
+
     document.getElementById("dom-result-stats").innerHTML = `
       <div style="font-size:38px; font-weight:800; color:#2563eb; margin-bottom:4px;">${netMarks.toFixed(2)} <span style="font-size:16px; color:#64748b;">/ ${maxPossibleMarks.toFixed(2)} pts</span></div>
-      <div style="font-size:16px; font-weight:700; color:#0f172a; margin-bottom:12px;">Percentage: ${netPct}% | Accuracy: ${accuracy}%</div>
+      <div style="font-size:16px; font-weight:700; color:#0f172a; margin-bottom:12px;">Percentage: ${netPct}% | Accuracy: ${accuracy}% ${modeLabel}</div>
 
       <div class="cbt-responsive-result-grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; max-width:540px; margin:0 auto 14px auto; font-size:13px;">
         <div style="background:#ecfdf5; border:1px solid #a7f3d0; padding:8px; border-radius:6px;">
