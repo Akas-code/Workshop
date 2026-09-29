@@ -57,66 +57,141 @@
       solution: "The Prelude was published in 1850 by Wordsworth's widow, Mary Wordsworth."
     },
 
-    // ----------------- John Galsworthy: PYQS -----------------
+    // ----------------- The Fugitive (Study Notes) -----------------
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "Galsworthy met him in 1893 and formed a life long friendship with him. Identify him.",
+      text: "In Galsworthy's The Fugitive, how are the temperaments of Clare and her husband George contrasted?",
+      text_hi: "गाल्सवर्दी के 'The Fugitive' में क्लेयर और उसके पति जॉर्ज के स्वभाव में क्या अंतर दिखाया गया है?",
+      options: [
+        "Clare is practical while George is romantic",
+        "Clare is poetic while George is prosaic",
+        "Clare is ambitious while George is indifferent",
+        "Clare is uneducated while George is scholarly"
+      ],
+      correct: 1,
+      solution: "Clare possesses a sensitive and poetic temperament, whereas her husband George Dedmond is utterly conventional and prosaic."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "What occupation does Clare briefly take up after leaving Malise?",
+      text_hi: "मैलीस को छोड़ने के बाद क्लेयर संक्षेप में कौन सा पेशा अपनाती है?",
+      options: ["Selling gloves", "Governess", "Typist", "Factory worker"],
+      correct: 0,
+      solution: "After leaving Malise, Clare tries to earn an independent living by selling gloves in a shop."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "What is Clare's tragic end in The Fugitive?",
+      text_hi: "'The Fugitive' में क्लेयर का दुखद अंत क्या होता है?",
+      options: ["She dies of illness", "She is murdered", "She commits suicide", "She returns to George"],
+      correct: 2,
+      solution: "Driven to utter despair and facing degradation, Clare commits suicide by drinking poison at a restaurant."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "Which of the following characters is a solicitor in The Fugitive?",
+      text_hi: "'The Fugitive' में निम्नलिखित में से कौन सा पात्र सॉलिसिटर (वकील) है?",
+      options: ["Edward Fullarton", "Reginald Huntingdon", "Twisden", "Haywood"],
+      correct: 2,
+      solution: "Twisden is the solicitor who acts for George Dedmond and advises on legal matters in The Fugitive."
+    },
+
+    // ----------------- Objective Questions: 1 to 124 -----------------
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "1. Galsworthy met him in 1893 and formed a life long friendship with him. Identify him.",
       text_hi: "गाल्सवर्दी 1893 में उनसे मिले और आजीवन मित्रता बनी रही। उन्हें पहचानें।",
       options: ["Conrad", "Hardy", "Shaw", "Ibsen"],
       correct: 0,
-      solution: "Galsworthy met Joseph Conrad in 1893 aboard the ship Torrens and they became lifelong close friends[span_5](start_span)[span_5](end_span)."
+      solution: "Galsworthy met Joseph Conrad in 1893 aboard the ship Torrens, initiating a lifelong bond."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "The first volume of Galsworthy entitled 'From the Four Winds' appeared in 1897 under the pseudonym:",
-      text_hi: "'From the Four Winds' (1897) किस उपनाम (pseudonym) के तहत प्रकाशित हुआ था?",
+      text: "2. The first volume of Galsworthy entitled From the Four Winds appeared in 1897 under the pseudonym:",
+      text_hi: "'From the Four Winds' (1897) किस उपनाम के तहत प्रकाशित हुआ था?",
       options: ["John Gals", "John Sinjohn", "Boz", "Elia"],
       correct: 1,
-      solution: "Galsworthy published his earliest collections including 'From the Four Winds' under the pen-name 'John Sinjohn[span_6](start_span)'[span_6](end_span)."
+      solution: "Galsworthy's early works appeared under the pseudonym 'John Sinjohn'."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "Galsworthy's first novel published in 1898 was:",
+      text: "3. Galsworthy's first novel was published in 1898. Which novel?",
       text_hi: "गाल्सवर्दी का पहला उपन्यास जो 1898 में प्रकाशित हुआ, कौन सा था?",
       options: ["Jocelyn", "Villa Rubein", "A Man of Devon, A Knight", "The Science"],
       correct: 0,
-      solution: "'Jocelyn' (1898) was John Galsworthy's first full-length novel, published under John Sinjohn[span_7](start_span)[span_7](end_span)."
+      solution: "'Jocelyn' (1898) was his first full-length novel, published under John Sinjohn."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "4. \"I read in various chamber, practiced almost not at all, and disliked my profession thoroughly.\" Who said?",
+      text_hi: "\"I read in various chamber, practiced almost not at all...\" यह कथन किसका है?",
+      options: ["Shaw", "Galsworthy", "Hardy", "None of these"],
+      correct: 1,
+      solution: "John Galsworthy said this regarding his legal training and admission to the bar in 1890."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "5. \"Burn it and you will oblige me\" About which does Galsworthy talk here?",
+      text_hi: "\"Burn it and you will oblige me\" गाल्सवर्दी यहाँ किस रचना के बारे में बात करते हैं?",
+      options: ["From the Four Winds", "Jocelyn", "The Silver Box", "None of these"],
+      correct: 0,
+      solution: "Galsworthy was self-critical of his first short story collection 'From the Four Winds' and wished it destroyed."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "The first work that earned Galsworthy was the novel. Identify it.",
-      text_hi: "गाल्सवर्दी का पहला उपन्यास जिसने उन्हें पहचान दिलाई:",
+      text: "6. The first work that earned Galsworthy was the novel. Identify it.",
+      text_hi: "गाल्सवर्दी की वह पहली रचना जिसने उन्हें लेखक के रूप में स्थापित किया:",
       options: ["Fraternity", "Country Mouse", "The Island Pharisees", "Jocelyn"],
       correct: 2,
-      solution: "'The Island Pharisees' (1904) was the first novel published under his own real name[span_8](start_span)[span_8](end_span)."
+      solution: "'The Island Pharisees' (1904) was the first novel published under his real name."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "The first play that made Galsworthy famous as a playwright is:",
+      text: "7. The Island Pharisees holds up a picture of the wealthy class ruling:",
+      text_hi: "'The Island Pharisees' किस वर्ग के प्रभुत्व का चित्रण प्रस्तुत करता है?",
+      options: [
+        "Over the poor class and fattening on them",
+        "Over the poor class and trying to make them rich",
+        "Over the rich class and flattering them",
+        "None of these"
+      ],
+      correct: 0,
+      solution: "It critiques upper-middle-class complacency living comfortably at the cost of the poor."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "8. The first play that made Galsworthy famous as a playwright is:",
       text_hi: "गाल्सवर्दी का पहला नाटक जिसने उन्हें नाटककार के रूप में प्रसिद्ध बनाया:",
       options: ["Justice", "Loyalties", "The Silver Box", "None of these"],
       correct: 2,
-      solution: "'The Silver Box' (1906) was Galsworthy's first play[span_9](start_span)[span_9](end_span)."
+      solution: "'The Silver Box' (1906) launched his dramatic career at the Court Theatre."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "Galsworthy's reputation as a novelist was established by:",
+      text: "9. Galsworthy's reputation as a novelist was established by:",
       text_hi: "गाल्सवर्दी की एक उपन्यासकार के रूप में प्रतिष्ठा किससे स्थापित हुई?",
-      options: ["The Forsyte Saga", "Loyalties", "Jocelyn", "The Silver Box"],
+      options: ["The Forsyte Saga", "Justice", "Jocelyn", "The Silver Box"],
       correct: 0,
-      solution: "'The Forsyte Saga' established his reputation as a master novelist[span_10](start_span)[span_10](end_span)."
+      solution: "'The Forsyte Saga' remains his premier achievement in fiction."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "The Forsyte Saga includes: The Man of Property (1906), In Chancery (1920), To Let (1921) and two Interludes. Find the Interlude.",
-      text_hi: "द फॉरसाइट सागा में शामिल इंटरल्यूड (Interlude) को पहचानें:",
+      text: "10. The Forsyte Saga includes: The Man of Property (1906), In Chancery (1920), To Let (1921) and two Interludes. Find the Interlude.",
+      text_hi: "द फॉरसाइट सागा में शामिल दो इंटरल्यूड्स (Interludes) में से कौन सा विकल्प सही है?",
       options: [
         "Indian Winter of a Forsyte Tales and Awakening",
         "Indian Autumn of a Forsyte Tales and Awakening",
@@ -124,63 +199,140 @@
         "None of these"
       ],
       correct: 2,
-      solution: "The two interludes are 'Indian Summer of a Forsyte' and 'Awakening[span_11](start_span)'[span_11](end_span)."
+      solution: "The two interludes are 'Indian Summer of a Forsyte' (1918) and 'Awakening' (1920)."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "Which play of Galsworthy deals with the inadequacy of the administration of justice and the attitude of different types of people towards an escaped prisoner?",
+      text: "11. Which play of Galsworthy deals with the inadequacy of the administration of justice and the attitude of different types of people towards an escaped prisoner?",
       text_hi: "गाल्सवर्दी का कौन सा नाटक भागे हुए कैदी और न्याय प्रशासन से संबंधित है?",
       options: ["The Show", "Jocelyn", "Escape", "None of these"],
       correct: 2,
-      solution: "'Escape' (1926) deals with Matt Denant, an escaped convict[span_12](start_span)[span_12](end_span)."
+      solution: "'Escape' (1926) depicts Matt Denant escaping prison and the mixed reactions of people he meets."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "Which play analyses the impact of modern publicity on private domestic tragedy?",
+      text: "12. Which play analyses the impact of modern publicity on private domestic tragedy?",
       text_hi: "कौन सा नाटक निजी घरेलू त्रासदी पर आधुनिक मीडिया/प्रेस के प्रभाव का विश्लेषण करता है?",
       options: ["The Show", "Jocelyn", "Escape", "None of these"],
       correct: 0,
-      solution: "'The Show' (1925) satirizes press journalism and sensation[span_13](start_span)[span_13](end_span)."
+      solution: "'The Show' (1925) examines sensationalized yellow journalism intruding upon personal sorrow."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "The year in which Galsworthy's father died was also the year of the publication of The Island Pharisees. Find out the year.",
+      text: "13. Which play contrasts the fates of the various storeys in a hotel?",
+      text_hi: "कौन सा नाटक एक होटल की विभिन्न मंजिलों में रहने वालों के भाग्य का विरोधाभास प्रस्तुत करता है?",
+      options: ["The Roof", "Jocelyn", "Escape", "None of these"],
+      correct: 0,
+      solution: "'The Roof' (1929) presents the lives of guests on different floors when a fire breaks out."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "14. \"Literature is its own reward.\" Who said?",
+      text_hi: "\"Literature is its own reward.\" यह कथन किसका है?",
+      options: ["Shaw", "Ibsen", "Wordsworth", "Galsworthy"],
+      correct: 3,
+      solution: "This famous literary maxim was stated by John Galsworthy."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "15. The year in which Galsworthy's father died was also the year of the publication of The Island Pharisees. Find out the year.",
       text_hi: "जिस वर्ष गाल्सवर्दी के पिता की मृत्यु हुई, उसी वर्ष 'The Island Pharisees' प्रकाशित हुई। वह वर्ष है:",
       options: ["1904", "1905", "1906", "1907"],
       correct: 0,
-      solution: "In 1904 his father died and 'The Island Pharisees' appeared[span_14](start_span)[span_14](end_span)."
+      solution: "Both occurrences took place in 1904."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "What did Galsworthy become in 1921?",
+      text: "16. A turning point in the life of Galsworthy came in with the publication of:",
+      text_hi: "गाल्सवर्दी के जीवन में निर्णायक मोड़ किस कृति के प्रकाशन से आया?",
+      options: ["The Man of Property", "Justice", "The Skin Game", "None of these"],
+      correct: 0,
+      solution: "'The Man of Property' (1906) marked his arrival as an undisputed literary master."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "17. What did Galsworthy become in 1921?",
       text_hi: "गाल्सवर्दी 1921 में क्या बने?",
       options: [
         "President of Literary Club",
-        "President of the P. E. N. Club London",
+        "President of the P.E.N. Club London",
         "Assistant in the P.E.N. Club London",
         "None of these"
       ],
       correct: 1,
-      solution: "Galsworthy became the first President of the P.E.N. Club London in 1921[span_15](start_span)[span_15](end_span)."
+      solution: "In 1921, Galsworthy became the first President of PEN International."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "What was conferred upon Galsworthy in 1929?",
+      text: "18. What was conferred upon Galsworthy in 1929?",
       text_hi: "1929 में गाल्सवर्दी को कौन सा सम्मान प्रदान किया गया था?",
-      options: ["Order of demerit", "Booker Prize", "Order of Merit", "None of these"],
+      options: ["Order of Demerit", "Booker Prize", "Order of Merit", "None of these"],
       correct: 2,
-      solution: "He received the Order of Merit in 1929[span_16](start_span)[span_16](end_span)."
+      solution: "He received the British Order of Merit (OM) in 1929."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "In Strife, the strike takes place at:",
-      text_hi: "'Strife' नाटक में हड़ताल (strike) किस स्थान पर होती है?",
+      text: "19. The first play of Galsworthy is:",
+      text_hi: "गाल्सवर्दी का पहला नाटक कौन सा है?",
+      options: ["The Silver Box", "Justice", "Loyalties", "None of these"],
+      correct: 0,
+      solution: "'The Silver Box' was produced in 1906."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "20. Which play of Galsworthy has the theme of the problem of unjust, unfair and partial treatment meted out to the poor by the law governing the society? It clearly shows that there are two laws: one is meant for the rich and another for the poor.",
+      text_hi: "किस नाटक में यह दिखाया गया है कि कानून अमीरों और गरीबों के लिए दो अलग-अलग मापदंड रखता है?",
+      options: ["Justice", "The Silver Box", "Loyalties", "None of these"],
+      correct: 1,
+      solution: "In 'The Silver Box', Jack Barthwick escapes scot-free while poor Jones is sent to prison."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "21. Strife deals with the conflict between:",
+      text_hi: "'Strife' नाटक में किसके बीच संघर्ष दिखाया गया है?",
+      options: [
+        "The poor and the rich",
+        "The labourers and poor men",
+        "The Capitalist and Labourers",
+        "None of these"
+      ],
+      correct: 2,
+      solution: "It portrays the industrial confrontation between capital (John Anthony) and labour (David Roberts)."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "22. Jack Barthwick appears in:",
+      text_hi: "जैक बार्थविक किस नाटक का पात्र है?",
+      options: ["Justice", "Fraternity", "The Silver Box", "None of these"],
+      correct: 2,
+      solution: "Jack Barthwick is the wealthy MP's son in 'The Silver Box'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "23. Poor Jones appears in:",
+      text_hi: "पुअर जोन्स (Poor Jones) किस नाटक में दिखाई देता है?",
+      options: ["Justice", "Fraternity", "The Silver Box", "None of these"],
+      correct: 2,
+      solution: "Jones is the unemployed working-class husband convicted in 'The Silver Box'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "24. In Strife, the strike takes place at:",
+      text_hi: "'Strife' नाटक में हड़ताल किस स्थान पर होती है?",
       options: [
         "Trenartha Tin Plate Works",
         "Thirtana Tine Plate Works",
@@ -188,126 +340,912 @@
         "None of these"
       ],
       correct: 0,
-      solution: "The strike took place at Trenartha Tin Plate Works[span_17](start_span)[span_17](end_span)."
+      solution: "The venue is Trenartha Tin Plate Works in on the borders of England and Wales."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "Who is the leader of the labourers in Strife?",
-      text_hi: "'Strife' में मजदूरों का नेता कौन है?",
+      text: "25. Who is the leader of the labourers in Strife?",
+      text_hi: "'Strife' में मजदूरों का कट्टर नेता कौन है?",
       options: ["Jack Barthwick", "Falder", "David Roberts", "None of these"],
       correct: 2,
-      solution: "David Roberts is the leader of the striking labourers[span_18](start_span)[span_18](end_span)."
+      solution: "David Roberts is the unyielding leader of the workers."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "Falder appears in:",
-      text_hi: "फाल्डर (Falder) किस नाटक में दिखाई देता है?",
+      text: "26. In this play there is conflict between the old established aristocracy and the loud, uncultured new rich manufacturing class of London society. Hillchrist and Hornblower represent aristocracy and poverty respectively. Which play is it?",
+      text_hi: "हिलक्रिस्ट और हॉर्नब्लोअर के बीच सामाजिक वर्ग संघर्ष किस नाटक में दिखाया गया है?",
+      options: ["The Mob", "The Silver Box", "The Skin Game", "None of these"],
+      correct: 2,
+      solution: "In 'The Skin Game' (1920), the squire Hillchrist clashes with the nouveau-riche Hornblower."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "27. Falder appears in:",
+      text_hi: "विलियम फाल्डर किस नाटक में दिखाई देता है?",
       options: ["Silver Box", "Loyalties", "Justice", "None of these"],
       correct: 2,
-      solution: "William Falder is the tragic protagonist of 'Justice' (1910)[span_19](start_span)[span_19](end_span)."
+      solution: "William Falder is the junior clerk in 'Justice'."
     },
     {
       topic: "John Galsworthy",
       category: "PYQS",
-      text: "This Hindi author is famous for his stories and novels. He translated The Silver Box as Chandi Ki Dibiya, Strife as Hartal and Justice as Nyaya. Who is this Hindi author?",
-      text_hi: "किस प्रसिद्ध हिंदी लेखक ने 'चांदी की डिबिया', 'हड़ताल' और 'न्याय' नाम से अनुवाद किया?",
-      options: ["Dharam Veer Bharti", "Mohan Rakesh", "Prem Chand", "None of these"],
-      correct: 2,
-      solution: "Munshi Premchand translated The Silver Box, Strife, and Justice into Hindi[span_20](start_span)[span_20](end_span)."
+      text: "28. Who suffers solitary confinement in Justice?",
+      text_hi: "'Justice' में किसे एकांत कारावास की सजा भुगतनी पड़ती है?",
+      options: ["Falder", "Jack Barthwick", "Ruth Honeywell", "None of these"],
+      correct: 0,
+      solution: "Falder suffers the traumatic torment of solitary confinement."
     },
-
-    // ----------------- John Galsworthy: Lines -----------------
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "29. It is a powerful social tragedy. It satirizes the contemporary English system of law and judiciary. Its hero suffers from the bitter punishment of solitary confinement. Find it out.",
+      text_hi: "वह सामाजिक त्रासदी जो अंग्रेजी कानूनी व्यवस्था पर व्यंग्य करती है और जिसका नायक एकांत कारावास झेलता है:",
+      options: ["The Skin Game", "Justice", "The Silver Box", "None of these"],
+      correct: 1,
+      solution: "Galsworthy's 1910 masterpiece 'Justice'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "30. The growth of an adolescent girl through emotional conflicts into a lover and a woman is the theme of:",
+      text_hi: "एक किशोरी के भावनात्मक विकास और प्रेम की परिपक्वता किस नाटक का विषय है?",
+      options: ["Skin Game", "Justice", "The Silver Box", "Joy"],
+      correct: 3,
+      solution: "'Joy' (1907) deals with the coming of age of a seventeen-year-old girl."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "31. The class-conscious prejudice of an old English baronet family against the marriage between the eldest son of the family and the serving maid is the theme of:",
+      text_hi: "एक कुलीन परिवार द्वारा नौकरानी से विवाह के विरोध का चित्रण किसमें हुआ है?",
+      options: ["The Mob", "Loyalties", "The Eldest Son", "None of these"],
+      correct: 2,
+      solution: "'The Eldest Son' (1912) exposes aristocratic hypocrisy."
+    },
     {
       topic: "John Galsworthy",
       category: "Lines",
-      text: "\"The law is what it is—a majestic edifice, sheltering all of us, each stone of which rests on another.\" Where does this line appear?",
+      text: "32. \"The heroes of Mr. Galsworthy's dramas are the unseen fates of modern existence against which we poor mortals can but pitifully cry out in a moment of desperation and horror.\" Whose comment is this?",
+      text_hi: "\"The heroes of Mr. Galsworthy's dramas are the unseen fates of modern existence...\" यह टिप्पणी किसकी है?",
+      options: ["Compton Rickett", "George Sampson", "Allardyce Nicoll", "None of these"],
+      correct: 2,
+      solution: "Critique by distinguished drama historian Allardyce Nicoll."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "33. In the play Joy, a girl who is senior by three year loves Joy, of 17. Name the girl/boy.",
+      text_hi: "'Joy' नाटक में सत्रह वर्षीय जॉय से प्रेम करने वाला युवक कौन है?",
+      options: ["Falder", "Colonel Hope", "John Builder", "Dick Merton"],
+      correct: 3,
+      solution: "Dick Merton, aged twenty, is in love with seventeen-year-old Joy."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "34. Colonel Hope appears in:",
+      text_hi: "कर्नल होप (Colonel Hope) किस नाटक में दिखाई देते हैं?",
+      options: ["The Eldest Son", "The Mob", "Joy", "None of these"],
+      correct: 2,
+      solution: "Colonel Hope is a character in 'Joy'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "35. John Builder is an unimaginative hot-tempered man. In which play does he appear?",
+      text_hi: "जॉन बिल्डर किस नाटक का पात्र है?",
+      options: ["A Family Man", "The Eldest Son", "A Man of Property", "None of these"],
+      correct: 0,
+      solution: "John Builder is the domineering father figure in 'A Family Man' (1921)."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "36. In the play The Silver Box, Jack Barthwick steals a woman's sky-blue velvet silk purse while John steals:",
+      text_hi: "'The Silver Box' में जैक रेशमी पर्स चुराता है जबकि जोन्स क्या चुराता है?",
+      options: ["Silver coins", "Silver box that has coins", "A silver cigarette box", "None of these"],
+      correct: 2,
+      solution: "Jones takes a silver cigarette box from Barthwick's dining room."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "37. Who is the police inspector in The Silver Box?",
+      text_hi: "'The Silver Box' में पुलिस इंस्पेक्टर कौन है?",
+      options: ["Snow", "Cockson", "Walter How", "None of these"],
+      correct: 0,
+      solution: "Inspector Snow is the police officer investigating the theft."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "38. Wellwyn is an artist in the play:",
+      text_hi: "वेलविन (Wellwyn) किस नाटक में एक उदार कलाकार है?",
+      options: ["The Skin Game", "The Silver Box", "The Pigeon", "None of these"],
+      correct: 2,
+      solution: "Christopher Wellwyn is the open-handed artist in 'The Pigeon' (1912)."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "39. \"Why don't your recognize once and for all that these people are men like yourselves, and want what's good for them just as you want what's good for you (Bitterly) your motorcars and champagne, eight-course dinners.\" Who speaks these lines?",
+      text_hi: "\"Why don't your recognize once and for all that these people are men like yourselves...\" यह संवाद कौन बोलता है?",
+      options: ["Roberts in Strife", "Falder in Justice", "Mrs. Jones in The Silver Box", "Harness in Strife"],
+      correct: 3,
+      solution: "Spoken by trade union official Harness in 'Strife'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "40. \"Ye may break the body, but ye cannot break the spirit. Get back to London, the men have nothing for ye.\" Who says?",
+      text_hi: "\"Ye may break the body, but ye cannot break the spirit...\" यह कौन कहता है?",
+      options: ["Roberts in Strife", "Harness in Strife", "Falder in Justice", "None of these"],
+      correct: 0,
+      solution: "David Roberts addresses the company officials defiantly in 'Strife'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "41. \"May be your God up in London has no time to listen to the working man. I'm told HE is a wealthy God; but if He listens to what I tell Him, He will know more than ever, HE learned in Kensington.\" Who said?",
+      text_hi: "\"May be your God up in London has no time to listen to the working man...\" यह कथन किसका है?",
+      options: ["Roberts in Strife", "Harness in Strife", "Falder in Justice", "None of these"],
+      correct: 0,
+      solution: "Spoken passionately by David Roberts in 'Strife'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "42. \"Waiting an' waiting—that's what a woman has to do!\" Who speaks?",
+      text_hi: "\"Waiting an' waiting—that's what a woman has to do!\" यह पंक्ति किसकी है?",
+      options: ["Madge in Strife", "Roberts in Strife", "Harness in Strife", "Falder in Justice"],
+      correct: 0,
+      solution: "Madge Thomas voices the sorrow of women suffering through strikes in 'Strife'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "43. \"That's capital! A white faced, stonyhearted monster!\" Who speaks?",
+      text_hi: "\"That's capital! A white faced, stonyhearted monster!\" यह कौन बोलता है?",
+      options: ["Roberts in Strife", "Harness in Strife", "Falder in Justice", "None of these"],
+      correct: 0,
+      solution: "David Roberts attacks capitalist exploitation in 'Strife'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "44. \"We are not free agents. We're part of a machine. Our only business is to see the Company earns as much profit as it safely can.\" Who is the speaker?",
+      text_hi: "\"We are not free agents. We're part of a machine...\" यह कौन कहता है?",
+      options: ["Wanklin in Strife", "Roberts in Strife", "Harness in Strife", "Falder in Justice"],
+      correct: 0,
+      solution: "Director Wanklin expresses corporate detachment in 'Strife'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "45. \"War is war.\" Who is the speaker?",
+      text_hi: "\"War is war.\" 'Strife' में यह कौन कहता है?",
+      options: ["Roberts in Strife", "Harness in Strife", "Falder in Justice", "Anthony in Strife"],
+      correct: 3,
+      solution: "Spoken by Chairman John Anthony asserting unwavering resolution in 'Strife'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "46. \"There can only be one master in a house! Where two men meet the better man will rule.\" Who is the speaker?",
+      text_hi: "\"There can only be one master in a house!...\" यह कथन किसका है?",
+      options: ["Anthony in Strife", "Roberts in Strife", "Harness in Strife", "Falder in Justice"],
+      correct: 0,
+      solution: "Chairman John Anthony's authoritarian view of industrial relations."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "47. \"Masters are masters, men are men! Yield one demand and they will make it six. They are like Oliver Twist, asking for more. If I were in their place I should be the same. But I am not in their place.\" Who is the speaker?",
+      text_hi: "\"Masters are masters, men are men! Yield one demand...\" यह संवाद किसका है?",
+      options: ["Anthony in Strife", "Roberts in Strife", "Harness in Strife", "Falder in Justice"],
+      correct: 0,
+      solution: "John Anthony delivering his uncompromising manifesto in 'Strife'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "48. \"What seems just to one man, sir, is injustice to another.\" Who is the speaker?",
+      text_hi: "\"What seems just to one man, sir, is injustice to another.\" यह पंक्ति किसकी है?",
+      options: ["Roberts in Strife", "Harness in Strife", "Falder in Justice", "Edgar in Strife"],
+      correct: 3,
+      solution: "Edgar Anthony, the chairman's empathetic son, speaking to his father in 'Strife'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "49. \"A woman dead; and the two best men both broken!\" Who is the speaker?",
+      text_hi: "\"A woman dead; and the two best men both broken!\" यह पंक्ति कौन बोलता है?",
+      options: ["Harness in Strife", "Roberts in Strife", "Madge in Strife", "Falder in Justice"],
+      correct: 0,
+      solution: "Harness's final philosophical lament on the futile resolution of the strike in 'Strife'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "50. Which play made a great sensation, especially in Parliamentary and official circles according to Galsworthy?",
+      text_hi: "गाल्सवर्दी के अनुसार किस नाटक ने संसदीय और आधिकारिक हलकों में हलचल मचा दी थी?",
+      options: ["Justice", "The Skin Game", "The Mob", "The Eldest Son"],
+      correct: 0,
+      solution: "'Justice' deeply influenced Home Secretary Winston Churchill to reform prison solitary confinement."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "51. James How, Walter How, Robert Cokeson, Wister, Cowley, Falder and Ruth Honeywill are the characters that appear in:",
+      text_hi: "जेम्स हाऊ, वाल्टर हाऊ, कोकसन और रूथ हनीविल किस नाटक के पात्र हैं?",
+      options: ["The Skin Game", "Justice", "The Mob", "Silver Box"],
+      correct: 1,
+      solution: "These are the main characters of 'Justice'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "52. He is 23 years old weak willed young man of nervous temperament. He falls in love with Ruth, forges a cheque to get money to run away with her and finally gets penal servitude for three years. Whose description is this?",
+      text_hi: "23 वर्षीय दुर्बल इच्छाशक्ति वाले युवक का यह विवरण किसके बारे में है?",
+      options: ["Falder", "Jack Barthwick", "Cokeson", "None of these"],
+      correct: 0,
+      solution: "Description of William Falder, the tragic hero of 'Justice'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "53. \"No one will touch him now! Never again! He is safe with gentle Jesus!\" Who says?",
+      text_hi: "\"No one will touch him now! Never again!...\" यह कौन कहता है?",
+      options: ["Falder about Cokeson", "Cokeson about Falder", "Ruth about Falder", "None of these"],
+      correct: 1,
+      solution: "Robert Cokeson exclaims this after Falder jumps to his death to avoid re-arrest."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "54. \"A man doesn't succumb like that in a moment, if he's a clean mind and habits. He is rotten; got the eyes of a man who can't keep his hands off when there's money about.\" This is the speech of James about:",
+      text_hi: "जेम्स हाऊ का यह कठोर कथन किसके बारे में है?",
+      options: ["Cokeson", "Walter How", "Falder", "None of these"],
+      correct: 2,
+      solution: "Senior partner James How condemning Falder's check alteration in 'Justice'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "55. \"Life's one long temptation.\" Who said?",
+      text_hi: "\"Life's one long temptation.\" यह संवाद कहाँ आता है?",
+      options: ["Galsworthy in Justice", "Galsworthy in The Skin Game", "Shaw in Pygmalion", "Shaw in Arms and the Man"],
+      correct: 0,
+      solution: "Spoken by Robert Cokeson in 'Justice'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "56. \"We live in a highly civilized age, and the sight of brutal violence disturbs us in a very strange way, even when we have no personal interest in the matter. But when we it inflicted on a woman whom we love-what then?\" Where do these lines appear?",
+      text_hi: "\"We live in a highly civilized age...\" यह पंक्तियाँ किस नाटक में आती हैं?",
+      options: ["The Mob", "The Loyalties", "Justice", "None of these"],
+      correct: 2,
+      solution: "Defence counsel Hector Frome during his passionate plea in 'Justice'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "57. \"Justice is a machine that, when someone has once given it the starting push, rolls on of itself.\" Where does this line appear?",
+      text_hi: "\"Justice is a machine that, when someone has once given it the starting push...\" यह पंक्ति किस नाटक की है?",
+      options: ["The Skin Game", "The Mob", "Justice", "None of these"],
+      correct: 2,
+      solution: "Spoken by Hector Frome in Act II of 'Justice'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "58. \"It's the same with the dogs. If you treat them with kindness they will do anything for you; but to shut them up alone, it only make them savage.\" Where do these lines appear?",
+      text_hi: "\"It's the same with the dogs... to shut them up alone, it only make them savage.\" कहाँ आता है?",
+      options: ["The Skin Game", "The Mob", "The Silver Box", "Justice"],
+      correct: 3,
+      solution: "Spoken by Cokeson while protesting solitary confinement in 'Justice'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "59. \"You can't play fast and loose with morality and hope to go scot free. If society didn't take care of itself, nobody would-the sooner you realize that the better.\" Where do these lines appear?",
+      text_hi: "\"You can't play fast and loose with morality...\" यह संवाद कहाँ आता है?",
+      options: ["The Mob", "The Eldest Son", "Strife", "Justice"],
+      correct: 3,
+      solution: "Delivered by James How lecturing Falder on moral codes in 'Justice'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "60. Hillcrist: \"Who knows where things end when they begin?\" In which play of Galsworthy do this statement appear?",
+      text_hi: "हिलक्रिस्ट का कथन \"Who knows where things end when they begin?\" किस नाटक में है?",
+      options: ["The Show", "The Skin Game", "The Silver Box", "The Mob"],
+      correct: 1,
+      solution: "In 'The Skin Game' (Act II), highlighting the uncontrolled escalation of personal enmity."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "61. Which play deals with the cruelty of solitary confinement?",
+      text_hi: "कौन सा नाटक एकांत कारावास की क्रूरता पर प्रकाश डालता है?",
+      options: ["Justice", "The Skin Game", "Loyalties", "Strife"],
+      correct: 0,
+      solution: "'Justice' famously portrays the devastating psychological effects of solitary confinement."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "62. \"As a painter of the physical universe and of the soul, John Galsworthy is a poet.\" Whose comment is this?",
+      text_hi: "\"As a painter of the physical universe and of the soul, John Galsworthy is a poet.\" किसकी टिप्पणी है?",
+      options: ["Compton Rickett", "Louis Cazamian", "Sampson", "None of these"],
+      correct: 1,
+      solution: "Appreciation of Galsworthy by French literary scholar Louis Cazamian."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "63. Which play is a study in racial pride and social convention?",
+      text_hi: "कौन सा नाटक नस्लीय गर्व और सामाजिक परंपराओं का अध्ययन है?",
+      options: ["The Skin Game", "The Mob", "The Silver Box", "Loyalties"],
+      correct: 3,
+      solution: "'Loyalties' (1922) examines class solidarity versus prejudice against Ferdinand De Levis."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "64. In which novel does Galsworthy illustrate the breaking down of inhibitions and barriers as the result of the war?",
+      text_hi: "किस उपन्यास में गाल्सवर्दी युद्ध के प्रभाव से नैतिक बाधाओं के टूटने का चित्रण करते हैं?",
+      options: ["Saint's Progress", "Jocelyn", "Fraternity", "None of these"],
+      correct: 0,
+      solution: "'Saint's Progress' (1919) reflects shifting wartime moral norms."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "65. \"The only way to get order, sir, is to bring disorderly up with the round turn.\" Where does this line appear?",
+      text_hi: "\"The only way to get order, sir, is to bring disorderly up with the round turn.\" कहाँ आता है?",
+      options: ["Fraternity", "Jocelyn", "The Skin Game", "The Pigeon"],
+      correct: 3,
+      solution: "Occurs in Galsworthy's philosophical comedy 'The Pigeon'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "66. \"We have to love because we love loving.\" Where does this line appear?",
+      text_hi: "\"We have to love because we love loving.\" किस नाटक में आता है?",
+      options: ["A Bit of Love", "The Skin Love", "The Mob", "None of these"],
+      correct: 0,
+      solution: "In Galsworthy's play 'A Bit of Love' (1915)."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "67. \"The great thing about love is that each should know what the other wants at the moment.\" Where does this line appear?",
+      text_hi: "\"The great thing about love is that each should know what the other wants at the moment.\" कहाँ आता है?",
+      options: ["The Roof", "The Skin Game", "Windows", "None of these"],
+      correct: 0,
+      solution: "Spoken in Galsworthy's late play 'The Roof'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "68. \"What is the use of all these lofty ideas that you can't live up to? Liberty, Equality, Democracy,—see what comes of, fighting for them? Where do these lines appear?",
+      text_hi: "\"What is the use of all these lofty ideas that you can't live up to?...\" कहाँ आता है?",
+      options: ["The Roof", "The Skin Game", "Windows", "None of these"],
+      correct: 2,
+      solution: "From 'Windows' (1922), highlighting post-war disillusionment."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "69. \"How beastly women are to each other?\" Where does this line appear?",
+      text_hi: "\"How beastly women are to each other?\" किस नाटक में आता है?",
+      options: ["The Roof", "The Skin Game", "Windows", "None of these"],
+      correct: 2,
+      solution: "Dialogue from 'Windows'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "70. \"There is nothing that gives more courage than to see the irony of things.\" Where does this line appear?",
+      text_hi: "\"There is nothing that gives more courage than to see the irony of things.\" कहाँ आता है?",
+      options: ["The Pigeon", "The Roof", "The Skin Game", "Windows"],
+      correct: 0,
+      solution: "Spoken by Ferrand in 'The Pigeon'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "71. \"Education is simply ruining the lower classes. It unsettles them, and that's the worst for us all. I see an enormous difference in the manner of servants.\" Where do these lines appear?",
+      text_hi: "\"Education is simply ruining the lower classes...\" यह पंक्ति किस नाटक में आती है?",
+      options: ["The Roof", "The Skin Game", "Windows", "The Silver Box"],
+      correct: 3,
+      solution: "Spoken by the conservative Mrs. Barthwick in 'The Silver Box'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "72. \"The law is what it is—a majestic edifice, sheltering all of us, each stone of which rests on another.\" Where does this line appear?",
       text_hi: "\"The law is what it is—a majestic edifice...\" यह पंक्ति किस नाटक में आती है?",
       options: ["The Roof", "The Skin Game", "Windows", "Justice"],
       correct: 3,
-      solution: "Spoken by the Judge in 'Justice' (1910)[span_21](start_span)[span_21](end_span)."
+      solution: "Spoken by the presiding Judge during Falder's trial in 'Justice'."
     },
     {
       topic: "John Galsworthy",
       category: "Lines",
-      text: "\"Loyalty comes before everything\", \"A wife's memory is not very good when her husband is in danger.\" are some of the sayings from:",
-      text_hi: "\"Loyalty comes before everything...\" यह प्रसिद्ध संवाद किस नाटक से है?",
+      text: "73. \"All the money goes to fellows who don't know a horse from a haystack\", \"Loyalty comes before everything\", \"A wife's memory is not very good when her husband is in danger,\" \"The Law's the Law\" etc. are some of the sayings from:",
+      text_hi: "\"Loyalty comes before everything...\" यह प्रसिद्ध संवाद किस नाटक से हैं?",
       options: ["The Roof", "The Skin Game", "Windows", "Loyalties"],
       correct: 3,
-      solution: "These lines appear in Galsworthy's play 'Loyalties' (1922)[span_22](start_span)[span_22](end_span)."
+      solution: "These lines are central to Galsworthy's 1922 play 'Loyalties'."
     },
     {
       topic: "John Galsworthy",
       category: "Lines",
-      text: "\"We all cut each other's throats from the best of motives.\" Where does it appear?",
+      text: "74. \"Galsworthy is scrupulously impartial. He never loads the dice. He diagonises the disease rather than prescribes a remedy. But underneath the surface detachment burns a vehement pity for the victims of Circumstance.\" Whose comment is this?",
+      text_hi: "\"Galsworthy is scrupulously impartial. He never loads the dice...\" यह आलोचनात्मक कथन किसका है?",
+      options: ["Lytton Hudson", "Oliver Elton", "George Sampson", "None of these"],
+      correct: 0,
+      solution: "Comment by critic Derek Lytton Hudson."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "75. Dancy, De Levis, Winsor, Canynge, Treisure, Robert, Lord St Erth, Borring, Miss Margaret Orme, Mabel, Gilman, Ricardos, Graveier and Jacob Twisden are the characeters that appear in a play. Find it out.",
+      text_hi: "डैन्सी, डी लेविस, विन्सर और जेकब ट्विसडेन किस नाटक के पात्र हैं?",
+      options: ["Loyalties", "The Roof", "The Skin Game", "Windows"],
+      correct: 0,
+      solution: "They form the cast of 'Loyalties'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "76. He is the recipient of D.S.O. He commits suicide and leaves a letter to Colford. He is in the play Loyalties. Who is he?",
+      text_hi: "D.S.O. प्राप्तकर्ता जो आत्महत्या करता है और कोलफोर्ड के लिए पत्र छोड़ता है ('Loyalties'):",
+      options: ["Dancy", "Winsor", "Treiusure", "Gilman"],
+      correct: 0,
+      solution: "Captain Ronald Dancy, D.S.O., shoots himself to evade disgrace."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "77. \"We all cut each other's throats from the best of motives.\" Where does it appear?",
       text_hi: "\"We all cut each other's throats from the best of motives.\" यह संवाद किस नाटक में आता है?",
       options: ["Loyalties", "The Skin Game", "The Eldest Son", "None of these"],
       correct: 0,
-      solution: "It appears in 'Loyalties[span_23](start_span)'[span_23](end_span)."
+      solution: "Spoken by Margaret Orme in the concluding scene of 'Loyalties'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "78. In Loyalties, Mabel is the wife of:",
+      text_hi: "'Loyalties' में मेबेल (Mabel) किसकी पत्नी है?",
+      options: ["Dancy", "Gilman", "Falder", "None of these"],
+      correct: 0,
+      solution: "Mabel Dancy is the devoted wife of Ronald Dancy."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "79. Ibsen who wrote A Doll's House was the predecessor of Galsworthy. He was:",
+      text_hi: "'A Doll's House' लिखने वाले इबसन किस देश के नाटककार थे?",
+      options: ["A Norwegian dramatist", "An Irish dramatist", "An American dramatist", "None of these"],
+      correct: 0,
+      solution: "Henrik Ibsen was a Norwegian dramatist who fathered modern realism."
     },
     {
       topic: "John Galsworthy",
       category: "Lines",
-      text: "\"Literature is its own reward.\" Who said?",
-      text_hi: "\"Literature is its own reward.\" यह कथन किसका है?",
-      options: ["Shaw", "Ibsen", "Wordsworth", "Galsworthy"],
+      text: "80. \"It is not the artist's business to preach. His business is to portray, but portray truly he cannot if he is devoid of the insight which comes from instinctive sympathy.\" Galsworthy writes in:",
+      text_hi: "\"It is not the artist's business to preach...\" गाल्सवर्दी ने यह कहाँ लिखा है?",
+      options: ["Another Sheaf", "The Five Tales", "The Awakening", "None of these"],
+      correct: 0,
+      solution: "From Galsworthy's essay collection 'Another Sheaf' (1919)."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "81. \"Let me have no temperament for the time being. Only from an impersonal point of view if there be such a thing, am I going to get even approximately at the truth.\" Who said?",
+      text_hi: "\"Let me have no temperament for the time being...\" यह कथन किसका है?",
+      options: ["Shaw", "Ibsen", "Galsworthy", "None of these"],
+      correct: 2,
+      solution: "John Galsworthy declaring his detached, objective artistic creed."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "82. \"Galsworthy is by nature cold, impartial, judicial. He can present on the stage the clash of character and character, the struggle of the poor and the rich, and he never depresses the beam of justice with his own finger.\" Who said?",
+      text_hi: "\"Galsworthy is by nature cold, impartial, judicial...\" यह किसने कहा?",
+      options: ["Oliver Elton", "Ibsen", "Compton Rickett", "William Harold"],
       correct: 3,
-      solution: "Said by John Galsworthy[span_24](start_span)[span_24](end_span)."
+      solution: "Statement by literary critic William Harold."
     },
     {
       topic: "John Galsworthy",
-      category: "Lines",
-      text: "\"Justice is a machine that, when someone has once given it the starting push, rolls on of itself.\" Where does this line appear?",
-      text_hi: "\"Justice is a machine that... rolls on of itself.\" यह पंक्ति कहाँ आती है?",
-      options: ["The Skin Game", "The Mob", "Justice", "None of these"],
-      correct: 2,
-      solution: "Spoken by managing clerk Cokeson in 'Justice[span_25](start_span)'[span_25](end_span)."
-    },
-    {
-      topic: "John Galsworthy",
-      category: "Lines",
-      text: "\"In Justice we feel the waste implied by Falder's suicide.\" Whose statement is this?",
-      text_hi: "\"In Justice we feel the waste implied by Falder's suicide.\" यह आलोचनात्मक टिप्पणी किसकी है?",
-      options: ["Allardyce Nicoll", "George Sampson", "W.L. Phelps", "None of these"],
+      category: "PYQS",
+      text: "83. A young woman kills her own illegitimate child to escape social tyranny. This happens in the play:",
+      text_hi: "सामाजिक बदनामी से बचने के लिए एक युवती अपने नाजायज बच्चे को मार देती है, यह किस नाटक में होता है?",
+      options: ["Windows", "The Roof", "The Skin Game", "None of these"],
       correct: 0,
-      solution: "Critic Allardyce Nicoll made this statement about Justice[span_26](start_span)[span_26](end_span)."
+      solution: "Faith Bly in 'Windows' (1922) serves two years in prison for suffocating her baby."
     },
     {
       topic: "John Galsworthy",
-      category: "Lines",
-      text: "\"His plots are not the unwinding of a skein of complicated happenings... His climaxes are good.\" This statement of Coats is about:",
-      text_hi: "आर. एच. कोट (R.H. Coat) का यह कथन किसके बारे में है?",
-      options: ["Milton", "Shakespeare", "Galsworthy", "Shaw"],
-      correct: 2,
-      solution: "Said by R.H. Coat about John Galsworthy[span_27](start_span)[span_27](end_span)."
-    },
-    {
-      topic: "John Galsworthy",
-      category: "Lines",
-      text: "\"Masters are masters, men are men! Yield one demand and they will make it six...\" Who is the speaker?",
-      text_hi: "\"Masters are masters, men are men! Yield one demand...\" 'Strife' में यह कौन कहता है?",
-      options: ["Anthony in Strife", "Roberts in Strife", "Harness in Strife", "Falder in Justice"],
+      category: "PYQS",
+      text: "84. John Anthony is the chairman of:",
+      text_hi: "जॉन एंथनी किस कंपनी के चेयरमैन हैं?",
+      options: [
+        "The Trenartha Tin Plate Works",
+        "The Global India",
+        "The Tin International",
+        "None of these"
+      ],
       correct: 0,
-      solution: "Said by John Anthony in 'Strife[span_28](start_span)'[span_28](end_span)."
+      solution: "Chairman of the Trenartha Tin Plate Works in 'Strife'."
     },
     {
       topic: "John Galsworthy",
-      category: "Lines",
-      text: "\"No one will touch him now! Never again! He is safe with gentle Jesus!\" Who says?",
-      text_hi: "\"No one will touch him now! Never again! He is safe with gentle Jesus!\" यह कौन कहता है?",
-      options: ["Falder about Cokeson", "Cokeson about Falder", "Ruth about Falder", "None of these"],
+      category: "PYQS",
+      text: "85. Galsworthy is the chief exponent of:",
+      text_hi: "गाल्सवर्दी मुख्य रूप से किस प्रकार के नाटकों के प्रवर्तक हैं?",
+      options: ["Problem plays", "Romantic tales", "Adventurous tales", "None of these"],
+      correct: 0,
+      solution: "He is famous for realistic social 'problem plays' (dramas of ideas)."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "86. Which drama depicts the fight of an idealist against adverse social forces?",
+      text_hi: "कौन सा नाटक प्रतिकूल सामाजिक शक्तियों के खिलाफ एक आदर्शवादी की लड़ाई को दर्शाता है?",
+      options: ["The Mob", "The Roof", "The Skin Game", "Windows"],
+      correct: 0,
+      solution: "'The Mob' (1914) depicts politician Stephen More standing against jingoistic public hysteria."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "87. Soames Forsyte, his wife Irene and old Jolyon are the characters of:",
+      text_hi: "सोम्स फॉरसाइट, उनकी पत्नी आइरीन और ओल्ड जोलियन किस कृति के पात्र हैं?",
+      options: ["The Forsyte Saga", "The Forsyte Naga", "The Forsyte Yaga", "The Forsyte Mega"],
+      correct: 0,
+      solution: "They are the central characters of 'The Forsyte Saga'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "88. Who belongs to the realist tradition of Jones and Pinero?",
+      text_hi: "हेनरी आर्थर जोन्स और पिनेरो की यथार्थवादी परंपरा से कौन संबंधित है?",
+      options: ["Galsworthy", "Shaw", "Ibsen", "None of these"],
+      correct: 0,
+      solution: "John Galsworthy continued English social realism influenced by Jones and Pinero."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "89. Galsworthy ideas on drama can be found in his collection of essays entitled:",
+      text_hi: "नाटक पर गाल्सवर्दी के विचार उनके किस निबंध संग्रह में मिलते हैं?",
+      options: ["The Ocean of Tranquillity", "The River of Tranquillity", "The Inn of Tranquillity", "None of these"],
+      correct: 2,
+      solution: "'The Inn of Tranquillity' (1912) includes his famous essay 'Some Platitudes Concerning Drama'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "90. Which play deals with the inequality of justice?",
+      text_hi: "कौन सा नाटक न्याय की असमानता से संबंधित है?",
+      options: ["The Silver Box", "Strife", "Justice", "The Skin Game"],
+      correct: 0,
+      solution: "'The Silver Box' directly exposes double standards in English courts."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "91. Strife dramatizes:",
+      text_hi: "'Strife' नाटक किसका नाट्य रूपांतरण करता है?",
+      options: ["a drama between lovers", "an interpersonal relationship", "a strike", "a war"],
+      correct: 2,
+      solution: "It centers entirely on a protracted workers' strike."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "92. Galsworthy's masterpiece is:",
+      text_hi: "गाल्सवर्दी की सर्वोत्कृष्ट कृति (Masterpiece) कौन सी है?",
+      options: ["The Patrician", "The Freelands", "The Forsyte Saga", "Fraternity"],
+      correct: 2,
+      solution: "'The Forsyte Saga' won him the Nobel Prize in Literature in 1932."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "93. Galsworthy was the son of a:",
+      text_hi: "गाल्सवर्दी किसके पुत्र थे?",
+      options: ["merchant", "lawyer", "novelist", "doctor"],
       correct: 1,
-      solution: "Said by Robert Cokeson over Falder's body in 'Justice[span_29](start_span)'[span_29](end_span)."
+      solution: "His father, John Galsworthy Sr., was a prominent London solicitor/lawyer."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "94. Forsyte Saga is said to be an English parallel to:",
+      text_hi: "'द फॉरसाइट सागा' को किसका अंग्रेजी समानांतर माना जाता है?",
+      options: ["Thomas Mann's Buddenbrooks", "Milton's Paradise Lost", "Shakespeare's Hamlet", "Seth's A Suitable Boy"],
+      correct: 0,
+      solution: "Both 'The Forsyte Saga' and Thomas Mann's 'Buddenbrooks' are monumental multi-generational family chronicles."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "95. Awakening and A Modern Comedy are the works of:",
+      text_hi: "'Awakening' और 'A Modern Comedy' किसकी रचनाएँ हैं?",
+      options: ["Milton", "Shelley", "Galsworthy", "Shakespeare"],
+      correct: 2,
+      solution: "Written by John Galsworthy as part of the extended Forsyte chronicles."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "96. The First and the Last, The Little Man, Hall Marked, Defeat, The Sun and Punch and Go are from the pen of Galsworthy. These are:",
+      text_hi: "गाल्सवर्दी की ये रचनाएँ किस विधा से संबंधित हैं?",
+      options: ["Comedies", "Tragedies", "History", "Short plays"],
+      correct: 3,
+      solution: "They are all one-act short plays (six short plays) written by Galsworthy."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "97. This Hindi author is famous for his stories and novels. He writes for a common man. He was so much influenced by John Galsworthy that he translated The Silver Box as Chandi Ki Dibiya, Strife as Hartal and Justice as Nyaya. Who is this Hindi author?",
+      text_hi: "किस प्रसिद्ध हिंदी लेखक ने 'चांदी की डिबिया', 'हड़ताल' और 'न्याय' नाम से अनुवाद किया?",
+      options: ["Dharam Veer Bharti", "Mohan Rakesh", "Prem Chand", "None of these"],
+      correct: 2,
+      solution: "Munshi Premchand translated Galsworthy's three major plays into Hindi."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "98. John Barthwick, Mrs. Barthwick, Jack Barthwick, Roper, Mrs. Jones, Marlow, Wheeler, Jones, Mrs. Seddon, Snow etc. are the characters that appear in:",
+      text_hi: "जॉन बार्थविक, जैक बार्थविक, मिसेज जोन्स और स्नो किस नाटक के पात्र हैं?",
+      options: ["The Silver Box: A Comedy in Three Acts", "Justice", "Loyalties", "None of these"],
+      correct: 0,
+      solution: "Cast of 'The Silver Box: A Comedy in Three Acts'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "99. This play has characters like James How (solicitor), Walter How, Robert Cokeson (the managing clerk), William Falder (the junior clerk), Sweedle, Wister (a detective), Cowley (a cashier), Mr. Justice Floyd (a judge), Harold Cleaver (an old advocate), Hector Frome (a young advocate), Captain Danson (a prison governor), Rev. Hugh Miller (a prison chaplain), Edward Clement (a prison doctor), Wooder (a chief warder), Moaney (convict), Clifton (convict), O'Cleary (convict), Ruth Honeywill etc. It has a very famous speech of Judge: \"The Law is what it is—a majestic edifice.\" It is:",
+      text_hi: "यह विस्तृत पात्र सूची और जज का प्रसिद्ध भाषण किस नाटक से संबंधित है?",
+      options: ["Galsworthy's Justice", "Galsworthy's Silver Box", "Galsworthy's Strife", "None of these"],
+      correct: 0,
+      solution: "Galsworthy's seminal legal tragedy 'Justice'."
     },
     {
       topic: "John Galsworthy",
       category: "Lines",
-      text: "\"You mob, are most contemptible thing under the sun...\" Who wrote this play?",
-      text_hi: "\"You mob, are most contemptible thing under the sun...\" यह 'The Mob' में किसने लिखा?",
+      text: "100. \"Loyalties—I don't know—criss-cross—we all cut each other's throats from the best of motives.\" is a dialogue in a play by:",
+      text_hi: "\"Loyalties—I don't know—criss-cross...\" संवाद किस नाटककार की रचना में है?",
+      options: ["Shakespeare's Macbeth", "Galsworthy's Loyalties", "Milton's Samson Agonistes", "Shaw's Candida"],
+      correct: 1,
+      solution: "Spoken by Margaret Orme in Galsworthy's 'Loyalties'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "101. Galsworthy's play Strife deals with the subject of:",
+      text_hi: "गाल्सवर्दी का नाटक 'Strife' किस विषय से संबंधित है?",
+      options: ["labour disputes", "justice", "wars", "class distinction"],
+      correct: 0,
+      solution: "Centered on industrial conflict and labour union disputes."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "102. Justice shows problems of:",
+      text_hi: "'Justice' किसकी समस्याओं को प्रदर्शित करता है?",
+      options: ["British Society", "English legal system", "American legal system", "Scottish Society"],
+      correct: 1,
+      solution: "It focuses on systemic flaws in the contemporary English legal and penal system."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "103. Galsworthy in The Silver box seems to echo the lines: \"Laws grind the poor / The rich men rule the laws\" These lines occur in:",
+      text_hi: "\"Laws grind the poor / The rich men rule the laws\" पंक्तियाँ किसकी रचना में आती हैं?",
+      options: ["Milton's Paradise Lost", "Gray's Elegy", "Goldsmith's The Traveller", "None of these"],
+      correct: 2,
+      solution: "Oliver Goldsmith's philosophical poem 'The Traveller' (1764)."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "104. Which play is an attack upon the press?",
+      text_hi: "प्रेस (समाचार पत्रों की सनसनीखेज रिपोर्टिंग) पर कौन सा नाटक प्रहार करता है?",
+      options: ["The Show", "The Skin Game", "The Mob", "The Strife"],
+      correct: 0,
+      solution: "'The Show' (1925) satirizes invasive and destructive press coverage."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "105. Most of the troubles in life rise on account of egoism, selfishness, prejudices and lack of sympathy. Galsworthy uses this theme in:",
+      text_hi: "अहंकार, स्वार्थ और सहानुभूति की कमी से उपजी समस्याओं को गाल्सवर्दी ने किस नाटक में उठाया है?",
+      options: ["The Show", "The Skin Game", "The Joy", "The Mob"],
+      correct: 2,
+      solution: "'Joy' (1907) explores self-absorption versus selfless understanding."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "106. How idealists and visionaries are crucified at the altar of mob mentality becomes the theme of:",
+      text_hi: "भीड़ की मानसिकता की वेदी पर आदर्शवादी कैसे बलि चढ़ते हैं, यह किस नाटक की थीम है?",
+      options: ["The Mob", "The Joy", "The Show", "The Skin Game"],
+      correct: 0,
+      solution: "'The Mob' (1914) details the lynching/killing of idealist MP Stephen More."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "107. \"You mob, are most contemptible thing under the sun. You are the thing that pelts the weak; kicks women; hurls down free speech. This is today, that tomorrow. Brain you have none. Spirit not the least of it.\" This description of mob appears in the play The Mob. Who wrote this play?",
+      text_hi: "\"You mob, are most contemptible thing under the sun...\" 'The Mob' नाटक के रचयिता कौन हैं?",
       options: ["Shaw", "Yeats", "Eliot", "Galsworthy"],
       correct: 3,
-      solution: "Written by John Galsworthy in 'The Mob[span_30](start_span)'[span_30](end_span)."
+      solution: "Written by John Galsworthy in 'The Mob'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "108. Anyone willing to stick to high principles must be ready to suffer opposition and persecution in his life. This description fits to one of the plays of Galsworthy. Name the play.",
+      text_hi: "उच्च सिद्धांतों पर टिके रहने वाले को उत्पीड़न सहना पड़ता है, यह किस नाटक पर सटीक बैठता है?",
+      options: ["The Joy", "A Bit of Love", "The Show", "The Skin Game"],
+      correct: 1,
+      solution: "In 'A Bit of Love' (1915), curate Michael Strangway endures village ostracism for forgiving his unfaithful wife."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "109. The play Loyalties is a cry against racial prejudice shown by the Christians to Captain Dancy, a Jew. It is written by:",
+      text_hi: "जातिगत व धार्मिक पूर्वाग्रह को उजागर करने वाला नाटक 'Loyalties' किसके द्वारा लिखा गया है?",
+      options: ["Milton", "Shaw", "Galsworthy", "Eliot"],
+      correct: 2,
+      solution: "Written by John Galsworthy (examining prejudice against Ferdinand De Levis)."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "110. The writer of the book Galsworthy as a Dramatic Artist is:",
+      text_hi: "'Galsworthy as a Dramatic Artist' पुस्तक के लेखक कौन हैं?",
+      options: ["Allardyce Nicoll", "W.H. Phelps", "R.H. Coats", "None of these"],
+      correct: 2,
+      solution: "R.H. Coats authored the critical treatise 'John Galsworthy as a Dramatic Artist' (1926)."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "111. As a novelist Galsworthy began his career at the age of 30 and his first book (From the Four Winds) was published under the name of:",
+      text_hi: "30 वर्ष की आयु में गाल्सवर्दी की पहली पुस्तक किस छद्म नाम से प्रकाशित हुई?",
+      options: ["Elia", "John Alpha", "Blair", "John Sinjohn"],
+      correct: 3,
+      solution: "He wrote under the pseudonym 'John Sinjohn'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "112. \"Too much exhibition of authority on the part of the elders is bound to lead to rebellion in the young hearts of grown up people.\" The description applies to one of the plays of Galsworthy. This play is:",
+      text_hi: "बुजुर्गों द्वारा अत्यधिक अधिकार प्रदर्शन से युवाओं में विद्रोह होता है, यह किस नाटक पर लागू होता है?",
+      options: ["The Joy", "A Family Man", "The Show", "The Skin Game"],
+      correct: 1,
+      solution: "'A Family Man' (1921), featuring John Builder's tyrannical domestic control."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "113. \"Justice has less equality in the scales than its title would seem to demand.\" Whose statement is this?",
+      text_hi: "\"Justice has less equality in the scales than its title would seem to demand.\" किसका कथन है?",
+      options: ["W.L. Phelps", "George Sampson", "Allardyce Nicoll", "None of these"],
+      correct: 0,
+      solution: "Statement made by American critic William Lyon Phelps."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "114. \"Justice is a legal diagram used to harrow the feelings of the audience with the horrors of the prison life.\" Whose statement is this?",
+      text_hi: "\"Justice is a legal diagram used to harrow the feelings of the audience...\" यह कथन किसका है?",
+      options: ["George Sampson", "W.L. Phelps", "Allardyce Nicoll", "None of these"],
+      correct: 0,
+      solution: "Remark by critic and literary historian George Sampson."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "115. \"In Justice we feel the waste implied by Falder's suicide.\" Whose statement is this?",
+      text_hi: "\"In Justice we feel the waste implied by Falder's suicide.\" यह टिप्पणी किसकी है?",
+      options: ["Allardyce Nicoll", "George Sampson", "W.L. Phelps", "None of these"],
+      correct: 0,
+      solution: "Noted critique by Allardyce Nicoll in 'British Drama'."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "Lines",
+      text: "116. \"His plots are not the unwinding of a skein of complicated happenings... His climaxes are good.\" This statement of Coats is about:",
+      text_hi: "कोट (R.H. Coats) का यह कथन किस लेखक के बारे में है?",
+      options: ["Milton", "Shakespeare", "Galsworthy", "Shaw"],
+      correct: 2,
+      solution: "Coats wrote this assessing John Galsworthy's dramatic technique."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "117. In Strife, the conflict is between:",
+      text_hi: "'Strife' नाटक में मुख्य संघर्ष किसके बीच है?",
+      options: ["capital and labour", "fair and black", "high caste and low caste", "none of these"],
+      correct: 0,
+      solution: "Conflict between capital (management) and labour (workers)."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "118. In Loyalties, the conflict is between different loyalties and:",
+      text_hi: "'Loyalties' में विभिन्न निष्ठाओं और किसके बीच टकराव है?",
+      options: ["the race prejudice", "the black", "traitors", "none of these"],
+      correct: 0,
+      solution: "Loyalties to club, regiment, and class clash with racial prejudice against De Levis."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "119. In Justice, the conflict is between an individual and:",
+      text_hi: "'Justice' में एक व्यक्ति का संघर्ष किससे है?",
+      options: ["the physical forces", "political forces", "environmental forces", "the social forces"],
+      correct: 3,
+      solution: "Conflict of a helpless individual against blind social and legal machinery."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "120. In his lecture on 'The Creation of Character in Literature', Galsworthy discusses his theory and formula of:",
+      text_hi: "'The Creation of Character in Literature' व्याख्यान में गाल्सवर्दी किस पर चर्चा करते हैं?",
+      options: ["plot", "dialogue", "characterization", "none of these"],
+      correct: 2,
+      solution: "His Romanes Lecture (1931) on characterization as the life-blood of literature."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "121. The Little Man: A Farcical Morality is in:",
+      text_hi: "'The Little Man: A Farcical Morality' कितने दृश्यों (scenes) में है?",
+      options: ["four scenes", "Three scenes", "five scenes", "none of these"],
+      correct: 1,
+      solution: "Galsworthy's one-act play 'The Little Man' consists of three continuous scenes."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "122. Which play deals with different values of the old aristocracy and the newly rich businessman?",
+      text_hi: "कौन सा नाटक पुरानी कुलीनता और नए अमीर व्यापारियों के मूल्यों के टकराव को दर्शाता है?",
+      options: ["Strife", "Loyalties", "The Skin Game", "Justice"],
+      correct: 2,
+      solution: "'The Skin Game' (Hillchrist family vs. Hornblower)."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "123. Which play deals with class loyalties and prejudices?",
+      text_hi: "वर्ग निष्ठा और सामाजिक पूर्वाग्रहों से कौन सा नाटक संबंधित है?",
+      options: ["The Skin Game", "Loyalties", "Escape", "Strife"],
+      correct: 1,
+      solution: "'Loyalties' (1922)."
+    },
+    {
+      topic: "John Galsworthy",
+      category: "PYQS",
+      text: "124. Who published some verse in Moods, Songs, and Doggerels (1912), The Bells of Peace (1921) and Verses New and Old (1926)?",
+      text_hi: "'Moods, Songs, and Doggerels' और 'Verses New and Old' काव्य संग्रह किसने प्रकाशित किए?",
+      options: ["John Galsworthy", "G. B. Shaw", "T. S. Eliot", "Whitman"],
+      correct: 0,
+      solution: "John Galsworthy published several volumes of poetry during his lifetime."
     }
   ];
 
@@ -1724,7 +2662,6 @@ Provide:
     }
     container.innerHTML = html;
 
-    // Attach immediate visual selection feedback
     container.querySelectorAll('input[name="cbt-choice"]').forEach(radio => {
       radio.addEventListener('change', (e) => {
         container.querySelectorAll('.cbt-opt-label').forEach(lbl => lbl.classList.remove('selected-opt'));
